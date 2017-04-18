@@ -1,0 +1,10 @@
+*.pem
+
+logs
+*.log
+
+lib
+dist
+node_modules
+.vscode
+coverage

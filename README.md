@@ -1,2 +1,2 @@
-# router
-Super simple interface for route handling in SPA
+# ultra
+Shield your app from routes

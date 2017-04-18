@@ -1,0 +1,3 @@
+[submodule "config/eslint"]
+	path = config/eslint
+	url = https://github.com/gt3/eslintrc
