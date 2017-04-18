@@ -1,17 +1,4 @@
-/*
-let input = '/c/:target.value'
-
-let fn = input => {
-  let lit = input.replace(/:([A-Za-z0-9_.]+)/g, '${this.$1}')
-  return new Function("return `"+lit+"`;")
-}
-
-console.log( fn(input).call({target: {value: 1}}) )
-*/
-const strProto = Object.getPrototypeOf('')
-function isStr(s) {
-  return Object.getPrototypeOf(Object(s)) === strProto
-}
+import {isStr} from './utils'
 
 const URIComponentBlacklist = `([^\s#$&+,/:;=?@]*)`
 const identifierx = /(:[A-Za-z0-9_]+)/

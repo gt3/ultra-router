@@ -1,17 +1,8 @@
-import createHistory from 'history/createHashHistory'
-import {PathSpec, makeLink as _makeLink} from './route'
+import {PathSpec, makeLink} from './path'
+import {pipe, isStr, noop} from './utils'
 import warning from 'warning'
 
-const pipe = (...fns) => v => fns.reduce((acc, fn) => fn ? fn(acc) : acc, v)
-const strProto = Object.getPrototypeOf('')
-function isStr(s) { return Object.getPrototypeOf(Object(s)) === strProto }
-
-function noop() {}
-
-export class Ultra {
-  static create(history = createHistory()) {
-    return new Ultra(history)
-  }
+export default class Ultra {
   constructor(history) {
     this.history = history
     this.specs = []
@@ -49,11 +40,9 @@ export class Ultra {
     let result, spec = this.specs.find(s => !!(result = s.find(path)).length)
     return result
   }
-  makeLink(path, values=[]) {
+  linkToPath(path, values=[]) {
     let link, [, parsed] = this.findPath(path)
-    if(parsed) link = _makeLink(parsed, values)
+    if(parsed) link = makeLink(parsed, values)
     return link || ''
   }
 }
-
-export default Ultra.create

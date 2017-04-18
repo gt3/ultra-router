@@ -1,7 +1,7 @@
 {
   "name": "ultra",
   "version": "0.0.1",
-  "description": "Kill a route or two without breaking a sweat!",
+  "description": "Handle a route or two without breaking a sweat!",
   "main": "./lib/ultra.js",
   "module": "./lib/ultra.mjs",
   "scripts": {
@@ -16,7 +16,6 @@
   "author": "Ankit Patel <gt3.someday@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "babel-cli": "^6.18.0",
     "babel-jest": "^17.0.0",
     "babel-plugin-dev-expression": "^0.2.1",
     "babel-plugin-transform-class-properties": "^6.19.0",
