@@ -25,8 +25,8 @@ function getMatchX(identifiers, literals) {
   return new RegExp(`^${substitute(literals, subs)}`, 'i')
 }
 
-let parseRoute = route => {
-  let fragments = route.split(identifierx)
+let parsePath = path => {
+  let fragments = path.split(identifierx)
   let identifiers = []
   let literals = fragments.reduce((acc, f) => {
     if(f.startsWith(':')) identifiers.push(f)
@@ -34,37 +34,48 @@ let parseRoute = route => {
     return acc
   }, [])
   let matchx = getMatchX(identifiers, literals)
-  return {key: route, identifiers, literals, matchx}
+  return {key: path, identifiers, literals, matchx}
 }
 
-export let makeLink = (route, values) => {
-  let {literals} = isStr(route) ? parseRoute(route) : route
+export let makeLink = (path, values) => {
+  let {literals} = isStr(path) ? parsePath(path) : path
   return substitute(literals, values)
 }
 
-export class RouteSegment {
-  constructor(action, routes) {
-    let parsedRoutes = routes.map(parseRoute)
-    Object.assign(this, {routes, parsedRoutes, action})
+export class PathSpec {
+  constructor(action, paths) {
+    let parsedPaths = paths.map(parsePath)
+    Object.assign(this, {paths, parsedPaths, action})
   }
-  find(route) {
-    let idx = this.routes.indexOf(route)
-    return idx > -1 ? [this.routes[idx], this.parsedRoutes[idx]] : []
+  find(path) {
+    let idx = this.paths.indexOf(path)
+    return idx > -1 ? [this.paths[idx], this.parsedPaths[idx]] : []
   }
   success(result) {
     this.action(result)
   }
   match({pathname}) {
-    let [mainRoute, ...subRoutes] = this.parsedRoutes
-    let result, matches = mainRoute.matchx.exec(pathname)
+    let [primary, ...subs] = this.parsedPaths
+    let result, matches = primary.matchx.exec(pathname)
     if(matches) {
       result = new Map()
-      result.set(mainRoute.key, matches.slice(1).map(decodeURIComponent))
-      subRoutes.forEach(r => {
-        let submatches = r.matchx.exec(pathname)
-        if(submatches) result.set(r.key, submatches.slice(1).map(decodeURIComponent))
+      result.set(primary.key, matches.slice(1).map(decodeURIComponent))
+      subs.forEach(p => {
+        let submatches = p.matchx.exec(pathname)
+        if(submatches) result.set(p.key, submatches.slice(1).map(decodeURIComponent))
       })
     }
     return result
   }
+}
+
+export default function createListener(action) {
+	return function clickHandler(e) {
+		//perform validation here: https://github.com/cyclejs/cyclejs/blob/master/history/src/captureClicks.ts
+		//1. check which == left click
+		//2. check defaultPrevented
+		//3. if (event.metaKey || event.ctrlKey || event.shiftKey)
+		e.preventDefault()
+		action()
+	}
 }

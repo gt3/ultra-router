@@ -21,7 +21,6 @@
     "babel-plugin-dev-expression": "^0.2.1",
     "babel-plugin-transform-class-properties": "^6.19.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.18.0",
-    "babel-plugin-transform-react-jsx": "^6.8.0",
     "babel-preset-babili": "0.0.12",
     "babel-preset-es2016": "^6.22.0",
     "babel-preset-stage-2": "^6.22.0",
@@ -29,15 +28,12 @@
     "eslint": "^3.2.2",
     "jest": "^18.1.0",
     "prettier": "^0.22.0",
-    "react": "^15.4.2",
-    "react-dom": "^15.4.0",
     "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-babili": "^2.0.0"
   },
   "peerDependencies": {
-    "babel-plugin-dev-expression": "^0.2.1",
-    "react": "^0.14.0 || ^15.0.0"
+    "babel-plugin-dev-expression": "^0.2.1"
   },
   "jest": {
     "testRegex": "(/test/.*\\.test\\.js$)",
