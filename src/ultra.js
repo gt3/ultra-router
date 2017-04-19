@@ -1,5 +1,5 @@
 import { PathSpec, makeLink } from './path'
-import { pipe, isStr, noop } from './utils'
+import { pipe, isStr, noop, muteProps } from './utils'
 import warning from 'warning'
 
 export class Ultra {
@@ -9,7 +9,7 @@ export class Ultra {
     this.default = noop
     this.match = this.match.bind(this)
     this.process = this.process.bind(this)
-    this.navigate = this.navigate.bind(this)
+    this.go = this.go.bind(this)
   }
   handle(action, ...paths) {
     if (!paths.length) this.default = action
@@ -34,7 +34,7 @@ export class Ultra {
   cleanup() {
     if (this.handle) this.handle()
   }
-  navigate(link) {
+  go(link) {
     warning(!!this.match(link).spec, 'link does not match a path: %s', link)
     this.history.push(link)
   }
@@ -50,13 +50,11 @@ export class Ultra {
   }
 }
 
-export const UltraLink = props => {
-  let { createElement, ultra, href, children, tag, clickEvent, ...rest } = props
-  let childprops = {
-    href,
-    [clickEvent]: createListener(ultra.navigate.bind(null, href))
-  }
-  return createElement(tag, Object.assign({}, rest, childprops), children)
+export const UltraLink = p => {
+  let props = muteProps(p, 'createElement', 'ultra', 'tag', 'clickEvent')
+  let { createElement, ultra, href, tag, clickEvent } = props
+  props[clickEvent] = createListener(ultra.go.bind(null, href))
+  return createElement(tag, props)
 }
 UltraLink.defaultProps = {
   tag: 'a',

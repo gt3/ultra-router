@@ -7,4 +7,12 @@ function isStr(s) {
 
 function noop() {}
 
-export { pipe, isStr, noop }
+const hasOwn = Object.prototype.hasOwnProperty
+
+function muteProps(t, ...keys) {
+  let res = Object.assign({}, t), mute = { enumerable: false }
+  keys.forEach(k => hasOwn.call(res, k) && Object.defineProperty(res, k, mute))
+  return res
+}
+
+export { pipe, isStr, noop, muteProps }
