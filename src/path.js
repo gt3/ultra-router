@@ -55,14 +55,3 @@ export class PathSpec {
     return result
   }
 }
-
-export default function createListener(action) {
-	return function clickHandler(e) {
-		//perform validation here: https://github.com/cyclejs/cyclejs/blob/master/history/src/captureClicks.ts
-		//1. check which == left click
-		//2. check defaultPrevented
-		//3. if (event.metaKey || event.ctrlKey || event.shiftKey)
-		e.preventDefault()
-		action()
-	}
-}

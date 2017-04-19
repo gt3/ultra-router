@@ -2,7 +2,7 @@ import {PathSpec, makeLink} from './path'
 import {pipe, isStr, noop} from './utils'
 import warning from 'warning'
 
-export default class Ultra {
+export class Ultra {
   constructor(history) {
     this.history = history
     this.specs = []
@@ -45,4 +45,22 @@ export default class Ultra {
     if(parsed) link = makeLink(parsed, values)
     return link || ''
   }
+}
+
+export const UltraLink = props => {
+  let {createElement, ultra, href, children, tag, clickEvent, ...rest} = props
+  let childprops = { href, [clickEvent]: createListener(ultra.navigate.bind(null, href)) }
+  return createElement(tag, Object.assign({}, rest, childprops), children)
+}
+UltraLink.defaultProps = { tag: 'a', clickEvent: typeof document !== 'undefined' && document.ontouchstart ? 'onTouchStart' : 'onClick' }
+
+export function createListener(action) {
+	return function clickHandler(e) {
+		//perform validation here: https://github.com/cyclejs/cyclejs/blob/master/history/src/captureClicks.ts
+		//1. check which == left click
+		//2. check defaultPrevented
+		//3. if (event.metaKey || event.ctrlKey || event.shiftKey)
+		e.preventDefault()
+		action()
+	}
 }

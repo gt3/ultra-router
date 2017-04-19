@@ -1,1 +1,1 @@
-export { default as Ultra } from './ultra'
+export { Ultra, UltraLink, createListener } from './ultra'
