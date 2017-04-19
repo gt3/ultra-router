@@ -39,7 +39,8 @@ export class Ultra {
     this.history.push(link)
   }
   findPath(path) {
-    let result, spec = this.specs.find(s => !!(result = s.find(path)).length)
+    let result
+    this.specs.find(s => !!(result = s.find(path)).length)
     return result
   }
   linkToPath(path, values = []) {
