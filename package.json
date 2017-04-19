@@ -16,23 +16,20 @@
   "author": "Ankit Patel <gt3.someday@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "babel-jest": "^17.0.0",
+    "babel-jest": "^19.0.0",
     "babel-plugin-dev-expression": "^0.2.1",
-    "babel-plugin-transform-class-properties": "^6.19.0",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.18.0",
-    "babel-preset-babili": "0.0.12",
-    "babel-preset-es2016": "^6.22.0",
-    "babel-preset-stage-2": "^6.22.0",
-    "cross-env": "^3.1.3",
-    "eslint": "^3.2.2",
-    "jest": "^18.1.0",
-    "prettier": "^0.22.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
+    "babel-preset-babili": "^1.0.0",
+    "babel-preset-es2016": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "cross-env": "^4.0.0",
+    "eslint": "^3.19.0",
+    "jest": "^19.0.2",
+    "prettier": "^1.1.0",
     "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-babili": "^2.0.0"
-  },
-  "peerDependencies": {
-    "babel-plugin-dev-expression": "^0.2.1"
   },
   "jest": {
     "testRegex": "(/test/.*\\.test\\.js$)",

@@ -1,0 +1,12 @@
+{
+  "plugins": [ "dev-expression" ],
+  "presets": ["es2016", "stage-2"],
+  "env": {
+    "test": {
+      "plugins": [
+        "transform-class-properties",
+        ["transform-es2015-modules-commonjs", { "loose": true }]
+      ]
+    }
+  }
+}
