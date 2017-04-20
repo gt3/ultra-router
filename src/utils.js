@@ -7,12 +7,9 @@ function isStr(s) {
 
 function noop() {}
 
-const hasOwn = Object.prototype.hasOwnProperty
-
 function muteProps(t, ...keys) {
-  let res = Object.assign({}, t), mute = { enumerable: false }
-  keys.forEach(k => hasOwn.call(res, k) && Object.defineProperty(res, k, mute))
-  return res
+  let keep = Object.keys(t).filter(k => !keys.includes(k)).map(k => ({[k]: t[k]}))
+  return Object.assign(Object.create(t), ...keep)
 }
 
 export { pipe, isStr, noop, muteProps }
