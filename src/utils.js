@@ -7,12 +7,14 @@ function isStr(s) {
 
 function noop() {}
 
-function muteProps(t, ...keys) {
-  let keep = Object.keys(t).filter(k => !keys.includes(k)).map(k => ({[k]: t[k]}))
+function shieldProps(t, ...keys) {
+  let keep = Object.keys(t)
+    .filter(k => !keys.includes(k))
+    .map(k => ({ [k]: t[k] }))
   return Object.assign(Object.create(t), ...keep)
 }
 
-export { pipe, isStr, noop, muteProps }
+export { pipe, isStr, noop, shieldProps }
 
 function isClickValid(e) {
   return !(e.defaultPrevented ||

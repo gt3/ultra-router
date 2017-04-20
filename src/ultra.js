@@ -1,5 +1,5 @@
 import { PathSpec, makeLink } from './path'
-import { pipe, isStr, noop, muteProps, isClickValid } from './utils'
+import { pipe, isStr, noop, shieldProps, isClickValid } from './utils'
 import warning from 'warning'
 
 export class Ultra {
@@ -51,7 +51,7 @@ export class Ultra {
 }
 
 export const UltraLink = p => {
-  let props = muteProps(p, 'createElement', 'ultra', 'tag', 'clickEvent')
+  let props = shieldProps(p, 'createElement', 'ultra', 'tag', 'clickEvent')
   let { href, createElement, ultra, tag, clickEvent } = props
   props[clickEvent] = createListener(ultra.go.bind(null, href))
   return createElement(tag, props)
