@@ -1,5 +1,5 @@
 import { PathSpec, makeLink } from './path'
-import { pipe, isStr, noop, muteProps } from './utils'
+import { pipe, isStr, noop, muteProps, isClickValid } from './utils'
 import warning from 'warning'
 
 export class Ultra {
@@ -52,24 +52,17 @@ export class Ultra {
 
 export const UltraLink = p => {
   let props = muteProps(p, 'createElement', 'ultra', 'tag', 'clickEvent')
-  let { createElement, ultra, href, tag, clickEvent } = props
+  let { href, createElement, ultra, tag, clickEvent } = props
   props[clickEvent] = createListener(ultra.go.bind(null, href))
   return createElement(tag, props)
 }
-UltraLink.defaultProps = {
-  tag: 'a',
-  clickEvent: typeof document !== 'undefined' && document.ontouchstart
-    ? 'onTouchStart'
-    : 'onClick'
-}
+UltraLink.defaultProps = { tag: 'a', clickEvent: 'onClick' }
 
 export function createListener(action) {
   return function clickHandler(e) {
-    //perform validation here: https://github.com/cyclejs/cyclejs/blob/master/history/src/captureClicks.ts
-    //1. check which == left click
-    //2. check defaultPrevented
-    //3. if (event.metaKey || event.ctrlKey || event.shiftKey)
-    e.preventDefault()
-    action()
+    if (isClickValid) {
+      e.preventDefault()
+      action()
+    }
   }
 }

@@ -16,3 +16,14 @@ function muteProps(t, ...keys) {
 }
 
 export { pipe, isStr, noop, muteProps }
+
+function isClickValid(e) {
+  return !(e.defaultPrevented ||
+    e.button !== 0 ||
+    e.metaKey ||
+    e.altKey ||
+    e.ctrlKey ||
+    e.shiftKey)
+}
+
+export { isClickValid }
