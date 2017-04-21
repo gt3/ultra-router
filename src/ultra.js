@@ -1,4 +1,4 @@
-import { PathSpec, makeLink } from './path'
+import { PathSpec } from './path'
 import { pipe, isStr, noop, shieldProps, isClickValid } from './utils'
 import warning from 'warning'
 
@@ -22,13 +22,16 @@ export class Ultra {
       spec = this.specs.find(spec => !!(result = spec.match(location)))
     return { result, spec }
   }
+  validate({ result, spec }) {
+
+  }
   process({ result, spec }) {
     if (spec) spec.success(result)
     else this.default()
   }
-  begin() {
+  run() {
     if (!this.handle)
-      this.handle = this.history.listen(pipe(this.match, this.process))
+      this.handle = this.history.listen(pipe(this.match, this.validate, this.process))
     return this
   }
   cleanup() {
@@ -40,13 +43,16 @@ export class Ultra {
   }
   findPath(path) {
     let result
-    this.specs.find(s => !!(result = s.find(path)).length)
+    this.specs.find(s => !!(result = s.find(path)))
     return result
   }
-  linkToPath(path, values = []) {
-    let link, [, parsed] = this.findPath(path)
-    if (parsed) link = makeLink(parsed, values)
+  linkToPath(pathKey, values = []) {
+    let link, path = this.findPath(pathKey)
+    if (path) link = path.makeLink(values)
     return link || ''
+  }
+  validate(action, ...paths) {
+    
   }
 }
 
