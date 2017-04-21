@@ -7,23 +7,25 @@ export class Ultra {
     this.history = history
     this.specs = []
     this.default = noop
-    this.match = this.match.bind(this)
-    this.process = this.process.bind(this)
-    this.go = this.go.bind(this)
   }
-  handle(action, ...paths) {
-    if (!paths.length) this.default = action
-    else this.specs.push(new PathSpec(action, paths))
+  handle(action, ...pathKeys) {
+    if (!pathKeys.length) this.default = action
+    else this.specs.push(new PathSpec(action, pathKeys))
+    return this
+  }
+  advice(action, ...pathKeys) {
+    pathKeys.forEach(k => {
+      let path = this.findPath(k)
+      warning(!!path, 'pathKey does not match any paths: %s', k)
+      if(path) path.addAdvice(action)
+    })
     return this
   }
   match(location) {
-    if (isStr(location)) location = { pathname: location }
+    let {pathname} = isStr(location) ? {pathname: location} : location
     let result,
-      spec = this.specs.find(spec => !!(result = spec.match(location)))
+      spec = this.specs.find(spec => !!(result = spec.match(pathname)))
     return { result, spec }
-  }
-  validate({ result, spec }) {
-
   }
   process({ result, spec }) {
     if (spec) spec.success(result)
@@ -31,19 +33,20 @@ export class Ultra {
   }
   run() {
     if (!this.handle)
-      this.handle = this.history.listen(pipe(this.match, this.validate, this.process))
+      let listener = pipe(this.match, this.process).bind(this)
+      this.handle = this.history.listen(listener)
     return this
   }
   cleanup() {
     if (this.handle) this.handle()
   }
   go(link) {
-    warning(!!this.match(link).spec, 'link does not match a path: %s', link)
+    warning(!!this.match(link).spec, 'link does not match any paths: %s', link)
     this.history.push(link)
   }
-  findPath(path) {
+  findPath(pathKey) {
     let result
-    this.specs.find(s => !!(result = s.find(path)))
+    this.specs.find(s => !!(result = s.find(pathKey)))
     return result
   }
   linkToPath(pathKey, values = []) {
@@ -51,15 +54,12 @@ export class Ultra {
     if (path) link = path.makeLink(values)
     return link || ''
   }
-  validate(action, ...paths) {
-    
-  }
 }
 
 export const UltraLink = p => {
   let props = shieldProps(p, 'createElement', 'ultra', 'tag')
   let { href, createElement, ultra, tag, style } = props
-  props.onClick = createListener(ultra.go.bind(null, href))
+  props.onClick = createListener(ultra.go.bind(ultra, href))
   if(!style && tag === 'a') props.style = props.defaultTagStyle
   return createElement(tag, props)
 }
