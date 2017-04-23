@@ -16,13 +16,13 @@ export class Ultra {
   advice(action, ...pathKeys) {
     pathKeys.forEach(k => {
       let path = this.findPath(k)
+      if (path) path.addAdvice(action)
       warning(!!path, 'pathKey does not match any paths: %s', k)
-      if(path) path.addAdvice(action)
     })
     return this
   }
   match(location) {
-    let {pathname} = isStr(location) ? {pathname: location} : location
+    let { pathname } = isStr(location) ? { pathname: location } : location
     let result,
       spec = this.specs.find(spec => !!(result = spec.match(pathname)))
     return { result, spec }
@@ -32,9 +32,10 @@ export class Ultra {
     else this.default()
   }
   run() {
-    if (!this.handle)
+    if (!this.handle) {
       let listener = pipe(this.match, this.process).bind(this)
       this.handle = this.history.listen(listener)
+    }
     return this
   }
   cleanup() {
@@ -58,12 +59,18 @@ export class Ultra {
 
 export const UltraLink = p => {
   let props = shieldProps(p, 'createElement', 'ultra', 'tag')
-  let { href, createElement, ultra, tag, style } = props
+  let { href, createElement, ultra, tag } = props
   props.onClick = createListener(ultra.go.bind(ultra, href))
-  if(!style && tag === 'a') props.style = props.defaultTagStyle
   return createElement(tag, props)
 }
-UltraLink.defaultProps = { tag: 'a', defaultTagStyle: {cursor: 'pointer', touchAction: 'manipulation', msTouchAction: 'manipulation'} }
+UltraLink.defaultProps = {
+  tag: 'a',
+  style: {
+    cursor: 'pointer',
+    touchAction: 'manipulation',
+    msTouchAction: 'manipulation'
+  }
+}
 
 export function createListener(action) {
   return function clickHandler(e) {

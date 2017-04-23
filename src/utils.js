@@ -1,16 +1,22 @@
-function pipe(...fns) {
-  function invoke(v) {
-    return fns.reduce( (acc, fn) => fn ? fn.call(this, acc) : acc, v)
-  }
-  return invoke
-}
+function noop() {}
 
 const strProto = Object.getPrototypeOf('')
 function isStr(s) {
   return Object.getPrototypeOf(Object(s)) === strProto
 }
 
-function noop() {}
+function pipe(...fns) {
+  function invoke(v) {
+    return fns.reduce((acc, fn) => (fn ? fn.call(this, acc) : acc), v)
+  }
+  return invoke
+}
+
+const m2f = (mKey, fn) => fn && (arr => Array.prototype[mKey].call(arr, fn))
+
+const flattenToObj = (arr, base = {}) => Object.assign(base, ...arr)
+const pipeOverKeys = (obj, ...fns) => obj && pipe(...fns)(Object.keys(obj))
+const mapOverKeys = (obj, mapper) => pipeOverKeys(obj, m2f('map', mapper))
 
 function shieldProps(t, ...keys) {
   let keep = Object.keys(t)
@@ -19,7 +25,7 @@ function shieldProps(t, ...keys) {
   return Object.assign(Object.create(t), ...keep)
 }
 
-export { pipe, isStr, noop, shieldProps }
+export { pipe, isStr, noop, flattenToObj, mapOverKeys, shieldProps }
 
 function isClickValid(e) {
   return !(e.defaultPrevented ||

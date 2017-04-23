@@ -1,4 +1,4 @@
-import { isStr, pipe } from './utils'
+import { isStr, pipe, flattenToObj } from './utils'
 
 const URIComponentBlacklist = `([^\s#$&+,/:;=?@]*)`
 const identifierx = /(:[A-Za-z0-9_]+)/
@@ -24,13 +24,19 @@ let parsePathKey = key => {
   return { key, identifiers, literals, matchx }
 }
 
+export function assignValues(pathKey, values = []) {
+  let { identifiers } = isStr(pathKey) ? parsePathKey(pathKey) : pathKey
+  let res = identifiers.map((ident, key) => ({ [ident]: values[key] }))
+  return flattenToObj(res)
+}
+
 export class Path {
   constructor(key, advice = []) {
     let parsed = parsePathKey(key)
-    Object.assign(this, parsed, {advice})
+    Object.assign(this, parsed, { advice })
   }
-  addAdvice(advice) {
-    this.advice.push(advice)
+  addAdvice(action) {
+    this.advice.push(action)
   }
   getAdvice(matches) {
     return pipe(...this.advice)(matches)
@@ -61,8 +67,8 @@ export class PathSpec {
     let result, matches = primary.match(locationPath)
     if (matches) {
       result = subs.reduce((acc, p) => {
-        let submatches = p.match(pathname)
-        if(submatches) acc[p.key] = submatches
+        let submatches = p.match(locationPath)
+        if (submatches) acc[p.key] = submatches
         return acc
       }, {})
       result[primary.key] = matches
