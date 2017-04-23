@@ -1,4 +1,4 @@
-import { isStr, pipe, flattenToObj } from './utils'
+import { id, isStr, isFn, pipe, flattenToObj } from './utils'
 
 const URIComponentBlacklist = `([^\s#$&+,/:;=?@]*)`
 const identifierx = /(:[A-Za-z0-9_]+)/
@@ -28,6 +28,22 @@ export function assignValues(pathKey, values = []) {
   let { identifiers } = isStr(pathKey) ? parsePathKey(pathKey) : pathKey
   let res = identifiers.map((ident, key) => ({ [ident]: values[key] }))
   return flattenToObj(res)
+}
+
+function rxToAdvice(rx) {
+  return values => values.filter(rx.test.bind(rx))
+}
+
+function rxsToAdvice(rxs) {
+  return values => values.filter((val, i) => !rxs[i] || rxs[i].test(val))
+}
+
+function makeAdvice(action) {
+  let advice
+  if(isFn(action)) advice = action
+  else if(Array.isArray(action)) advice = rxsToAdvice(action)
+  else advice = rxToAdvice(action)
+  return advice
 }
 
 export class Path {
