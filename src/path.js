@@ -52,14 +52,16 @@ export class Path {
     Object.assign(this, parsed, { advice })
   }
   addAdvice(action) {
-    this.advice.push(action)
+    this.advice.push(makeAdvice(action))
   }
-  getAdvice(matches) {
-    return pipe(...this.advice)(matches)
+  applyAdvice(matches) {
+    let [match, ...values] = matches, res = values
+    if(values.length) res = pipe(...this.advice)(values)
+    return (res === values || res.length) ? res : null
   }
   match(locationPath) {
     let matches = this.matchx.exec(locationPath)
-    return matches && this.getAdvice(matches.map(decodeURIComponent))
+    return matches && this.applyAdvice(matches.map(decodeURIComponent))
   }
   makeLink(values) {
     return substitute(this.literals, values)

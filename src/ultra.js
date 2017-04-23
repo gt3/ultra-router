@@ -31,7 +31,7 @@ export class Ultra {
     if (spec) spec.success(result)
     else this.default()
   }
-  run() {
+  ready() {
     if (!this.handle) {
       let listener = pipe(this.match, this.process).bind(this)
       this.handle = this.history.listen(listener)
