@@ -58,13 +58,12 @@ export class Ultra {
 }
 
 export const UltraLink = p => {
-  let props = shieldProps(p, 'createElement', 'ultra', 'tag')
-  let { href, createElement, ultra, tag } = props
+  let props = shieldProps(p, 'createElement', 'ultra')
+  let { href, createElement, ultra } = props
   props.onClick = createListener(ultra.go.bind(ultra, href))
-  return createElement(tag, props)
+  return createElement('a', props)
 }
 UltraLink.defaultProps = {
-  tag: 'a',
   style: {
     cursor: 'pointer',
     touchAction: 'manipulation',
