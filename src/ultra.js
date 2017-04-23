@@ -1,19 +1,19 @@
 import { PathSpec } from './path'
-import { pipe, isStr, noop, shieldProps, isClickValid } from './utils'
+import { pipe, isStr, shieldProps, isClickValid } from './utils'
 import warning from 'warning'
 
 export class Ultra {
   constructor(history) {
     this.history = history
     this.specs = []
-    this.default = noop
+    this.defaultActions = []
   }
-  handle(action, ...pathKeys) {
-    if (!pathKeys.length) this.default = action
+  add(action, ...pathKeys) {
+    if (!pathKeys.length) this.defaultActions.push(action)
     else this.specs.push(new PathSpec(action, pathKeys))
     return this
   }
-  advice(action, ...pathKeys) {
+  addAdvice(action, ...pathKeys) {
     pathKeys.forEach(k => {
       let path = this.findPath(k)
       if (path) path.addAdvice(action)
@@ -21,15 +21,14 @@ export class Ultra {
     })
     return this
   }
-  match(location) {
-    let { pathname } = isStr(location) ? { pathname: location } : location
-    let result,
-      spec = this.specs.find(spec => !!(result = spec.match(pathname)))
-    return { result, spec }
+  match(loc) {
+    let result, { pathname } = isStr(loc) ? { pathname: loc } : loc
+    let spec = this.specs.find(spec => !!(result = spec.match(pathname)))
+    return { result, spec, pathname }
   }
-  process({ result, spec }) {
-    if (spec) spec.success(result)
-    else this.default()
+  process({ result, spec, pathname }) {
+    if (spec) spec.success(result, pathname)
+    else this.defaultActions.forEach(action => action(pathname))
   }
   ready() {
     if (!this.handle) {

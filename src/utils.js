@@ -1,7 +1,3 @@
-function noop() {}
-
-function id(x) { return x }
-
 const strProto = Object.getPrototypeOf('')
 function isStr(s) {
   return Object.getPrototypeOf(Object(s)) === strProto
@@ -27,7 +23,7 @@ function shieldProps(t, ...keys) {
   return Object.assign(Object.create(t), ...keep)
 }
 
-export { noop, id, pipe, isStr, flattenToObj, mapOverKeys, shieldProps }
+export { pipe, isStr, flattenToObj, mapOverKeys, shieldProps }
 
 function isClickValid(e) {
   return !(e.defaultPrevented ||

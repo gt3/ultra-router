@@ -1,4 +1,4 @@
-import { id, isStr, isFn, pipe, flattenToObj } from './utils'
+import { isStr, isFn, pipe, flattenToObj } from './utils'
 
 const URIComponentBlacklist = `([^\s#$&+,/:;=?@]*)`
 const identifierx = /(:[A-Za-z0-9_]+)/
@@ -40,8 +40,8 @@ function rxsToAdvice(rxs) {
 
 function makeAdvice(action) {
   let advice
-  if(isFn(action)) advice = action
-  else if(Array.isArray(action)) advice = rxsToAdvice(action)
+  if (isFn(action)) advice = action
+  else if (Array.isArray(action)) advice = rxsToAdvice(action)
   else advice = rxToAdvice(action)
   return advice
 }
@@ -55,9 +55,9 @@ export class Path {
     this.advice.push(makeAdvice(action))
   }
   applyAdvice(matches) {
-    let [match, ...values] = matches, res = values
-    if(values.length) res = pipe(...this.advice)(values)
-    return (res === values || res.length) ? res : null
+    let [, ...values] = matches, res = values
+    if (values.length) res = pipe(...this.advice)(values)
+    return res === values || res.length ? res : null
   }
   match(locationPath) {
     let matches = this.matchx.exec(locationPath)
