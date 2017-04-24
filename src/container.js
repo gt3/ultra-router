@@ -1,12 +1,13 @@
 import { shieldProps, isClickValid } from './utils'
 import warning from 'warning'
+import createHistory from 'history/createBrowserHistory'
 
 export class BrowserContainer {
   static run(router) {
     return new BrowserContainer(router).run()
   }
   constructor(router) {
-    this.history = new History()
+    this.history = createHistory()
     this.router = router
   }
   run() {
