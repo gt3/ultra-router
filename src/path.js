@@ -55,13 +55,13 @@ export class Path {
     this.advice.push(makeAdvice(action))
   }
   applyAdvice(matches) {
-    let [, ...values] = matches, res = values
+    let values = matches.slice(1).map(decodeURIComponent), res = values
     if (values.length) res = pipe(...this.advice)(values)
-    return res === values || res.length ? res : null
+    return (res === values || res.length) ? res : null
   }
   match(locationPath) {
     let matches = this.matchx.exec(locationPath)
-    return matches && this.applyAdvice(matches.map(decodeURIComponent))
+    return matches && this.applyAdvice(matches)
   }
   makeLink(values) {
     return substitute(this.literals, values)
