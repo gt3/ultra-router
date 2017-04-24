@@ -1,1 +1,2 @@
-export { Ultra, UltraLink, createListener } from './ultra'
+export { Ultra } from './ultra'
+export { BrowserContainer, UltraLink, createListener } from './container'

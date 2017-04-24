@@ -1,3 +1,7 @@
+function isFn(t) {
+  return typeof t === 'function' ? t : void 0
+}
+
 const strProto = Object.getPrototypeOf('')
 function isStr(s) {
   return Object.getPrototypeOf(Object(s)) === strProto
@@ -16,14 +20,15 @@ const flattenToObj = (arr, base = {}) => Object.assign(base, ...arr)
 const pipeOverKeys = (obj, ...fns) => obj && pipe(...fns)(Object.keys(obj))
 const mapOverKeys = (obj, mapper) => pipeOverKeys(obj, m2f('map', mapper))
 
+const hasOwn = Object.prototype.hasOwnProperty
+
 function shieldProps(t, ...keys) {
-  let keep = Object.keys(t)
-    .filter(k => !keys.includes(k))
-    .map(k => ({ [k]: t[k] }))
-  return Object.assign(Object.create(t), ...keep)
+  let res = Object.assign({}, t), mute = { enumerable: false }
+  keys.forEach(k => hasOwn.call(res, k) && Object.defineProperty(res, k, mute))
+  return res
 }
 
-export { pipe, isStr, flattenToObj, mapOverKeys, shieldProps }
+export { isFn, isStr, pipe, flattenToObj, mapOverKeys, shieldProps }
 
 function isClickValid(e) {
   return !(e.defaultPrevented ||

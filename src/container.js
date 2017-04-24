@@ -13,6 +13,7 @@ export class BrowserContainer {
   run() {
     let {history, router} = this
     if (!this.handle) this.handle = history.listen(router.listen)
+    return this
   }
   stop() {
     if(this.handle) this.handle()
@@ -28,9 +29,9 @@ export class BrowserContainer {
 }
 
 export const UltraLink = p => {
-  let props = shieldProps(p, 'createElement', 'container')
-  let { href, createElement, container } = props
-  props.onClick = createListener(container.push.bind(container, href))
+  let props = shieldProps(p, 'createElement', 'ultra')
+  let { href, createElement, ultra } = props
+  props.onClick = createListener(ultra.push.bind(ultra, href))
   return createElement('a', props)
 }
 UltraLink.defaultProps = {
