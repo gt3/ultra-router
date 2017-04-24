@@ -1,7 +1,7 @@
 import { isStr, isFn, pipe, flattenToObj } from './utils'
 
 const URIComponentBlacklist = `([^\s#$&+,/:;=?@]*)`
-const identifierx = /(:[A-Za-z0-9_]+)/
+const identifierx = /(:[A-Za-z0-9_:]+)/
 
 function substitute(literals, values) {
   return String.raw({ raw: literals }, ...values)
