@@ -1,3 +1,5 @@
+function noop() {}
+
 function isFn(t) {
   return typeof t === 'function' ? t : void 0
 }
@@ -28,7 +30,7 @@ function shieldProps(t, ...keys) {
   return res
 }
 
-export { isFn, isStr, pipe, flattenToObj, mapOverKeys, shieldProps }
+export { noop, isFn, isStr, pipe, flattenToObj, mapOverKeys, shieldProps }
 
 function isClickValid(e) {
   return !(e.defaultPrevented ||
