@@ -23,9 +23,8 @@ const mapOverKeys = (obj, mapper) => pipeOverKeys(obj, m2f('map', mapper))
 const hasOwn = Object.prototype.hasOwnProperty
 
 function shieldProps(t, ...keys) {
-  let res = Object.assign({}, t), mute = { enumerable: false }
-  keys.forEach(k => hasOwn.call(res, k) && Object.defineProperty(res, k, mute))
-  return res
+  let keep = flattenToObj(Object.keys(t).filter(k => !keys.includes(k)).map(k => ({ [k]: t[k] })))
+  return Object.setPrototypeOf(keep, t)
 }
 
 export { isFn, isStr, pipe, flattenToObj, mapOverKeys, shieldProps }
