@@ -5,15 +5,24 @@ import warning from 'warning'
 export class Ultra {
   constructor() {
     this.specs = []
+    this.validators = {}
     this.default = noop
     this.listen = pipe(this.match, this.process).bind(this)
   }
-  add(action, ...pathKeys) {
-    if(pathKeys.length) this.specs.push(new PathSpec(action, pathKeys))
-    return this
+  on(...pathKeys) {
+    let spec = new PathSpec(pathKeys)
+    this.specs.push(spec)
+    return spec
   }
-  setDefault(action) {
+  handle(action) {
     this.default = action
+  }
+  validate(rx, ...ids) {
+    ids.forEach(id => {
+      this.validators[id] = [...(this.validators[id] || []), rx]
+    })
+    ids.map(id =>)
+    return this
   }
   addAdvice(action, ...pathKeys) {
     pathKeys.forEach(k => {

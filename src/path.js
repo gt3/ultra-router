@@ -69,9 +69,13 @@ export class Path {
 }
 
 export class PathSpec {
-  constructor(action, pathKeys) {
+  constructor(pathKeys) {
     let paths = pathKeys.map(k => new Path(k))
-    Object.assign(this, { pathKeys, paths, action })
+    Object.assign(this, { pathKeys, paths })
+  }
+  get ready() { return this.paths.length > 0 && isFn(this.success) }
+  handle(success, partial) {
+    return Object.assign(this, {success, partial})
   }
   find(pathKey) {
     let idx = this.pathKeys.indexOf(pathKey)
