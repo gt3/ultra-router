@@ -12,7 +12,8 @@ function getMatchX(identifiers, literals) {
   return new RegExp(`^${substitute(literals, subs)}`, 'i')
 }
 
-let parsePathKey = key => {
+let parsePathKey = pathKey => {
+  let key = isStr(pathKey) ? pathKey : ''
   let fragments = key.split(identifierx)
   let identifiers = []
   let literals = fragments.reduce((acc, f) => {
@@ -20,8 +21,8 @@ let parsePathKey = key => {
     else acc.push(f)
     return acc
   }, [])
-  let matchx = getMatchX(identifiers, literals)
-  return { key, identifiers, literals, matchx }
+  let matchx = key == '' ? new RegExp('') : getMatchX(identifiers, literals)
+  return { key: pathKey, identifiers, literals, matchx }
 }
 
 export function assignValues(pathKey, values = []) {
@@ -81,7 +82,7 @@ class PathSpec {
     return result && Object.keys(result).some(k => result[k].exact)
   }
   realize(result) {
-    if(sucess(result)) this.next(result)
+    if(!this.err || sucess(result)) this.next(result)
     else this.err(result)
   }
 }
