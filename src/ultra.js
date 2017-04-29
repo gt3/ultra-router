@@ -33,11 +33,11 @@ export class Ultra {
 function matcher(specs, validator, loc) {
   let result, { pathname } = isStr(loc) ? { pathname: loc } : loc
   let spec = specs.find(spec => !!(result = spec.match(pathname, validator)))
-  return { result, spec, pathname }
+  return { result, spec }
 }
 
-function process({ result, spec, pathname }) {
-  if (spec) spec.success(result, pathname)
+function process({ result, spec }) {
+  if(spec) spec.realize(result)
   //else this.default(pathname)
 }
 

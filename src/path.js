@@ -34,14 +34,20 @@ export class Path {
   constructor(key) {
     Object.assign(this, parsePathKey(key))
   }
-  validate(validator, matches) {
-    let [, values] = matches, ids = this.identifiers
-    let vexists = hasOwn.bind(validator)
-    return values.find((val, i) => vexists(ids[i]) && !validator[ids[i]](val))
+  findInvalid(validator, values) {
+    let ids = this.identifiers, check = hasOwn.bind(validator)
+    return values.findIndex((val, i) => check(ids[i]) && !validator[ids[i]](val))
   }
-  match(locationPath) {
+  validate(validator, values, exact) {
+    let invalid = this.findInvalid(validator, values)
+    return invalid === -1 ? { match, values, passed: true, exact } : { match, values: values.slice(0, invalid) }
+  }
+  match(validator, locationPath) {
     let matches = this.matchx.exec(locationPath)
-    return matches && matches.map(decodeURIComponent)
+    if(!matches) return {}
+    let match = matches[0], values = matches.slice(1).map(decodeURIComponent)
+    let exact = match.length === locationPath.length
+    return this.validate(validator, values, exact)
   }
   makeLink(values) {
     return substitute(this.literals, values)
@@ -54,25 +60,30 @@ class PathSpec {
     let [next, err] = actions
     Object.assign(this, { pathKeys, paths, next, err })
   }
-  success(result, pathname) {
-    this.next(result, pathname)
-  }
   find(pathKey) {
     let idx = this.pathKeys.indexOf(pathKey)
     return idx > -1 && this.paths[idx]
   }
   match(locationPath, validator) {
     let [primary, ...subs] = this.paths
-    let result, matches = primary.match(locationPath)
-    if (matches) {
-      result = subs.reduce((acc, p) => {
-        let submatches = p.match(locationPath)
-        if (submatches) acc[p.key] = submatches
-        return acc
-      }, {})
+    let result, matches = primary.match(validator, locationPath)
+    if (matches.passed) {
+      result = {}
       result[primary.key] = matches
+      subs.some(sub => {
+        let submatches = sub.match(validator, locationPath)
+        if(submatches.passed) result[sub.key] = submatches
+        return submatches.exact
+      })
     }
     return result
+  }
+  exactMatch(result) {
+    return false
+  }
+  realize(result) {
+    if(result && Object.keys(result).some(k => result[k].exact)) this.next(result)
+    else this.err(result)
   }
 }
 
