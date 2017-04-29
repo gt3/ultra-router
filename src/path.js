@@ -1,4 +1,4 @@
-import { isStr, isFn, pipe, flattenToObj } from './utils'
+import { isStr, isFn, pipe, flattenToObj, hasOwn } from './utils'
 
 const URIComponentBlacklist = `([^\s#$&+,/:;=?@]*)`
 const identifierx = /(:[A-Za-z0-9_:]+)/
@@ -26,65 +26,42 @@ let parsePathKey = key => {
 
 export function assignValues(pathKey, values = []) {
   let { identifiers } = isStr(pathKey) ? parsePathKey(pathKey) : pathKey
-  let res = identifiers.map((ident, key) => ({ [ident]: values[key] }))
+  let res = identifiers.map((id, key) => ({ [id]: values[key] }))
   return flattenToObj(res)
 }
 
-function rxToAdvice(rx) {
-  return values => values.filter(rx.test.bind(rx))
-}
-
-function rxsToAdvice(rxs) {
-  return values => values.filter((val, i) => !rxs[i] || rxs[i].test(val))
-}
-
-function makeAdvice(action) {
-  let advice
-  if (isFn(action)) advice = action
-  else if (Array.isArray(action)) advice = rxsToAdvice(action)
-  else advice = rxToAdvice(action)
-  return advice
-}
-
 export class Path {
-  constructor(key, advice = []) {
-    let parsed = parsePathKey(key)
-    Object.assign(this, parsed, { advice })
+  constructor(key) {
+    Object.assign(this, parsePathKey(key))
   }
-  addAdvice(action) {
-    this.advice.push(makeAdvice(action))
-  }
-  applyAdvice(matches) {
-    let values = matches.slice(1).map(decodeURIComponent), res = values
-    if (values.length) res = pipe(...this.advice)(values)
-    return (res === values || res.length) ? res : null
+  validate(validator, matches) {
+    let [, values] = matches, ids = this.identifiers
+    let vexists = hasOwn.bind(validator)
+    return values.find((val, i) => vexists(ids[i]) && !validator[ids[i]](val))
   }
   match(locationPath) {
     let matches = this.matchx.exec(locationPath)
-    return matches && this.applyAdvice(matches)
+    return matches && matches.map(decodeURIComponent)
   }
   makeLink(values) {
     return substitute(this.literals, values)
   }
 }
 
-export class PathSpec {
-  constructor(pathKeys) {
+class PathSpec {
+  constructor(pathKeys, actions) {
     let paths = pathKeys.map(k => new Path(k))
-    Object.assign(this, { pathKeys, paths })
+    let [next, err] = actions
+    Object.assign(this, { pathKeys, paths, next, err })
   }
-  get ready() { return this.paths.length > 0 && isFn(this.success) }
-  handle(success, partial) {
-    return Object.assign(this, {success, partial})
+  success(result, pathname) {
+    this.next(result, pathname)
   }
   find(pathKey) {
     let idx = this.pathKeys.indexOf(pathKey)
     return idx > -1 && this.paths[idx]
   }
-  success(result) {
-    this.action(result)
-  }
-  match(locationPath) {
+  match(locationPath, validator) {
     let [primary, ...subs] = this.paths
     let result, matches = primary.match(locationPath)
     if (matches) {
@@ -98,3 +75,29 @@ export class PathSpec {
     return result
   }
 }
+
+function actions(pathKeys, ...fns) {
+  return new PathSpec(pathKeys, fns)
+}
+
+export function spec(...pathKeys) {
+  return actions.bind(null, pathKeys)
+}
+
+function rxToFn(rx) {
+  return values => values.filter(rx.test.bind(rx))
+}
+
+function validator(id, rx) {
+  return { [id]: rxToFn(rx) }
+}
+
+function rx(ids, rx) {
+  return ids.map(id => validator(id, rx))
+}
+
+export function checks(...ids) {
+  return rx.bind(null, ids)
+}
+
+check(':id', ':date')(/\d/)
