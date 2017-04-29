@@ -11,15 +11,20 @@ function navigate(matchers, navAction, loc) {
   navAction(loc)
 }
 
-function processMatches(matchers, ...args) {
-  matchers.forEach(matcher => pipe(matcher, matcher.process)(...args))
+function process(actions, ...args) {
+  return actions.forEach(fn => fn(...args))
+}
+
+function processMatches(matchers) {
+  let actions = matchers.map(matcher => pipe(matcher, matcher.process))
+  return process.bind(null, actions)
 }
 
 function run(matchers, history = createHistory()) {
-  let handle = history.listen(processMatches.bind(null, matchers))
+  let stop = history.listen(processMatches(matchers))
   let push = navigate.bind(null, matchers, history.push)
   let replace = navigate.bind(null, matchers, history.replace)
-  return Object.assign(handle, {push, replace})
+  return {stop, push, replace}
 }
 
 export function container(...matchers) {

@@ -1,6 +1,5 @@
 import { PathSpec } from './path'
 import { noop, pipe, isStr, flattenToObj } from './utils'
-import warning from 'warning'
 
 function findPath(specs, pathKey) {
   let result
