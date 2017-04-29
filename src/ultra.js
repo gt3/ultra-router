@@ -2,32 +2,16 @@ import { PathSpec } from './path'
 import { noop, pipe, isStr, flattenToObj } from './utils'
 import warning from 'warning'
 
-export class Ultra {
-  constructor(specs, checks) {
-    this.specs = specs
-    this.checks = checks
-    this.default = noop
-    this.listen = pipe(this.match, this.process).bind(this)
-  }
-  match(loc) {
-    let result, { pathname } = isStr(loc) ? { pathname: loc } : loc
-    let spec = this.specs.find(spec => !!(result = spec.match(pathname)))
-    return { result, spec, pathname }
-  }
-  process({ result, spec, pathname }) {
-    if (spec) spec.success(result, pathname)
-    else this.default(pathname)
-  }
-  findPath(pathKey) {
-    let result
-    this.specs.find(s => !!(result = s.find(pathKey)))
-    return result
-  }
-  linkToPath(pathKey, values = []) {
-    let link, path = this.findPath(pathKey)
-    if (path) link = path.makeLink(values)
-    return link || ''
-  }
+function findPath(specs, pathKey) {
+  let result
+  specs.find(spec => !!(result = spec.find(pathKey)))
+  return result
+}
+
+function linkToPath(specs, pathKey, values = []) {
+  let link, path = findPath(specs, pathKey)
+  if (path) link = path.makeLink(values)
+  return link || ''
 }
 
 function matcher(specs, validator, loc) {
@@ -41,7 +25,11 @@ function process({ result, spec }) {
   //else this.default(pathname)
 }
 
+function runner(matcher, processor) {
+  return 
+}
+
 export function match(specs, checks=[]) {
   let validator = flattenToObj(checks)
-  pipe(matcher.bind(null, specs, validator), process)
+  return Object.assign(matcher.bind(null, specs, validator), {process})
 }

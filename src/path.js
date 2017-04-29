@@ -55,9 +55,8 @@ export class Path {
 }
 
 class PathSpec {
-  constructor(pathKeys, actions) {
+  constructor(pathKeys, next, err) {
     let paths = pathKeys.map(k => new Path(k))
-    let [next, err] = actions
     Object.assign(this, { pathKeys, paths, next, err })
   }
   find(pathKey) {
@@ -78,17 +77,17 @@ class PathSpec {
     }
     return result
   }
-  exactMatch(result) {
-    return false
+  sucess(result) {
+    return result && Object.keys(result).some(k => result[k].exact)
   }
   realize(result) {
-    if(result && Object.keys(result).some(k => result[k].exact)) this.next(result)
+    if(sucess(result)) this.next(result)
     else this.err(result)
   }
 }
 
-function actions(pathKeys, ...fns) {
-  return new PathSpec(pathKeys, fns)
+function actions(pathKeys, next, err) {
+  return new PathSpec(pathKeys, next, err)
 }
 
 export function spec(...pathKeys) {
@@ -110,5 +109,3 @@ function rx(ids, rx) {
 export function checks(...ids) {
   return rx.bind(null, ids)
 }
-
-check(':id', ':date')(/\d/)

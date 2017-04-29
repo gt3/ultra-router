@@ -9,6 +9,8 @@ function isStr(s) {
   return Object.getPrototypeOf(Object(s)) === strProto
 }
 
+const invokeFn = Function.prototype.call.bind(Function.prototype.call)
+
 function pipe(...fns) {
   function invoke(v) {
     return fns.reduce((acc, fn) => (fn ? fn.call(this, acc) : acc), v)
@@ -29,7 +31,7 @@ function shieldProps(t, ...keys) {
   return Object.setPrototypeOf(keep, t)
 }
 
-export { noop, isFn, isStr, pipe, flattenToObj, mapOverKeys, shieldProps }
+export { noop, isFn, isStr, invokeFn, pipe, flattenToObj, mapOverKeys, shieldProps }
 
 function isClickValid(e) {
   return !(e.defaultPrevented ||
