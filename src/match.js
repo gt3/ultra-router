@@ -1,4 +1,3 @@
-import { PathSpec } from './path'
 import { noop, pipe, isStr, flattenToObj } from './utils'
 
 function findPath(specs, pathKey) {
@@ -21,11 +20,6 @@ function matcher(specs, validator, loc) {
 
 function process({ result, spec }) {
   if(spec) spec.realize(result)
-  //else this.default(pathname)
-}
-
-function runner(matcher, processor) {
-  return 
 }
 
 export function match(specs, checks=[]) {

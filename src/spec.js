@@ -25,13 +25,13 @@ let parsePathKey = pathKey => {
   return { key: pathKey, identifiers, literals, matchx }
 }
 
-export function assignValues(pathKey, values = []) {
+function assignValues(pathKey, values = []) {
   let { identifiers } = isStr(pathKey) ? parsePathKey(pathKey) : pathKey
   let res = identifiers.map((id, key) => ({ [id]: values[key] }))
   return flattenToObj(res)
 }
 
-export class Path {
+class Path {
   constructor(key) {
     Object.assign(this, parsePathKey(key))
   }

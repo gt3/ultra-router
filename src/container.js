@@ -1,4 +1,4 @@
-import { invokeFn, pipe, shieldProps, isClickValid } from './utils'
+import { pipe } from './utils'
 import warning from 'warning'
 import createHistory from 'history/createBrowserHistory'
 
@@ -29,27 +29,4 @@ function run(matchers, history = createHistory()) {
 
 export function container(...matchers) {
   return run.bind(null, matchers)
-}
-
-export const UltraLink = p => {
-  let props = shieldProps(p, 'createElement', 'ultra')
-  let { href, createElement, ultra } = props
-  props.onClick = createListener(ultra.push.bind(null, href))
-  return createElement('a', props)
-}
-UltraLink.defaultProps = {
-  style: {
-    cursor: 'pointer',
-    touchAction: 'manipulation',
-    msTouchAction: 'manipulation'
-  }
-}
-
-export function createListener(action) {
-  return function clickHandler(e) {
-    if (isClickValid) {
-      e.preventDefault()
-      action()
-    }
-  }
 }
