@@ -11,17 +11,15 @@ function navigate(matchers, navAction, loc) {
   navAction(loc)
 }
 
-function stop(handles) {
-  handles.forEach(invokeFn)
+function processMatches(matchers, ...args) {
+  matchers.forEach(matcher => pipe(matcher, matcher.process)(...args))
 }
 
 function run(matchers, history = createHistory()) {
-  let handles = matchers.map(m => history.listen(pipe(m, m.process)))
-  return {
-    stop: stop.bind(null, handles),
-    push: navigate.bind(null, matchers, history.push),
-    replace: navigate.bind(null, matchers, history.replace)
-  }
+  let handle = history.listen(processMatches.bind(null, matchers))
+  let push = navigate.bind(null, matchers, history.push)
+  let replace = navigate.bind(null, matchers, history.replace)
+  return Object.assign(handle, {push, replace})
 }
 
 export function container(...matchers) {
