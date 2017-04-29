@@ -24,7 +24,7 @@ function run(matchers, history = createHistory()) {
   let stop = history.listen(processMatches(matchers))
   let push = navigate.bind(null, matchers, history.push)
   let replace = navigate.bind(null, matchers, history.replace)
-  return {stop, push, replace}
+  return { stop, push, replace }
 }
 
 export function container(...matchers) {

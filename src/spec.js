@@ -1,4 +1,4 @@
-import { isStr, isFn, pipe, flattenToObj, hasOwn } from './utils'
+import { isStr, flattenToObj, hasOwn } from './utils'
 
 const URIComponentBlacklist = `([^\s#$&+,/:;=?@]*)`
 const identifierx = /(:[A-Za-z0-9_:]+)/
@@ -37,18 +37,22 @@ class Path {
   }
   findInvalid(validator, values) {
     let ids = this.identifiers, check = hasOwn.bind(validator)
-    return values.findIndex((val, i) => check(ids[i]) && !validator[ids[i]](val))
+    return values.findIndex(
+      (val, i) => check(ids[i]) && !validator[ids[i]](val)
+    )
   }
-  validate(validator, values, exact) {
+  validate(validator, match, values, exact) {
     let invalid = this.findInvalid(validator, values)
-    return invalid === -1 ? { match, values, passed: true, exact } : { match, values: values.slice(0, invalid) }
+    return invalid === -1
+      ? { match, values, passed: true, exact }
+      : { match, values: values.slice(0, invalid) }
   }
   match(validator, locationPath) {
     let matches = this.matchx.exec(locationPath)
-    if(!matches) return {}
+    if (!matches) return {}
     let match = matches[0], values = matches.slice(1).map(decodeURIComponent)
     let exact = match.length === locationPath.length
-    return this.validate(validator, values, exact)
+    return this.validate(validator, match, values, exact)
   }
   makeLink(values) {
     return substitute(this.literals, values)
@@ -72,17 +76,17 @@ class PathSpec {
       result[primary.key] = matches
       subs.some(sub => {
         let submatches = sub.match(validator, locationPath)
-        if(submatches.passed) result[sub.key] = submatches
+        if (submatches.passed) result[sub.key] = submatches
         return submatches.exact
       })
     }
     return result
   }
-  sucess(result) {
+  success(result) {
     return result && Object.keys(result).some(k => result[k].exact)
   }
   realize(result) {
-    if(!this.err || sucess(result)) this.next(result)
+    if (!this.err || this.success(result)) this.next(result)
     else this.err(result)
   }
 }

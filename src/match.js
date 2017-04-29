@@ -1,4 +1,4 @@
-import { noop, pipe, isStr, flattenToObj } from './utils'
+import { isStr, flattenToObj } from './utils'
 
 function findPath(specs, pathKey) {
   let result
@@ -19,10 +19,10 @@ function matcher(specs, validator, loc) {
 }
 
 function process({ result, spec }) {
-  if(spec) spec.realize(result)
+  if (spec) spec.realize(result)
 }
 
-export function match(specs, checks=[]) {
+export function match(specs, checks = []) {
   let validator = flattenToObj(checks)
-  return Object.assign(matcher.bind(null, specs, validator), {process})
+  return Object.assign(matcher.bind(null, specs, validator), { process })
 }
