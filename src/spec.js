@@ -61,6 +61,7 @@ class Path {
 
 class PathSpec {
   constructor(pathKeys, next, err) {
+    if (!pathKeys || !pathKeys.length) pathKeys = ['']
     let paths = pathKeys.map(k => new Path(k))
     Object.assign(this, { pathKeys, paths, next, err })
   }
@@ -91,12 +92,8 @@ class PathSpec {
   }
 }
 
-function actions(pathKeys, next, err) {
-  return new PathSpec(pathKeys, next, err)
-}
-
 export function spec(...pathKeys) {
-  return actions.bind(null, pathKeys)
+  return (next, err) => new PathSpec(pathKeys, next, err)
 }
 
 function rxToFn(rx) {
