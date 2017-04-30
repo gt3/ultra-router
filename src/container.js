@@ -6,9 +6,14 @@ function verify(matchers, loc) {
   return matchers.some(matcher => !!matcher(loc).spec)
 }
 
-function navigate(matchers, navAction, loc) {
+function replaceWrapped(history, loc, force) {
+  let pathname = history.location.pathname
+  if(force || !pathname.startsWith(loc)) history.replace(loc)
+}
+
+function navigate(matchers, navAction, loc, ...args) {
   warning(verify(matchers, loc), 'No paths defined for this location: %s', loc)
-  navAction(loc)
+  navAction(loc, ...args)
 }
 
 function process(actions, ...args) {
@@ -23,7 +28,7 @@ function processMatches(matchers) {
 function run(matchers, history = createHistory()) {
   let stop = history.listen(processMatches(matchers))
   let push = navigate.bind(null, matchers, history.push)
-  let replace = navigate.bind(null, matchers, history.replace)
+  let replace = navigate.bind(null, matchers, replaceWrapped.bind(null, history))
   return { stop, push, replace }
 }
 
