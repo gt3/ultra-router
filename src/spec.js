@@ -41,18 +41,18 @@ class Path {
       (val, i) => check(ids[i]) && !validator[ids[i]](val)
     )
   }
-  validate(validator, match, values, exact) {
+  validate(validator, values) {
     let invalid = this.findInvalid(validator, values)
     return invalid === -1
-      ? { match, values, passed: true, exact }
-      : { match, values: values.slice(0, invalid) }
+      ? { values, passed: true }
+      : { values: values.slice(0, invalid) }
   }
   match(validator, locationPath) {
     let matches = this.matchx.exec(locationPath)
     if (!matches) return {}
     let match = matches[0], values = matches.slice(1).map(decodeURIComponent)
     let exact = match.length === locationPath.length
-    return this.validate(validator, match, values, exact)
+    return Object.assign(this.validate(validator, values, exact), {match, exact})
   }
   makeLink(values) {
     return substitute(this.literals, values)
