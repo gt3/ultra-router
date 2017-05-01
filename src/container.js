@@ -3,12 +3,15 @@ import warning from 'warning'
 import createHistory from 'history/createBrowserHistory'
 
 function verify(matchers, loc) {
-  return matchers.some(matcher => !!matcher(loc).spec)
+  return matchers.some(matcher => {
+    let { spec, result } = matcher(loc).spec
+    return spec && spec.success(result)
+  })
 }
 
 function replaceWrapped(history, loc, force) {
   let pathname = history.location.pathname
-  if(force || !pathname.startsWith(loc)) history.replace(loc)
+  if (force || !pathname.startsWith(loc)) history.replace(loc)
 }
 
 function navigate(matchers, navAction, loc, ...args) {
@@ -19,7 +22,7 @@ function navigate(matchers, navAction, loc, ...args) {
 function processMatches(matchers) {
   let actions = matchers.map(matcher => pipe(matcher, matcher.process))
   return (ultra, loc) => {
-    let ultraLoc = Object.assign({}, loc, {ultra})
+    let ultraLoc = Object.assign({}, loc, { ultra })
     actions.forEach(fn => fn(ultraLoc))
   }
 }

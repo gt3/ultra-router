@@ -52,7 +52,10 @@ class Path {
     if (!matches) return {}
     let match = matches[0], values = matches.slice(1).map(decodeURIComponent)
     let exact = match.length === locationPath.length
-    return Object.assign(this.validate(validator, values, exact), {match, exact})
+    return Object.assign(this.validate(validator, values, exact), {
+      match,
+      exact
+    })
   }
   makeLink(values) {
     return substitute(this.literals, values)
