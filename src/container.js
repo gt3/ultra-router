@@ -20,13 +20,13 @@ function process(actions, ...args) {
   return actions.forEach(fn => fn(...args))
 }
 
-function processMatches(matchers) {
-  let actions = matchers.map(matcher => pipe(matcher, matcher.process))
+function processMatches(history, matchers) {
+  let actions = matchers.map(matcher => pipe(matcher, matcher.process.bind(null, history)))
   return process.bind(null, actions)
 }
 
 function run(matchers, history = createHistory()) {
-  let stop = history.listen(processMatches(matchers))
+  let stop = history.listen(processMatches(history, matchers))
   let push = navigate.bind(null, matchers, history.push)
   let replace = navigate.bind(null, matchers, replaceWrapped.bind(null, history))
   return { stop, push, replace }

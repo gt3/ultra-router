@@ -18,8 +18,8 @@ function matcher(specs, validator, loc) {
   return { result, spec }
 }
 
-function process({ result, spec }) {
-  if (spec) spec.realize(result)
+function process(history, { result, spec }) {
+  if (spec) spec.realize(result, history)
 }
 
 export function match(specs, checks = []) {
