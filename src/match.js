@@ -13,13 +13,13 @@ function linkToPath(specs, pathKey, values = []) {
 }
 
 function matcher(specs, validator, loc) {
-  let result, { pathname } = isStr(loc) ? { pathname: loc } : loc
+  let result, { pathname, ultra } = isStr(loc) ? { pathname: loc } : loc
   let spec = specs.find(spec => !!(result = spec.match(pathname, validator)))
-  return { result, spec }
+  return { result, spec, ultra }
 }
 
-function process(history, { result, spec }) {
-  if (spec) spec.realize(result, history)
+function process({ result, spec, ultra }) {
+  if (spec) spec.realize(result, ultra)
 }
 
 export function match(specs, checks = []) {

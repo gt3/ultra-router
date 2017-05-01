@@ -63,9 +63,6 @@ class PathSpec {
   constructor(pathKeys, next, err) {
     if (!pathKeys || !pathKeys.length) pathKeys = ['']
     let paths = pathKeys.map(k => new Path(k))
-    if(isStr(next)) {
-      next = (loc => (res, history) => history.replace(loc))(next.slice())
-    }
     Object.assign(this, { pathKeys, paths, next, err })
   }
   find(pathKey) {
@@ -89,9 +86,9 @@ class PathSpec {
   success(result) {
     return result && Object.keys(result).some(k => result[k].exact)
   }
-  realize(result, history) {
-    if (!this.err || this.success(result)) this.next(result, history)
-    else this.err(result)
+  realize(result, ultra) {
+    if (!this.err || this.success(result)) this.next(result, ultra)
+    else this.err(result, ultra)
   }
 }
 

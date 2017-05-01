@@ -16,20 +16,22 @@ function navigate(matchers, navAction, loc, ...args) {
   navAction(loc, ...args)
 }
 
-function process(actions, ...args) {
-  return actions.forEach(fn => fn(...args))
-}
-
-function processMatches(history, matchers) {
-  let actions = matchers.map(matcher => pipe(matcher, matcher.process.bind(null, history)))
-  return process.bind(null, actions)
+function processMatches(matchers) {
+  let actions = matchers.map(matcher => pipe(matcher, matcher.process))
+  return (ultra, loc) => {
+    let ultraLoc = Object.assign({}, loc, {ultra})
+    actions.forEach(fn => fn(ultraLoc))
+  }
 }
 
 function run(matchers, history = createHistory()) {
-  let stop = history.listen(processMatches(history, matchers))
-  let push = navigate.bind(null, matchers, history.push)
-  let replace = navigate.bind(null, matchers, replaceWrapped.bind(null, history))
-  return { stop, push, replace }
+  let process = processMatches(matchers)
+  let ultra = {
+    stop: history.listen(loc => process(ultra, loc)),
+    push: navigate.bind(null, matchers, history.push),
+    replace: navigate.bind(null, matchers, replaceWrapped.bind(null, history))
+  }
+  return ultra
 }
 
 export function container(...matchers) {
