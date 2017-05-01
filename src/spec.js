@@ -1,4 +1,4 @@
-import { isStr, flattenToObj, hasOwn } from './utils'
+import { isStr, flattenToObj, hasOwn, empty } from './utils'
 
 const URIComponentBlacklist = `([^\s#$&+,/:;=?@]*)`
 const identifierx = /(:[A-Za-z0-9_:]+)/
@@ -38,7 +38,7 @@ class Path {
   findInvalid(validator, values) {
     let ids = this.identifiers, check = hasOwn.bind(validator)
     return values.findIndex(
-      (val, i) => check(ids[i]) && !validator[ids[i]](val)
+      (val, i) => check(ids[i]) && !validator[ids[i]](values)
     )
   }
   validate(validator, values) {
@@ -100,7 +100,7 @@ export function spec(...pathKeys) {
 }
 
 function rxToFn(rx) {
-  return values => values.filter(rx.test.bind(rx))
+  return values => !empty(values.filter(rx.test.bind(rx)))
 }
 
 function validator(id, rx) {

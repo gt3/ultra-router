@@ -9,6 +9,10 @@ function isStr(s) {
   return Object.getPrototypeOf(Object(s)) === strProto
 }
 
+function empty(arr) {
+  return !arr || !arr.length
+}
+
 const invokeFn = Function.prototype.call.bind(Function.prototype.call)
 
 function pipe(...fns) {
@@ -37,6 +41,7 @@ export {
   noop,
   isFn,
   isStr,
+  empty,
   invokeFn,
   pipe,
   flattenToObj,

@@ -15,7 +15,11 @@ function replaceWrapped(history, loc, force) {
 }
 
 function navigate(matchers, navAction, loc, ...args) {
-  warning(verify(matchers, loc), 'At least one path should be an exact match: %s', loc)
+  warning(
+    verify(matchers, loc),
+    'At least one path should be an exact match: %s',
+    loc
+  )
   navAction(loc, ...args)
 }
 
