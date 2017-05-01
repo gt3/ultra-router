@@ -31,16 +31,26 @@ function processMatches(matchers) {
   }
 }
 
-function run(matchers, history = createHistory()) {
+function run(matchers, history) {
   let process = processMatches(matchers)
   let ultra = {
     stop: history.listen(loc => process(ultra, loc)),
     push: navigate.bind(null, matchers, history.push),
-    replace: navigate.bind(null, matchers, replaceWrapped.bind(null, history))
+    replace: navigate.bind(null, matchers, replaceWrapped.bind(null, history)),
+    history,
+    matchers
   }
   return ultra
 }
 
+function initialize(matchers, ultra = {}) {
+  let {stop, matchers: currentMatchers, history}  = ultra
+  if(stop) stop.call(ultra)
+  if(currentMatchers) matchers = currentMatchers.concat(matchers)
+  if(!history) history = createHistory()
+  return run(matchers, history)
+}
+
 export function container(...matchers) {
-  return run.bind(null, matchers)
+  return initialize.bind(null, matchers)
 }
