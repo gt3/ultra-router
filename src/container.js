@@ -4,7 +4,7 @@ import createHistory from 'history/createBrowserHistory'
 
 function verify(matchers, loc) {
   return matchers.some(matcher => {
-    let { spec, result } = matcher(loc).spec
+    let { spec, result } = matcher(loc)
     return spec && spec.success(result)
   })
 }
