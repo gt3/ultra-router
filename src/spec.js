@@ -89,7 +89,7 @@ class PathSpec {
   success(result) {
     return result && Object.keys(result).some(k => result[k].exact)
   }
-  realize(result, ultra) {
+  resolve(result, ultra) {
     if (!this.err || this.success(result)) this.next(result, ultra)
     else this.err(result, ultra)
   }

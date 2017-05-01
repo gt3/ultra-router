@@ -19,7 +19,7 @@ function matcher(specs, validator, loc) {
 }
 
 function process({ result, spec, ultra }) {
-  if (spec) spec.realize(result, ultra)
+  if (spec) spec.resolve(result, ultra)
 }
 
 export function match(specs, checks = []) {
