@@ -1,6 +1,7 @@
 import { pipe } from './utils'
 import warning from 'warning'
 import createHistory from 'history/createBrowserHistory'
+import Listener from './listener'
 
 function verify(matchers, loc) {
   return matchers.some(matcher => {
