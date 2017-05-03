@@ -21,6 +21,7 @@ export default class Listener extends Set {
   add(val) {
     this.beginListen()
     super.add.call(this, val)
+    return this.delete.bind(this, val)
   }
   delete(val) {
     super.delete.call(this, val)
