@@ -1,19 +1,21 @@
+let defaultHandler = handlers => (...args) => handlers.forEach(h => h(...args))
+
 export default class Listener extends Set {
-  constructor(eventKey, target = window) {
+  constructor(eventKey, target = window, handler = defaultHandler) {
     super()
-    let listener = (...args) => this.forEach(l => l(...args))
-    Object.assign(this, {eventKey, target, listener, active: false})
+    handler = handler(this)
+    Object.assign(this, {eventKey, target, handler, active: false})
   }
   beginListen() {
     if(!this.active) {
-      this.target.addEventListener(this.eventKey, this.listener)
+      this.target.addEventListener(this.eventKey, this.handler)
       this.active = true
     }
   }
   stopListen() {
     if(this.active) {
       this.active = false
-      this.target.removeEventListener(this.eventKey, this.listener)
+      this.target.removeEventListener(this.eventKey, this.handler)
     }
   }
   add(val) {
