@@ -24,8 +24,9 @@ export default class Listener extends Set {
     return this.delete.bind(this, val)
   }
   delete(val) {
-    super.delete.call(this, val)
+    let res = super.delete.call(this, val)
     if(this.size === 0) this.stopListen()
+    return res
   }
   clear() {
     this.stopListen()
