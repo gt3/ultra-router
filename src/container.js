@@ -4,7 +4,7 @@ import createHistory from 'history/createBrowserHistory'
 import Listener from './listener'
 
 function verify(matchers, loc) {
-  return matchers.some(matcher => matcher(loc).success)
+  return matchers.some(matcher => matcher.match(loc).success)
 }
 
 function replaceWrapped(history, loc, force) {
@@ -22,7 +22,7 @@ function navigate(matchers, navAction, loc, ...args) {
 }
 
 function processMatches(matchers) {
-  let actions = matchers.map(matcher => pipe(matcher, matcher.process))
+  let actions = matchers.map(matcher => pipe(matcher.match, matcher.process))
   return (ultra, loc) => {
     let ultraLoc = Object.assign({}, loc, { ultra })
     actions.forEach(fn => fn(ultraLoc))
