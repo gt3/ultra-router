@@ -4,10 +4,7 @@ import createHistory from 'history/createBrowserHistory'
 import Listener from './listener'
 
 function verify(matchers, loc) {
-  return matchers.some(matcher => {
-    let { spec, result } = matcher(loc)
-    return spec && spec.success(result)
-  })
+  return matchers.some(matcher => matcher(loc).success)
 }
 
 function replaceWrapped(history, loc, force) {

@@ -4,22 +4,22 @@ function dispatch(makeMsg, handlers) {
   return event => handlers.forEach(h => h(makeMsg(event)))
 }
 
-function fixPath(base, source = location.pathname) {
+function resolvePath(base, source = location.pathname) {
   return base ? source.replace(base, '') : source
 }
 
-function createMsg(fix, event) {
-  let pathname = fix()
+function createMsg(resolve, event) {
+  let pathname = resolve()
   return {pathname, event}
 }
 
 export function createHistory(base = '', eventKey = 'popstate') {
-  let fix = fixPath.bind(null, base)
-  let listener = new Listener(eventKey, window, dispatch.bind(null, createMsg.bind(null, fix)))
+  let resolve = resolvePath.bind(null, base)
+  let listener = new Listener(eventKey, window, dispatch.bind(null, createMsg.bind(null, resolve)))
   let history = {
     listen: listener.add.bind(listener),
-    push: (p, s, t) => window.history.pushState(s, t, fix(p)),
-    replace: (p, s, t) => window.history.replaceState(s, t, fix(p))
+    push: (p, s, t) => window.history.pushState(s, t, resolve(p)),
+    replace: (p, s, t) => window.history.replaceState(s, t, resolve(p))
   }
   return history
 }
