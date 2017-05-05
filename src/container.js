@@ -1,16 +1,6 @@
 import { pipe } from './utils'
 import warning from 'warning'
-import Listener from './listener'
-
-let push = (p, s, t) => {
-  let pathname = location.pathname
-  if (!pathname.startsWith(p)) history.pushState(s, t, p)
-}
-
-let replace = (p, s, t) => {
-  let pathname = location.pathname, state = history.state
-  if(!(pathname.startsWith(p) && state === s)) history.replaceState(s, t, p)
-}
+import {createPopstate, push, replace} from './history'
 
 function verify(matchers, loc) {
   return matchers.some(matcher => matcher.match(loc).success)
@@ -56,13 +46,4 @@ function initialize(matchers, ultra = {}) {
 
 export function container(...matchers) {
   return initialize.bind(null, matchers)
-}
-
-function invokeHandlers(handlers) {
-  let makeMsg = event => ({ pathname: location.pathname, event })
-  return event => handlers.forEach(h => h(makeMsg(event)))
-}
-
-function createPopstate() {
-  return new Listener('popstate', window, invokeHandlers)
 }
