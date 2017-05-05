@@ -1,4 +1,5 @@
 import { isStr, flattenToObj } from './utils'
+import { prefixSpec } from './spec'
 
 function findPath(specs, pathKey) {
   let result
@@ -6,50 +7,39 @@ function findPath(specs, pathKey) {
   return result
 }
 
-function linkFromPathKey(specs, base, pathKey, values = []) {
+function addPrefix(prefix, path) {
+  return isStr(prefix) && !path.startsWith(prefix) ? `${prefix}${path}` : path
+}
+
+function linkFromPathKey(specs, prefix, pathKey, values = [], usePrefix = true) {
   let link, path = findPath(specs, pathKey)
-  if (path) link = addBase(base, path.makeLink(values))
+  if (usePrefix && path) link = addPrefix(prefix, path.makeLink(values))
   return link || ''
 }
 
-function addBase(base, path) {
-  let res = path
-  if(base) {
-    let { pathname } = checkRemoveBase(base, path)
-    res = `${base}${pathname}`
-  }
-  return res
-}
-
-function checkRemoveBase(base, path) {
-  let baseViolated, pathname = path
-  if(base) {
-    baseViolated = !path.startsWith(base)
-    if(!baseViolated) pathname = path.replace(base, '')
-  }
-  return { baseViolated, pathname }
-}
-
-let resolveLoc = (base, loc) => {
-  let res = isStr(loc) ? { pathname: loc } : loc
-  return Object.assign(res, base && checkRemoveBase(base, res.pathname))
-}
-
-function matcher(specs, validator, base, loc) {
-  let spec, result, { baseViolated, pathname, ultra } = resolveLoc(base, loc)
-  if(!baseViolated)
-    spec = specs.find(spec => !!(result = spec.match(pathname, validator)))
+function matcher(specs, validator, loc) {
+  let spec, result, { pathname, ultra } = isStr(loc) ? { pathname: loc } : loc
+  spec = specs.find(spec => !!(result = spec.match({ pathname }, validator)))
   let success = spec && spec.success(result)
-  return { success, result, spec, pathname, ultra }
+  return { success, result, spec, ultra }
 }
 
-function process({ result, spec, ultra }) {
-  if(spec) spec.resolve(result, ultra)
+function process({ success, result, spec, ultra }) {
+  if(spec) spec.resolve(Object.assign(result, {ultra}), success)
 }
 
-export function match(specs, checks = [], base = '') {
+function matchPrefix(matcher) {
+  let {prefix, match} = matcher, result = matcher
+  if(isStr(prefix)) {
+    let spec = prefixSpec(prefix, pipe(match, process))
+    result.match = spec.match.bind(spec)
+  }
+  return result
+}
+
+export function match(specs, checks = [], prefix) {
   let validator = flattenToObj(checks)
-  let match = matcher.bind(null, specs, validator, base)
-  let makeLink = linkFromPathKey.bind(null, specs, base)
-  return { match, process, base, makeLink }
+  let match = matcher.bind(null, specs, validator)
+  let makeLink = linkFromPathKey.bind(null, specs, prefix)
+  return matchPrefix({ match, process, makeLink, prefix, specs })
 }

@@ -9,8 +9,8 @@ function isStr(s) {
   return Object.getPrototypeOf(Object(s)) === strProto
 }
 
-function empty(arr) {
-  return !arr || !arr.length
+function empty(t) {
+  return !t || !(Array.isArray(t) ? t : Object.keys(t)).length
 }
 
 const invokeFn = Function.prototype.call.bind(Function.prototype.call)

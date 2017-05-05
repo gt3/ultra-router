@@ -37,9 +37,8 @@ class Path {
   }
   findInvalid(validator, values) {
     let ids = this.identifiers, check = hasOwn.bind(validator)
-    return values.findIndex(
-      (val, i) => check(ids[i]) && !validator[ids[i]](values)
-    )
+    return empty(validator) ? -1 : 
+    values.findIndex((val, i) => check(ids[i]) && !validator[ids[i]](values))
   }
   validate(validator, values) {
     let invalid = this.findInvalid(validator, values)
@@ -47,15 +46,12 @@ class Path {
       ? { values, passed: true }
       : { values: values.slice(0, invalid) }
   }
-  match(validator, locationPath) {
-    let matches = this.matchx.exec(locationPath)
+  match(validator, pathname) {
+    let matches = this.matchx.exec(pathname)
     if (!matches) return {}
     let match = matches[0], values = matches.slice(1).map(decodeURIComponent)
-    let exact = match.length === locationPath.length
-    return Object.assign(this.validate(validator, values, exact), {
-      match,
-      exact
-    })
+    let exact = match.length === pathname.length
+    return Object.assign(this.validate(validator, values), {match, exact})
   }
   makeLink(values) {
     return substitute(this.literals, values)
@@ -64,7 +60,7 @@ class Path {
 
 class PathSpec {
   constructor(pathKeys, next, err) {
-    if (!pathKeys || !pathKeys.length) pathKeys = ['']
+    if (!pathKeys || !pathKeys.length) pathKeys = [isStr(pathKeys) ? pathKeys : '']
     let paths = pathKeys.map(k => new Path(k))
     Object.assign(this, { pathKeys, paths, next, err })
   }
@@ -72,14 +68,14 @@ class PathSpec {
     let idx = this.pathKeys.indexOf(pathKey)
     return idx > -1 && this.paths[idx]
   }
-  match(locationPath, validator) {
+  match({ pathname }, validator) {
     let [primary, ...subs] = this.paths
-    let result, matches = primary.match(validator, locationPath)
+    let result, matches = primary.match(validator, pathname)
     if (matches.passed) {
-      result = {}
+      result = { pathname }
       result[primary.key] = matches
       subs.some(sub => {
-        let submatches = sub.match(validator, locationPath)
+        let submatches = sub.match(validator, pathname)
         if (submatches.passed) result[sub.key] = submatches
         return submatches.exact
       })
@@ -89,14 +85,45 @@ class PathSpec {
   success(result) {
     return result && Object.keys(result).some(k => result[k].exact)
   }
-  resolve(result, ultra) {
-    if (!this.err || this.success(result)) this.next(result, ultra)
-    else this.err(result, ultra)
+  resolve(result, success = this.success(result)) {
+    if (!this.err || success) this.next(result)
+    else this.err(result)
+  }
+}
+
+class PrefixSpec extends PathSpec {
+  consructor(prefix, next) {
+    super(prefix, next)
+  }
+  has(path) {
+    return this.prefix && path && path.startsWith(this.prefix)
+  }
+  strip(target) {
+    let {pathname} = target, result = target
+    if(this.has(pathname)) {
+      pathname = pathname.replace(this.prefix, '')
+      result = Object.assign({}, target, {pathname})
+    }
+    return result
+  }
+  match(loc) {
+    let {ultra} = loc
+    let result = super.match(loc)
+    if(result) {
+      result = this.strip(result)
+      result.ultra = ultra
+      return super.resolve(result, true)
+    }
+    return result
   }
 }
 
 export function spec(...pathKeys) {
   return (next, err) => new PathSpec(pathKeys, next, err)
+}
+
+export function prefixSpec(prefix, next) {
+  return new PrefixSpec(prefix, next)
 }
 
 function rxToFn(rx) {
