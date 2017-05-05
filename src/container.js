@@ -1,15 +1,15 @@
 import { pipe } from './utils'
 import warning from 'warning'
-import createHistory from 'history/createBrowserHistory'
 import Listener from './listener'
+
+let push = (p, s, t) => history.pushState(s, t, p)
+let replace = (p, s, t) => {
+  let pathname = location.pathname, state = history.state
+  if(!(pathname.startsWith(loc) && state === s)) history.replaceState(s, t, p)
+}
 
 function verify(matchers, loc) {
   return matchers.some(matcher => matcher.match(loc).success)
-}
-
-function replaceWrapped(history, loc, force) {
-  let pathname = history.location.pathname
-  if (force || !pathname.startsWith(loc)) history.replace(loc)
 }
 
 function navigate(matchers, navAction, loc, ...args) {
@@ -21,7 +21,7 @@ function navigate(matchers, navAction, loc, ...args) {
   navAction(loc, ...args)
 }
 
-function processMatches(matchers) {
+function getDispatch(matchers) {
   let actions = matchers.map(matcher => pipe(matcher.match, matcher.process))
   return (ultra, loc) => {
     let ultraLoc = Object.assign({}, loc, { ultra })
@@ -29,26 +29,35 @@ function processMatches(matchers) {
   }
 }
 
-function run(matchers, history) {
-  let process = processMatches(matchers)
+function run(matchers, popstate) {
+  let dispatch = getDispatch(matchers)
   let ultra = {
-    stop: history.listen(loc => process(ultra, loc)),
-    push: navigate.bind(null, matchers, history.push),
-    replace: navigate.bind(null, matchers, replaceWrapped.bind(null, history)),
-    history,
+    stop: popstate.add(loc => dispatch(ultra, loc)),
+    push: navigate.bind(null, matchers, push),
+    replace: navigate.bind(null, matchers, replace),
+    popstate,
     matchers
   }
   return ultra
 }
 
 function initialize(matchers, ultra = {}) {
-  let {stop, matchers: currentMatchers, history}  = ultra
+  let {stop, matchers: currentMatchers, popstate}  = ultra
   if(stop) stop.call(ultra)
   if(currentMatchers) matchers = currentMatchers.concat(matchers)
-  if(!history) history = createHistory()
-  return run(matchers, history)
+  if(!popstate) popstate = createPopstate()
+  return run(matchers, popstate)
 }
 
 export function container(...matchers) {
   return initialize.bind(null, matchers)
+}
+
+function invokeHandlers(handlers) {
+  let makeMsg = event => ({ pathname: location.pathname, event })
+  return event => handlers.forEach(h => h(makeMsg(event)))
+}
+
+function createPopstate() {
+  return new Listener('popstate', window, invokeHandlers)
 }

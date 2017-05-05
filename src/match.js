@@ -40,6 +40,5 @@ function matchPrefix(matcher) {
 export function match(specs, checks = [], prefix) {
   let validator = flattenToObj(checks)
   let match = matcher.bind(null, specs, validator)
-  let makeLink = linkFromPathKey.bind(null, specs, prefix)
-  return matchPrefix({ match, process, makeLink, prefix, specs, validator })
+  return matchPrefix({ match, process, prefix, specs, validator })
 }

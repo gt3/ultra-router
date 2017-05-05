@@ -36,7 +36,6 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "history": "^4.6.1",
     "warning": "^3.0.0"
   },
   "files": [
