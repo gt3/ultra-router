@@ -19,7 +19,7 @@ function linkFromPathKey(specs, prefix, pathKey, values = [], usePrefix = true) 
 
 function matcher(specs, validator, loc) {
   let spec, result, { pathname, ultra } = isStr(loc) ? { pathname: loc } : loc
-  spec = specs.find(spec => !!(result = spec.match({ pathname }, validator)))
+  spec = specs.find(spec => !!(result = spec.match(validator, pathname)))
   let success = spec && spec.success(result)
   return { success, result, spec, ultra }
 }

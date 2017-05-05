@@ -68,7 +68,7 @@ class PathSpec {
     let idx = this.pathKeys.indexOf(pathKey)
     return idx > -1 && this.paths[idx]
   }
-  match(pathname, validator) {
+  match(validator, pathname) {
     let [primary, ...subs] = this.paths
     let result, matches = primary.match(validator, pathname)
     if (matches.passed) {
@@ -108,7 +108,7 @@ class PrefixSpec extends PathSpec {
   }
   match(validator, loc) {
     let {ultra} = loc
-    let result = super.match(loc, validator)
+    let result = super.match(validator, loc)
     if(result) {
       result = this.strip(result)
       result.ultra = ultra
