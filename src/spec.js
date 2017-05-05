@@ -68,7 +68,7 @@ class PathSpec {
     let idx = this.pathKeys.indexOf(pathKey)
     return idx > -1 && this.paths[idx]
   }
-  match({ pathname }, validator) {
+  match(pathname, validator) {
     let [primary, ...subs] = this.paths
     let result, matches = primary.match(validator, pathname)
     if (matches.passed) {
@@ -86,15 +86,15 @@ class PathSpec {
     return result && Object.keys(result).some(k => result[k].exact)
   }
   resolve(result, success = this.success(result)) {
-    if (!this.err || success) this.next(result)
-    else this.err(result)
+    return (!this.err || success) ? this.next(result) : this.err(result)
   }
 }
 
+export function spec(...pathKeys) {
+  return (next, err) => new PathSpec(pathKeys, next, err)
+}
+
 class PrefixSpec extends PathSpec {
-  consructor(prefix, next) {
-    super(prefix, next)
-  }
   has(path) {
     return this.prefix && path && path.startsWith(this.prefix)
   }
@@ -106,20 +106,16 @@ class PrefixSpec extends PathSpec {
     }
     return result
   }
-  match(loc) {
+  match(validator, loc) {
     let {ultra} = loc
-    let result = super.match(loc)
+    let result = super.match(loc, validator)
     if(result) {
       result = this.strip(result)
       result.ultra = ultra
-      return super.resolve(result, true)
+      result = super.resolve(result, true)
     }
     return result
   }
-}
-
-export function spec(...pathKeys) {
-  return (next, err) => new PathSpec(pathKeys, next, err)
 }
 
 export function prefixSpec(prefix, next) {

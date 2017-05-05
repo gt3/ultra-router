@@ -29,10 +29,10 @@ function process({ success, result, spec, ultra }) {
 }
 
 function matchPrefix(matcher) {
-  let {prefix, match} = matcher, result = matcher
+  let {prefix, match, validator} = matcher, result = matcher
   if(isStr(prefix)) {
-    let spec = prefixSpec(prefix, pipe(match, process))
-    result.match = spec.match.bind(spec)
+    let pspec = prefixSpec(prefix, match)
+    result.match = pspec.match.bind(pspec, validator)
   }
   return result
 }
@@ -41,5 +41,5 @@ export function match(specs, checks = [], prefix) {
   let validator = flattenToObj(checks)
   let match = matcher.bind(null, specs, validator)
   let makeLink = linkFromPathKey.bind(null, specs, prefix)
-  return matchPrefix({ match, process, makeLink, prefix, specs })
+  return matchPrefix({ match, process, makeLink, prefix, specs, validator })
 }
