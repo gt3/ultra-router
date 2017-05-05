@@ -2,10 +2,14 @@ import { pipe } from './utils'
 import warning from 'warning'
 import Listener from './listener'
 
-let push = (p, s, t) => history.pushState(s, t, p)
+let push = (p, s, t) => {
+  let pathname = location.pathname
+  if (!pathname.startsWith(p)) history.pushState(s, t, p)
+}
+
 let replace = (p, s, t) => {
   let pathname = location.pathname, state = history.state
-  if(!(pathname.startsWith(loc) && state === s)) history.replaceState(s, t, p)
+  if(!(pathname.startsWith(p) && state === s)) history.replaceState(s, t, p)
 }
 
 function verify(matchers, loc) {
@@ -24,6 +28,7 @@ function navigate(matchers, navAction, loc, ...args) {
 function getDispatch(matchers) {
   let actions = matchers.map(matcher => pipe(matcher.match, matcher.process))
   return (ultra, loc) => {
+    console.log('dispatch:', loc)
     let ultraLoc = Object.assign({}, loc, { ultra })
     actions.forEach(fn => fn(ultraLoc))
   }
