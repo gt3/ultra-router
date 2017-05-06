@@ -37,8 +37,11 @@ class Path {
   }
   findInvalid(validator, values) {
     let ids = this.identifiers, check = hasOwn.bind(validator)
-    return empty(validator) ? -1 : 
-    values.findIndex((val, i) => check(ids[i]) && !validator[ids[i]](values))
+    return empty(validator)
+      ? -1
+      : values.findIndex(
+          (val, i) => check(ids[i]) && !validator[ids[i]](values)
+        )
   }
   validate(validator, values) {
     let invalid = this.findInvalid(validator, values)
@@ -51,7 +54,7 @@ class Path {
     if (!matches) return {}
     let match = matches[0], values = matches.slice(1).map(decodeURIComponent)
     let exact = match.length === pathname.length
-    return Object.assign(this.validate(validator, values), {match, exact})
+    return Object.assign(this.validate(validator, values), { match, exact })
   }
   makeLink(values) {
     return substitute(this.literals, values)
@@ -60,7 +63,8 @@ class Path {
 
 class PathSpec {
   constructor(pathKeys, next, err) {
-    if (!pathKeys || !pathKeys.length) pathKeys = [isStr(pathKeys) ? pathKeys : '']
+    if (!pathKeys || !pathKeys.length)
+      pathKeys = [isStr(pathKeys) ? pathKeys : '']
     let paths = pathKeys.map(k => new Path(k))
     Object.assign(this, { pathKeys, paths, next, err })
   }
@@ -86,7 +90,7 @@ class PathSpec {
     return result && Object.keys(result).some(k => result[k].exact)
   }
   resolve(result, success = this.success(result)) {
-    return (!this.err || success) ? this.next(result) : this.err(result)
+    return !this.err || success ? this.next(result) : this.err(result)
   }
 }
 
@@ -99,17 +103,17 @@ class PrefixSpec extends PathSpec {
     return this.prefix && path && path.startsWith(this.prefix)
   }
   strip(target) {
-    let {pathname} = target, result = target
-    if(this.has(pathname)) {
+    let { pathname } = target, result = target
+    if (this.has(pathname)) {
       pathname = pathname.replace(this.prefix, '')
-      result = Object.assign({}, target, {pathname})
+      result = Object.assign({}, target, { pathname })
     }
     return result
   }
   match(validator, loc) {
-    let {ultra} = loc
+    let { ultra } = loc
     let result = super.match(validator, loc)
-    if(result) {
+    if (result) {
       result = this.strip(result)
       result.ultra = ultra
       result = super.resolve(result, true)

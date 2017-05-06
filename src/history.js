@@ -1,24 +1,32 @@
 import Listener from './listener'
+import { noop } from './utils'
 
-let proxyPopstateKey = '_popstate'
+const proxyPopstateKey = '_popstate'
 
 function proxyDispatch(detail) {
-  return window.dispatchEvent(new CustomEvent(proxyPopstateKey, {detail}))
+  return window.dispatchEvent(new CustomEvent(proxyPopstateKey, { detail }))
 }
 
 function invokeHandlers(handlers) {
   function invoke(event, fn) {
-    let pathname = location.pathname, state = event && (event.state || event.detail)
-    return fn({pathname, state, event})
+    let pathname = location.pathname,
+      state = event && (event.state || event.detail)
+    return fn({ pathname, state, event })
   }
   return event => handlers.forEach(invoke.bind(null, event))
 }
 
 function createProxy(popstateListener) {
-  return new Listener(proxyPopstateKey, window, invokeHandlers.bind(null, popstateListener))
+  let proxy = new Listener(
+    proxyPopstateKey,
+    window,
+    invokeHandlers.bind(null, popstateListener)
+  )
+  proxy.add(noop)
+  return proxy
 }
 
-export function createPopstate() {
+function createPopstate() {
   let listener = new Listener('popstate', window, invokeHandlers)
   listener.proxy = createProxy(listener)
   return listener
@@ -34,10 +42,10 @@ let push = (p, s, t) => {
 
 let replace = (p, s, t) => {
   let pathname = location.pathname, state = history.state
-  if(!(pathname.startsWith(p) && state === s)) {
+  if (!(pathname.startsWith(p) && state === s)) {
     history.replaceState(s, t, p)
     proxyDispatch(s)
   }
 }
 
-export {push, replace, createPopstate}
+export { createPopstate, push, replace }

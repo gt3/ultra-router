@@ -11,7 +11,13 @@ function addPrefix(prefix, path) {
   return isStr(prefix) && !path.startsWith(prefix) ? `${prefix}${path}` : path
 }
 
-function linkFromPathKey(specs, prefix, pathKey, values = [], usePrefix = true) {
+function linkFromPathKey(
+  specs,
+  prefix,
+  pathKey,
+  values = [],
+  usePrefix = true
+) {
   let link, path = findPath(specs, pathKey)
   if (usePrefix && path) link = addPrefix(prefix, path.makeLink(values))
   return link || ''
@@ -25,12 +31,12 @@ function matcher(specs, validator, loc) {
 }
 
 function process({ success, result, spec, ultra }) {
-  if(spec) spec.resolve(Object.assign(result, {ultra}), success)
+  if (spec) spec.resolve(Object.assign(result, { ultra }), success)
 }
 
 function matchPrefix(matcher) {
-  let {prefix, match, validator} = matcher, result = matcher
-  if(isStr(prefix)) {
+  let { prefix, match, validator } = matcher, result = matcher
+  if (isStr(prefix)) {
     let pspec = prefixSpec(prefix, match)
     result.match = pspec.match.bind(pspec, validator)
   }

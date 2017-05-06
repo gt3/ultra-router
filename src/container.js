@@ -1,6 +1,6 @@
 import { pipe } from './utils'
 import warning from 'warning'
-import {createPopstate, push, replace} from './history'
+import { createPopstate, push, replace } from './history'
 
 function verify(matchers, loc) {
   return matchers.some(matcher => matcher.match(loc).success)
@@ -18,7 +18,6 @@ function navigate(matchers, navAction, loc, ...args) {
 function getDispatch(matchers) {
   let actions = matchers.map(matcher => pipe(matcher.match, matcher.process))
   return (ultra, loc) => {
-    console.log('dispatch:', loc)
     let ultraLoc = Object.assign({}, loc, { ultra })
     actions.forEach(fn => fn(ultraLoc))
   }
@@ -37,10 +36,10 @@ function run(matchers, popstate) {
 }
 
 function initialize(matchers, ultra = {}) {
-  let {stop, matchers: currentMatchers, popstate}  = ultra
-  if(stop) stop.call(ultra)
-  if(currentMatchers) matchers = currentMatchers.concat(matchers)
-  if(!popstate) popstate = createPopstate()
+  let { stop, matchers: currentMatchers, popstate } = ultra
+  if (stop) stop.call(ultra)
+  if (currentMatchers) matchers = currentMatchers.concat(matchers)
+  if (!popstate) popstate = createPopstate()
   return run(matchers, popstate)
 }
 
