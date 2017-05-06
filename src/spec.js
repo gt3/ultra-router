@@ -63,8 +63,7 @@ class Path {
 
 class PathSpec {
   constructor(pathKeys, next, err) {
-    if (!pathKeys || !pathKeys.length)
-      pathKeys = [isStr(pathKeys) ? pathKeys : '']
+    if (!Array.isArray(pathKeys)) pathKeys = [isStr(pathKeys) ? pathKeys : '']
     let paths = pathKeys.map(k => new Path(k))
     Object.assign(this, { pathKeys, paths, next, err })
   }
@@ -112,12 +111,13 @@ class PrefixSpec extends PathSpec {
   }
   match(validator, loc) {
     let { ultra } = loc
-    let result = super.match(validator, loc)
-    if (result) {
-      result = this.strip(result)
+    let result, matchResult = super.match(validator, loc)
+    if (matchResult) {
+      result = this.strip(matchResult)
       result.ultra = ultra
       result = super.resolve(result, true)
     }
+    else result = { ultra, success: false }
     return result
   }
 }
