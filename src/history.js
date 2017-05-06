@@ -1,10 +1,11 @@
 import Listener from './listener'
 import { noop } from './utils'
+import createEvent from './customevent'
 
 const proxyPopstateKey = '_popstate'
 
 function proxyDispatch(detail) {
-  return window.dispatchEvent(new CustomEvent(proxyPopstateKey, { detail }))
+  return window.dispatchEvent(createEvent(proxyPopstateKey, detail))
 }
 
 function invokeHandlers(handlers) {
