@@ -65,7 +65,7 @@ class Path {
 
 class PathSpec {
   constructor(pathKeys, next, err) {
-    if (!Array.isArray(pathKeys)) pathKeys = [isStr(pathKeys) ? pathKeys : '']
+    if (!Array.isArray(pathKeys) || !pathKeys.length) pathKeys = [isStr(pathKeys) ? pathKeys : '']
     let paths = pathKeys.map(k => new Path(k))
     Object.assign(this, { pathKeys, paths, next, err })
   }
