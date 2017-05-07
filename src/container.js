@@ -1,4 +1,4 @@
-import { pipe } from './utils'
+import { pipe, isStr } from './utils'
 import warning from 'warning'
 import { createPopstate, push, replace } from './history'
 
@@ -6,12 +6,12 @@ function verify(matchers, loc) {
   return matchers.some(matcher => matcher.match(loc).success)
 }
 
+function toPath(loc) {
+  return isStr(loc) ? { pathname: loc } : loc
+}
+
 function navigate(matchers, navAction, loc, ...args) {
-  warning(
-    verify(matchers, loc),
-    'At least one path should be an exact match: %s',
-    loc
-  )
+  warning(verify(matchers, toPath(loc)), 'At least one path should be an exact match: %s', loc)
   navAction(loc, ...args)
 }
 
@@ -19,7 +19,7 @@ function getDispatch(matchers) {
   let actions = matchers.map(matcher => pipe(matcher.match, matcher.process))
   return (ultra, loc) => {
     let ultraLoc = Object.assign({}, loc, { ultra })
-    actions.forEach(fn => fn(ultraLoc))
+    actions.some(fn => fn(ultraLoc))
   }
 }
 

@@ -2,6 +2,7 @@ import { isStr, flattenToObj, hasOwn, empty } from './utils'
 
 const URIComponentBlacklist = `([^\s#$&+,/:;=?@]*)`
 const identifierx = /(:[A-Za-z0-9_:]+)/
+const trailingSlashx = /\/$/
 
 function substitute(literals, values) {
   return String.raw({ raw: literals }, ...values)
@@ -13,7 +14,7 @@ function getMatchX(identifiers, literals) {
 }
 
 let parsePathKey = pathKey => {
-  let key = isStr(pathKey) ? pathKey : ''
+  let key = isStr(pathKey) ? pathKey.replace(trailingSlashx, '') : ''
   let fragments = key.split(identifierx)
   let identifiers = []
   let literals = fragments.reduce((acc, f) => {
@@ -50,8 +51,9 @@ class Path {
       : { values: values.slice(0, invalid) }
   }
   match(validator, pathname) {
+    pathname = pathname.replace(trailingSlashx, '')
     let matches = this.matchx.exec(pathname)
-    if (!matches) return {}
+    if (!matches) return { }
     let match = matches[0], values = matches.slice(1).map(decodeURIComponent)
     let exact = match.length === pathname.length
     return Object.assign(this.validate(validator, values), { match, exact })
@@ -75,8 +77,7 @@ class PathSpec {
     let [primary, ...subs] = this.paths
     let result, matches = primary.match(validator, pathname)
     if (matches.passed) {
-      result = { pathname }
-      result[primary.key] = matches
+      result = {[primary.key]: matches}
       subs.some(sub => {
         let submatches = sub.match(validator, pathname)
         if (submatches.passed) result[sub.key] = submatches
@@ -98,26 +99,14 @@ export function spec(...pathKeys) {
 }
 
 class PrefixSpec extends PathSpec {
-  has(path) {
-    return this.prefix && path && path.indexOf(prefix) === 0
+  static strip(prefix, path) {
+    return path.replace(prefix, '/').replace('//', '/')
   }
-  strip(target) {
-    let { pathname } = target, result = target
-    if (this.has(pathname)) {
-      pathname = pathname.replace(this.prefix, '')
-      result = Object.assign({}, target, { pathname })
-    }
-    return result
-  }
+  get prefix() { return this.pathKeys[0] }
   match(validator, loc) {
-    let { ultra } = loc
-    let result, matchResult = super.match(validator, loc)
-    if (matchResult) {
-      result = this.strip(matchResult)
-      result.ultra = ultra
-      result = super.resolve(result, true)
-    }
-    else result = { ultra, success: false }
+    let { ultra, pathname } = loc, result = { ultra, success: false }
+    if(super.match(validator, pathname))
+      result = super.resolve({ultra, pathname: PrefixSpec.strip(this.prefix, pathname)}, true)
     return result
   }
 }
