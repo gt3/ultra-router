@@ -7,7 +7,7 @@
   "scripts": {
     "test": "cross-env BABEL_ENV=test jest --useStderr",
     "cover": "cross-env BABEL_ENV=test jest --coverage",
-    "format": "prettier --no-semi --single-quote --write \"{src,test}/**/*.js\"",
+    "format": "prettier --no-semi --single-quote --print-width 100 --write \"{src,test}/**/*.js\"",
     "lint": "npm run format && eslint -c ./config/eslint/.eslintrc.json --ignore-path .gitignore src/**",
     "build": "rollup -c && rollup -c --environment DIST",
     "prepublish": "npm run build"

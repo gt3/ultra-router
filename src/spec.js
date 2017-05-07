@@ -17,7 +17,7 @@ let parsePathKey = pathKey => {
   let fragments = key.split(identifierx)
   let identifiers = []
   let literals = fragments.reduce((acc, f) => {
-    if (f.startsWith(':')) identifiers.push(f)
+    if (f.indexOf(':') === 0) identifiers.push(f)
     else acc.push(f)
     return acc
   }, [])
@@ -99,7 +99,7 @@ export function spec(...pathKeys) {
 
 class PrefixSpec extends PathSpec {
   has(path) {
-    return this.prefix && path && path.startsWith(this.prefix)
+    return this.prefix && path && path.indexOf(prefix) === 0
   }
   strip(target) {
     let { pathname } = target, result = target

@@ -8,7 +8,7 @@ function findPath(specs, pathKey) {
 }
 
 function addPrefix(prefix, path) {
-  return isStr(prefix) && !path.startsWith(prefix) ? `${prefix}${path}` : path
+  return isStr(prefix) && path.indexOf(prefix) !== 0 ? `${prefix}${path}` : path
 }
 
 function linkFromPathKey(
