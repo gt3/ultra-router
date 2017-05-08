@@ -39,7 +39,7 @@ function matchPrefix(matcher) {
 }
 
 export function match(specs, checks = [], prefix) {
-  if(!Array.isArray(specs)) specs = [].concat(specs)
+  if (!Array.isArray(specs)) specs = [].concat(specs)
   let validator = checks && checks.length ? flattenToObj(checks) : {}
   let match = matcher.bind(null, specs, validator)
   return matchPrefix({ match, process, prefix, specs, validator })

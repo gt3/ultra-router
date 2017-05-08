@@ -40,20 +40,16 @@ class Path {
     let ids = this.identifiers, check = hasOwn.bind(validator)
     return empty(validator)
       ? -1
-      : values.findIndex(
-          (val, i) => check(ids[i]) && !validator[ids[i]](values)
-        )
+      : values.findIndex((val, i) => check(ids[i]) && !validator[ids[i]](values))
   }
   validate(validator, values) {
     let invalid = this.findInvalid(validator, values)
-    return invalid === -1
-      ? { values, passed: true }
-      : { values: values.slice(0, invalid) }
+    return invalid === -1 ? { values, passed: true } : { values: values.slice(0, invalid) }
   }
   match(validator, pathname) {
     pathname = pathname.replace(trailingSlashx, '')
     let matches = this.matchx.exec(pathname)
-    if (!matches) return { }
+    if (!matches) return {}
     let match = matches[0], values = matches.slice(1).map(decodeURIComponent)
     let exact = match.length === pathname.length
     return Object.assign(this.validate(validator, values), { match, exact })
@@ -77,7 +73,7 @@ class PathSpec {
     let [primary, ...subs] = this.paths
     let result, matches = primary.match(validator, pathname)
     if (matches.passed) {
-      result = {[primary.key]: matches}
+      result = { [primary.key]: matches }
       subs.some(sub => {
         let submatches = sub.match(validator, pathname)
         if (submatches.passed) result[sub.key] = submatches
@@ -102,11 +98,13 @@ class PrefixSpec extends PathSpec {
   static strip(prefix, path) {
     return path.replace(prefix, '/').replace('//', '/')
   }
-  get prefix() { return this.pathKeys[0] }
+  get prefix() {
+    return this.pathKeys[0]
+  }
   match(validator, loc) {
     let { ultra, pathname } = loc, result = { ultra, success: false }
-    if(super.match(validator, pathname))
-      result = super.resolve({ultra, pathname: PrefixSpec.strip(this.prefix, pathname)}, true)
+    if (super.match(validator, pathname))
+      result = super.resolve({ ultra, pathname: PrefixSpec.strip(this.prefix, pathname) }, true)
     return result
   }
 }

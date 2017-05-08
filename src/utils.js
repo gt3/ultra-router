@@ -31,32 +31,14 @@ const mapOverKeys = (obj, mapper) => pipeOverKeys(obj, m2f('map', mapper))
 const hasOwn = Object.prototype.hasOwnProperty
 
 function shieldProps(t, ...keys) {
-  let keep = flattenToObj(
-    Object.keys(t).filter(k => !keys.includes(k)).map(k => ({ [k]: t[k] }))
-  )
+  let keep = flattenToObj(Object.keys(t).filter(k => !keys.includes(k)).map(k => ({ [k]: t[k] })))
   return Object.setPrototypeOf(keep, t)
 }
 
-export {
-  noop,
-  isFn,
-  isStr,
-  empty,
-  invokeFn,
-  pipe,
-  flattenToObj,
-  mapOverKeys,
-  hasOwn,
-  shieldProps
-}
+export { noop, isFn, isStr, empty, invokeFn, pipe, flattenToObj, mapOverKeys, hasOwn, shieldProps }
 
 function isClickValid(e) {
-  return !(e.defaultPrevented ||
-    e.button !== 0 ||
-    e.metaKey ||
-    e.altKey ||
-    e.ctrlKey ||
-    e.shiftKey)
+  return !(e.defaultPrevented || e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
 }
 
 export { isClickValid }

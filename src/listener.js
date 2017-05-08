@@ -1,10 +1,12 @@
-let defaultHandler = handlers => (...args) => handlers.forEach(h => h(...args))
+let defaultHandler = handlers => (...args) => handlers().forEach(h => h(...args))
 
 export default class Listener extends Set {
   constructor(eventKey, target = window, handler = defaultHandler) {
     super()
-    handler = handler(this)
-    Object.assign(this, { eventKey, target, handler, active: false })
+    this.values = this.values.bind(this)
+    handler = handler(this.values)
+    let orphans = new WeakSet(), active = false
+    Object.assign(this, { eventKey, target, handler, orphans, active })
   }
   beginListen() {
     if (!this.active) {
@@ -21,15 +23,23 @@ export default class Listener extends Set {
   add(val) {
     this.beginListen()
     super.add.call(this, val)
+    this.orphans.delete(val)
     return this.delete.bind(this, val)
   }
   delete(val) {
-    let res = super.delete.call(this, val)
-    if (this.size === 0) this.stopListen()
-    return res
+    this.orphans.add(val)
   }
   clear() {
-    this.stopListen()
-    super.call(this)
+    this.values().map(v => this.orphans.add(v))
+  }
+  *[Symbol.iterator]() {
+    ;[...super.values.call(this)]
+      .filter(v => this.orphans.has(v))
+      .map(v => super.delete.call(this, v))
+    if (this.size === 0) this.stopListen()
+    else yield* super.values.call(this)
+  }
+  values() {
+    return Array.from(this)
   }
 }

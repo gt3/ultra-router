@@ -8,22 +8,20 @@ function proxyDispatch(detail) {
   return window.dispatchEvent(createEvent(proxyPopstateKey, detail))
 }
 
-function getPathname() { return location.pathname }
+function getPathname() {
+  return location.pathname
+}
 
 function invokeHandlers(handlers) {
   function invoke(event, fn) {
     let pathname = getPathname(), state = event && (event.state || event.detail)
     return fn({ pathname, state, event })
   }
-  return event => handlers.forEach(invoke.bind(null, event))
+  return event => handlers().forEach(invoke.bind(null, event))
 }
 
-function createProxy(popstateListener) {
-  let proxy = new Listener(
-    proxyPopstateKey,
-    window,
-    invokeHandlers.bind(null, popstateListener)
-  )
+function createProxy(listener) {
+  let proxy = new Listener(proxyPopstateKey, window, invokeHandlers.bind(null, listener.values))
   proxy.add(noop)
   return proxy
 }
