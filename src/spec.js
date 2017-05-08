@@ -32,6 +32,10 @@ function assignValues(pathKey, values = []) {
   return flattenToObj(res)
 }
 
+function makeMatchPath(path) {
+  return path.replace(trailingSlashx, '')
+}
+
 class Path {
   constructor(key) {
     Object.assign(this, parsePathKey(key))
@@ -47,7 +51,6 @@ class Path {
     return invalid === -1 ? { values, passed: true } : { values: values.slice(0, invalid) }
   }
   match(validator, pathname) {
-    pathname = pathname.replace(trailingSlashx, '')
     let matches = this.matchx.exec(pathname)
     if (!matches) return {}
     let match = matches[0], values = matches.slice(1).map(decodeURIComponent)
@@ -70,12 +73,13 @@ class PathSpec {
     return idx > -1 && this.paths[idx]
   }
   match(validator, pathname) {
+    let matchPath = makeMatchPath(pathname)
     let [primary, ...subs] = this.paths
-    let result, matches = primary.match(validator, pathname)
+    let result, matches = primary.match(validator, matchPath)
     if (matches.passed) {
       result = { [primary.key]: matches }
       subs.some(sub => {
-        let submatches = sub.match(validator, pathname)
+        let submatches = sub.match(validator, matchPath)
         if (submatches.passed) result[sub.key] = submatches
         return submatches.exact
       })
