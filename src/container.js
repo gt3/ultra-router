@@ -15,15 +15,14 @@ function navigate(matchers, navAction, loc, ...args) {
   navAction(loc, ...args)
 }
 
-function checkOverride(dispatch, ultra, loc) {
-  let [len, path, override] = ultra.override, msg = Object.assign({}, loc, { ultra })
-  let next = () => {
-    ultra.override = null;
+function checkPause(dispatch, ultra, loc) {
+  let [len, path, confirm] = ultra.pauseRecord, msg = Object.assign({}, loc, { ultra, path })
+  let ok = () => {
+    ultra.resume()
     return dispatch(msg)
   }
-  let restore = () => ultra.replace(path)
-  let actions = { restore, dispatch: next }
-  return (override && len === history.length && path !== location.pathname) ? override(next, restore, msg) : next()
+  let cancel = () => ultra.replace(path)
+  return (confirm && len === history.length && path !== location.pathname) ? confirm(ok, cancel, msg) : ok()
 }
 
 function getDispatch(matchers) {
@@ -32,11 +31,12 @@ function getDispatch(matchers) {
 }
 
 function run(matchers, popstate) {
-  let _override = [], dispatch = getDispatch(matchers)
+  let _pauseRecord = [], dispatch = getDispatch(matchers)
   let ultra = {
-    get override() { return _override },
-    set override(value) { _override = value ? [history.length, location.pathname, value] : [] },
-    stop: popstate.add(loc => checkOverride(dispatch, ultra, loc)),
+    get pauseRecord() { return _pauseRecord },
+    resume() { return _pauseRecord = [] },
+    pause(cb) { return _pauseRecord = [history.length, location.pathname, cb] },
+    stop: popstate.add(loc => checkPause(dispatch, ultra, loc)),
     push: navigate.bind(null, matchers, push),
     replace: navigate.bind(null, matchers, replace),
     popstate,
