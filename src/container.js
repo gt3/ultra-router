@@ -2,6 +2,21 @@ import { pipe, isStr } from './utils'
 import warning from 'warning'
 import { createPopstate, push, replace } from './history'
 
+function getDispatch(matchers) {
+  let actions = matchers.map(matcher => pipe(matcher.match, matcher.process))
+  return msg => actions.some(fn => fn(msg))
+}
+
+function checkPause(ultra, dispatch, loc) {
+  let [len, prevPath, confirm] = ultra.pauseRecord, msg = Object.assign({}, loc, { ultra, prevPath })
+  let ok = () => {
+    ultra.resume()
+    return dispatch(msg)
+  }
+  let cancel = () => ultra.replace(prevPath)
+  return (confirm && len === history.length && prevPath !== location.pathname) ? confirm(ok, cancel, msg) : ok()
+}
+
 function verify(matchers, loc) {
   return matchers.some(matcher => matcher.match(loc).success)
 }
@@ -10,24 +25,11 @@ function toPath(loc) {
   return isStr(loc) ? { pathname: loc } : loc
 }
 
-function navigate(matchers, navAction, loc, ...args) {
+function navigate(dispatch, ultra, navAction, loc) {
+  let {pauseRecord, matchers} = ultra, action = pipe(navAction, dispatch)
+  //warning - check for same loc
   warning(verify(matchers, toPath(loc)), 'At least one path should be an exact match: %s', loc)
-  navAction(loc, ...args)
-}
-
-function checkPause(dispatch, ultra, loc) {
-  let [len, path, confirm] = ultra.pauseRecord, msg = Object.assign({}, loc, { ultra, path })
-  let ok = () => {
-    ultra.resume()
-    return dispatch(msg)
-  }
-  let cancel = () => ultra.replace(path)
-  return (confirm && len === history.length && path !== location.pathname) ? confirm(ok, cancel, msg) : ok()
-}
-
-function getDispatch(matchers) {
-  let actions = matchers.map(matcher => pipe(matcher.match, matcher.process))
-  return msg => actions.some(fn => fn(msg))
+  return checkPause(action, ultra, loc)
 }
 
 function run(matchers, popstate) {
@@ -36,9 +38,9 @@ function run(matchers, popstate) {
     get pauseRecord() { return _pauseRecord },
     resume() { return _pauseRecord = [] },
     pause(cb) { return _pauseRecord = [history.length, location.pathname, cb] },
-    stop: popstate.add(loc => checkPause(dispatch, ultra, loc)),
-    push: navigate.bind(null, matchers, push),
-    replace: navigate.bind(null, matchers, replace),
+    stop: popstate.add(loc => checkPause(ultra, dispatch, loc)),
+    push: loc => navigate(ultra, dispatch, push),
+    replace: loc => navigate(ultra, dispatch, replace),
     popstate,
     matchers
   }
