@@ -15,18 +15,28 @@ function navigate(matchers, navAction, loc, ...args) {
   navAction(loc, ...args)
 }
 
+function checkOverride(dispatch, ultra, loc) {
+  let [len, path, override] = ultra.override, msg = Object.assign({}, loc, { ultra })
+  let next = () => {
+    ultra.override = null;
+    return dispatch(msg)
+  }
+  let restore = () => ultra.replace(path)
+  let actions = { restore, dispatch: next }
+  return (override && len === history.length && path !== location.pathname) ? override(next, restore, msg) : next()
+}
+
 function getDispatch(matchers) {
   let actions = matchers.map(matcher => pipe(matcher.match, matcher.process))
-  return (ultra, loc) => {
-    let ultraLoc = Object.assign({}, loc, { ultra })
-    actions.some(fn => fn(ultraLoc))
-  }
+  return msg => actions.some(fn => fn(msg))
 }
 
 function run(matchers, popstate) {
-  let dispatch = getDispatch(matchers)
+  let _override = [], dispatch = getDispatch(matchers)
   let ultra = {
-    stop: popstate.add(loc => dispatch(ultra, loc)),
+    get override() { return _override },
+    set override(value) { _override = value ? [history.length, location.pathname, value] : [] },
+    stop: popstate.add(loc => checkOverride(dispatch, ultra, loc)),
     push: navigate.bind(null, matchers, push),
     replace: navigate.bind(null, matchers, replace),
     popstate,
