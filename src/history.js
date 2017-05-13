@@ -4,6 +4,10 @@ function getPathname() {
   return location.pathname
 }
 
+function getState() {
+  return history.state
+}
+
 function invokeHandlers(handlers) {
   function invoke(event, fn) {
     let pathname = getPathname(), state = event && (event.state || event.detail)
@@ -16,16 +20,22 @@ function createPopstate() {
   return new Listener('popstate', window, invokeHandlers)
 }
 
-let push = msg => {
+let push = (cb, msg) => {
   let {pathname, state, title} = msg
-  history.pushState(state, title, pathname)
-  return msg
+  if(pathname !== getPathname()) {
+    history.pushState(state, title, pathname)
+    if(cb) return cb(msg)
+  }
+  else warning(false, 'Attempt to push path identical to current path: %s', pathname)
 }
 
-let replace = msg => {
+let replace = (cb, msg) => {
   let {pathname, state, title} = msg
-  history.replaceState(state, title, pathname)
-  return msg
+  if (!(pathname === getPathname() && state === getState())) {
+    history.replaceState(state, title, pathname)
+    if(cb) return cb(msg)
+  }
+  else warning(false, 'Attempt to push path identical to current path: %s', pathname)
 }
 
 export { createPopstate, push, replace }
