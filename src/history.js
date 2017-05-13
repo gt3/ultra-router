@@ -1,4 +1,5 @@
 import Listener from './listener'
+import warning from 'warning'
 
 function getPathname() {
   return location.pathname
@@ -18,6 +19,7 @@ function createPopstate() {
 
 let push = msg => {
   let {pathname, state, title} = msg
+  warning(pathname === getPathname(), 'Attempt to push path identical to current path: %s', pathname)
   history.pushState(state, title, pathname)
   return msg
 }

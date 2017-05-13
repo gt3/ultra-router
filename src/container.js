@@ -7,14 +7,14 @@ function getDispatch(matchers) {
   return msg => actions.some(fn => fn(msg))
 }
 
-function checkPause(ultra, dispatch, loc) {
+function guardDispatch(ultra, dispatch, loc) {
   let [len, prevPath, confirm] = ultra.pauseRecord, msg = Object.assign({}, loc, { ultra, prevPath })
   let ok = () => {
     ultra.resume()
     return dispatch(msg)
   }
   let cancel = () => ultra.replace(prevPath)
-  return (confirm && len === history.length && prevPath !== location.pathname) ? confirm(ok, cancel, msg) : ok()
+  return (confirm && len === history.length) ? confirm(ok, cancel, msg) : ok()
 }
 
 function verify(matchers, loc) {
@@ -27,9 +27,8 @@ function toPath(loc) {
 
 function navigate(dispatch, ultra, navAction, loc) {
   let {pauseRecord, matchers} = ultra, action = pipe(navAction, dispatch)
-  //warning - check for same loc
   warning(verify(matchers, toPath(loc)), 'At least one path should be an exact match: %s', loc)
-  return checkPause(action, ultra, loc)
+  return guardDispatch(action, ultra, loc)
 }
 
 function run(matchers, popstate) {
@@ -38,9 +37,9 @@ function run(matchers, popstate) {
     get pauseRecord() { return _pauseRecord },
     resume() { return _pauseRecord = [] },
     pause(cb) { return _pauseRecord = [history.length, location.pathname, cb] },
-    stop: popstate.add(loc => checkPause(ultra, dispatch, loc)),
-    push: loc => navigate(ultra, dispatch, push),
-    replace: loc => navigate(ultra, dispatch, replace),
+    stop: popstate.add(loc => guardDispatch(ultra, dispatch, loc)),
+    push: loc => navigate(ultra, dispatch, push, loc),
+    replace: loc => navigate(ultra, dispatch, replace, loc),
     popstate,
     matchers
   }
