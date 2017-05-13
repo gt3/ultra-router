@@ -1,4 +1,5 @@
 import Listener from './listener'
+import warning from 'warning'
 
 function getPathname() {
   return location.pathname
