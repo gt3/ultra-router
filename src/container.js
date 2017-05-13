@@ -39,20 +39,23 @@ function run(matchers, popstate) {
     resume() { return _pauseRecord = [] },
     pause(cb) { return _pauseRecord = [history.length, toPath(location.pathname), cb] },
     stop: popstate.add(loc => guardDispatch(ultra, dispatch, loc)),
-    push: loc => navigate(ultra, dispatch, push, loc),
-    replace: loc => navigate(ultra, dispatch, replace, loc),
+    go: (action, loc) => navigate(ultra, dispatch, action, loc),
+    push: loc => ultra.go(push, loc),
+    replace: loc => ultra.go(replace, loc),
     popstate,
     matchers
   }
   return ultra
 }
 
-function initialize(matchers, ultra = {}) {
-  let { stop, matchers: currentMatchers, popstate } = ultra
-  if (stop) stop.call(ultra)
+function initialize(matchers, ultraOptions = {}) {
+  let { stop, matchers: currentMatchers, popstate, preventCurrent } = ultraOptions
+  if (stop) stop.call(ultraOptions)
   if (currentMatchers) matchers = currentMatchers.concat(matchers)
   if (!popstate) popstate = createPopstate()
-  return run(matchers, popstate)
+  let ultra = run(matchers, popstate)
+  if(!preventCurrent) ultra.go((cb, msg) => cb(msg), location.pathname)
+  return ultra
 }
 
 export function container(...matchers) {
