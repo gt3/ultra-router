@@ -1,3 +1,5 @@
+import warning from 'warning'
+
 function noop() {}
 
 function isFn(t) {
@@ -37,8 +39,9 @@ function shieldProps(t, ...keys) {
 
 export { noop, isFn, isStr, empty, invokeFn, pipe, flattenToObj, mapOverKeys, hasOwn, shieldProps }
 
-function isClickValid(e) {
+function validateClick(href, e) {
+  warning(href !== location.pathname, 'Attempt to push path identical to current path: %s', href)
   return !(e.defaultPrevented || e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
 }
 
-export { isClickValid }
+export { validateClick }

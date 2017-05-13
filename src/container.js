@@ -25,10 +25,11 @@ function toPath(loc) {
   return isStr(loc) ? { pathname: loc } : loc
 }
 
-function navigate(dispatch, ultra, navAction, loc) {
+function navigate(ultra, dispatch, navAction, loc) {
   let {pauseRecord, matchers} = ultra, action = pipe(navAction, dispatch)
-  warning(verify(matchers, toPath(loc)), 'At least one path should be an exact match: %s', loc)
-  return guardDispatch(action, ultra, loc)
+  loc = toPath(loc)
+  warning(verify(matchers, loc), 'At least one path should be an exact match: %s', loc.pathname)
+  return guardDispatch(ultra, action, loc)
 }
 
 function run(matchers, popstate) {

@@ -1,9 +1,9 @@
-import { shieldProps, isClickValid } from './utils'
+import { shieldProps, validateClick } from './utils'
 
 export const UltraLink = p => {
   let props = shieldProps(p, 'createElement', 'ultra')
   let { href, createElement, ultra } = props
-  props.onClick = createListener(ultra.push.bind(null, href))
+  props.onClick = createListener(href, ultra.push)
   return createElement('a', props)
 }
 UltraLink.defaultProps = {
@@ -14,11 +14,11 @@ UltraLink.defaultProps = {
   }
 }
 
-export function createListener(action) {
+export function createListener(href, action) {
   return function clickHandler(e) {
-    if (isClickValid) {
+    if (validateClick(href, e)) {
       e.preventDefault()
-      action()
+      action(href)
     }
   }
 }
