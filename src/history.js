@@ -9,6 +9,10 @@ function getState() {
   return history.state
 }
 
+function getLength() {
+  return history.length
+}
+
 function invokeHandlers(handlers) {
   function invoke(event, fn) {
     let pathname = getPathname(), state = event && (event.state || event.detail)
@@ -37,6 +41,19 @@ let replace = (cb, msg) => {
     if(cb) return cb(msg)
   }
   else warning(false, 'Attempt to push path identical to current path: %s', pathname)
+}
+
+let recalibrate = (cb, msg) => {
+  let { pausePath, ultra } = msg
+  let len = getLength()
+  if(ultra.visited.get(len) === pausePath) ;
+  else if (ultra.visited.get(len-1) === pausePath) {
+    history.go(-1)
+  }
+  else if (ultra.visited.get(len+1) === pausePath) {
+    history.go(1)
+  }
+  if(cb) return cb(msg)
 }
 
 export { createPopstate, push, replace }

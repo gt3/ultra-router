@@ -1,6 +1,24 @@
 import { pipe, isStr } from './utils'
 import warning from 'warning'
-import { createPopstate, push, replace } from './history'
+import { createPopstate, push, replace, recalibrate } from './history'
+
+function recordVisit(msg) {
+  let { ultra, pathname } = msg
+  let historyLength = history.length
+  if(!ultra.visited) ultra.visited = new Map()
+  if(!ultra.visited.has(historyLength)) {
+    ultra.visited.set(historyLength, pathname)
+  }
+  else {
+    if(ultra.visited.get(historyLength - 1) === pathname) {
+      ultra.visited.delete(historyLength)
+    }
+    else {
+      ultra.visited.set(historyLength, pathname)
+    }
+  }
+  return msg
+}
 
 function getDispatch(matchers) {
   let actions = matchers.map(matcher => pipe(matcher.match, matcher.process))
@@ -8,12 +26,12 @@ function getDispatch(matchers) {
 }
 
 function guardDispatch(ultra, dispatch, loc) {
-  let [len, prevPath, confirm] = ultra.pauseRecord, msg = Object.assign({}, loc, { ultra, prevPath })
+  let [len, pausePath, confirm] = ultra.pauseRecord, msg = Object.assign({}, loc, { ultra, pausePath })
   let ok = () => {
     ultra.resume()
     return dispatch(msg)
   }
-  let cancel = replace.bind(null, null, prevPath)
+  let cancel = recalibrate.bind(null, null, msg)
   return (confirm && len === history.length) ? confirm(ok, cancel, msg) : ok()
 }
 
@@ -37,7 +55,7 @@ function run(matchers, popstate) {
   let ultra = {
     get pauseRecord() { return _pauseRecord },
     resume() { return _pauseRecord = [] },
-    pause(cb) { return _pauseRecord = [history.length, toPath(location.pathname), cb] },
+    pause(cb) { return _pauseRecord = [history.length, location.pathname, cb] },
     stop: popstate.add(loc => guardDispatch(ultra, dispatch, loc)),
     go: (action, loc) => navigate(ultra, dispatch, action, loc),
     push: loc => ultra.go(push, loc),
