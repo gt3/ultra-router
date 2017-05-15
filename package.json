@@ -7,11 +7,10 @@
   "scripts": {
     "test": "cross-env BABEL_ENV=test jest --useStderr",
     "cover": "cross-env BABEL_ENV=test jest --coverage",
-    "format": "prettier --no-semi --single-quote --print-width 100 --write \"{src,test}/**/*.js\"",
+    "format": "prettier --single-quote --print-width 100 --write \"{src,test}/**/*.js\"",
     "lint": "npm run format && eslint -c ./config/eslint/.eslintrc.json --ignore-path .gitignore src/**",
     "build": "rollup -c && rollup -c --environment DIST",
-    "prepublish": "npm run build",
-    "copy": "npm pack && move /Y ./ultra-0.0.1.tgz ../react-circuit-example/ "
+    "prepublish": "npm run build"
   },
   "repository": "react-circuit/ultra",
   "author": "Ankit Patel <gt3.someday@gmail.com>",
