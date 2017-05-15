@@ -25,6 +25,7 @@ let push = (cb, msg) => {
   let {pathname, state, title} = msg
   if(pathname !== getPathname()) {
     history.pushState(state, title, pathname)
+    console.log('push:',pathname, state)
     if(cb) return cb(msg)
   }
   else warning(false, 'Attempt to push path identical to current path: %s', pathname)
@@ -34,12 +35,15 @@ let replace = (cb, msg) => {
   let {pathname, state, title} = msg
   if (!(pathname === getPathname() && state === getState())) {
     history.replaceState(state, title, pathname)
+    console.log('replace:',pathname, state)
     if(cb) return cb(msg)
   }
   else warning(false, 'Attempt to push path identical to current path: %s', pathname)
 }
 
 let recalibrate = msg => {
+      console.log('recalibrating...')
+
   let { ultra, state } = msg, currentLen = history.length
   let [len, ...visits] = ultra.visited
   if(state && state.id && currentLen === len) {

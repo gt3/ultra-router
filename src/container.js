@@ -2,22 +2,36 @@ import { pipe, isStr } from './utils'
 import warning from 'warning'
 import { createPopstate, push, replace, recalibrate } from './history'
 
+function place(n) {
+  return [10,100].find(x => n%x == n)
+}
+
+function makeId(m, n=0) {
+  return m*place(n) + n
+}
+
 function recordVisit(msg) {
+  let id, newState
   let { ultra, pathname, state } = msg, currentLen = history.length
   console.log('before:', ultra.visited)
   if(!ultra.visited) { ultra.visited = [] }
   let [len, ...visits] = ultra.visited
   if(!len || currentLen > len) {
-    let newState = Object.assign({}, state, {id: currentLen})
-    console.log('new id:', currentLen)
-    ultra.visited = [currentLen, currentLen]
+    id = makeId(currentLen)
+    newState = Object.assign({}, state, {id})
+    console.log('new id:', id)
+    ultra.visited = [currentLen, id]
     replace(null, {pathname, state: newState})
   }
   else {
-    if(visits[visits.length-1] < state.id) {
-      // will we ever get here ???
-      console.log('append id:',state.id)
-      ultra.visited = [currentLen, ...visits.concat(state.id).slice(-currentLen)]
+    id = state ? state.id : makeId(currentLen, visits.length)
+    if(!visits.length || id > visits[visits.length-1]) {
+      console.log('xxx append:', id)
+      ultra.visited = [currentLen, ...visits, id]
+    }
+    if(!state) {
+      newState = Object.assign({}, state, {id})
+      replace(null, {pathname, state: newState})
     }
   }
   console.log('after:', ultra.visited)
@@ -33,7 +47,6 @@ function guardDispatch(ultra, dispatch, loc) {
   let msg = Object.assign({}, loc, { ultra, stickyPath })
   let ok = () => {
     ultra.resume()
-    console.log('ok...')
     return dispatch(msg)
   }
   let cancel = recalibrate.bind(null, msg)
