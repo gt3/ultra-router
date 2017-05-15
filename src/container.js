@@ -3,14 +3,6 @@ import warning from 'warning'
 import { createPopstate, push, replace, go } from './history'
 import { makeVisit, recalibrate } from './visit'
 
-function getDispatch(matchers) {
-  let actions = matchers.map(matcher => pipe(matcher.match, matcher.process))
-  return msg => {
-    recordVisit(msg)
-    return actions.some(fn => fn(msg))
-  }
-}
-
 export function recordVisit(msg) {
   let { ultra, pathname, state } = msg
   console.log('before:', ultra.visited)
@@ -20,6 +12,14 @@ export function recordVisit(msg) {
     replace(null, { pathname, state: newState })
   }
   console.log('after:', ultra.visited)
+}
+
+function getDispatch(matchers) {
+  let actions = matchers.map(matcher => pipe(matcher.match, matcher.process))
+  return msg => {
+    recordVisit(msg)
+    return actions.some(fn => fn(msg))
+  }
 }
 
 function guardDispatch(ultra, dispatch, loc) {
@@ -32,9 +32,6 @@ function guardDispatch(ultra, dispatch, loc) {
   let cancel = pipe(recalibrate, go).bind(null, msg)
   if (confirm && len === history.length) {
     if (pathname !== stickyPath) return confirm(ok, cancel, msg)
-    else {
-      console.log('result of go action - do nothing')
-    }
   } else return ok()
 }
 
@@ -66,9 +63,9 @@ function run(matchers, popstate) {
       return (_pauseRecord = [history.length, location.pathname, cb])
     },
     stop: popstate.add(loc => guardDispatch(ultra, dispatch, loc)),
-    go: (action, loc) => navigate(ultra, dispatch, action, loc),
-    push: loc => ultra.go(push, loc),
-    replace: loc => ultra.go(replace, loc),
+    nav: (action, loc) => navigate(ultra, dispatch, action, loc),
+    push: loc => ultra.nav(push, loc),
+    replace: loc => ultra.nav(replace, loc),
     popstate,
     matchers
   }
@@ -81,7 +78,7 @@ function initialize(matchers, ultraOptions = {}) {
   if (currentMatchers) matchers = currentMatchers.concat(matchers)
   if (!popstate) popstate = createPopstate()
   let ultra = run(matchers, popstate)
-  if (!preventCurrent) ultra.go((cb, msg) => cb(msg), location.pathname)
+  if (!preventCurrent) ultra.nav((cb, msg) => cb(msg), location.pathname)
   return ultra
 }
 
