@@ -11,7 +11,7 @@ function getState() {
 
 function invokeHandlers(handlers) {
   function invoke(event, fn) {
-    let pathname = getPathname(), state = event && (event.state || event.detail)
+    let pathname = getPathname(), state = event.state
     return fn({ pathname, state, event })
   }
   return event => handlers().forEach(invoke.bind(null, event))
@@ -40,10 +40,10 @@ let replace = (cb, msg) => {
 }
 
 let recalibrate = msg => {
-  let { ultra, pathname } = msg, currentLen = history.length
+  let { ultra, state } = msg, currentLen = history.length
   let [len, ...visits] = ultra.visited
-  if(currentLen === len) {
-    if(visits[visits.length - 2] === pathname) {
+  if(state && state.id && currentLen === len) {
+    if(visits[visits.length - 1] === state.id) {
       console.log('go back')
       history.go(-1)
     }

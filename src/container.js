@@ -3,15 +3,22 @@ import warning from 'warning'
 import { createPopstate, push, replace, recalibrate } from './history'
 
 function recordVisit(msg) {
-  let { ultra, pathname } = msg, currentLen = history.length
+  let { ultra, pathname, state } = msg, currentLen = history.length
   console.log('before:', ultra.visited)
   if(!ultra.visited) { ultra.visited = [] }
   let [len, ...visits] = ultra.visited
   if(!len || currentLen > len) {
-    ultra.visited = [currentLen, pathname]
+    let newState = Object.assign({}, state, {id: currentLen})
+    console.log('new id:', currentLen)
+    ultra.visited = [currentLen, currentLen]
+    replace(null, {pathname, state: newState})
   }
   else {
-    ultra.visited = [currentLen, ...visits.concat(pathname).slice(-currentLen)]
+    if(visits[visits.length-1] < state.id) {
+      // will we ever get here ???
+      console.log('append id:',state.id)
+      ultra.visited = [currentLen, ...visits.concat(state.id).slice(-currentLen)]
+    }
   }
   console.log('after:', ultra.visited)
 }
