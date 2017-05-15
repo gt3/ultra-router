@@ -1,32 +1,34 @@
 function place(n) {
-  return [10, 100].find(x => n % x === n);
+  return [10, 100].find(x => n % x === n)
 }
 
 function makeId(m, n = 0) {
-  return m * place(n) + n;
+  return m * place(n) + n
 }
 
 export function makeVisit(ultra, state) {
-  let id, currentLen = history.length, result = ultra.visited || [];
-  let [len, ...visits] = result;
-  if (!len || currentLen > len) {
-    id = makeId(currentLen);
-    result = [currentLen, id];
+  let currLen = history.length, visited = ultra.visited || []
+  let origId = state && state.id, id, newState
+  let [len, ...visits] = visited
+  if (!len || currLen > len) {
+    id = makeId(currLen)
+    visited = [currLen, id]
   } else {
-    id = state ? state.id : makeId(currentLen, visits.length);
+    id = origId || makeId(currLen, visits.length)
     if (!visits.length || id > visits[visits.length - 1]) {
-      result = [currentLen, ...visits, id];
+      visited = [currLen, ...visits, id]
     }
   }
-  return [result, id];
+  if (origId !== id) newState = Object.assign({}, state, { id })
+  return { visited, newState }
 }
 
 export function recalibrate(msg) {
-  let { ultra, state } = msg, currentLen = history.length;
-  let [len, ...visits] = ultra.visited, delta = 0;
+  let { ultra, state } = msg, currentLen = history.length
+  let [len, ...visits] = ultra.visited, delta = 0
   if (state && state.id && currentLen === len) {
-    delta = visits[visits.length - 1] === state.id ? -1 : 1;
+    delta = visits[visits.length - 1] === state.id ? -1 : 1
   }
-  console.log('recalibrated: ', delta);
-  return delta;
+  console.log('recalibrated: ', delta)
+  return delta
 }
