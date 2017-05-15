@@ -7,7 +7,7 @@ function getDispatch(matchers) {
   let actions = matchers.map(matcher => pipe(matcher.match, matcher.process))
   return msg => {
     recordVisit(msg)
-    actions.some(fn => fn(msg))
+    return actions.some(fn => fn(msg))
   }
 }
 
