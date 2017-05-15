@@ -10,7 +10,8 @@
     "format": "prettier --no-semi --single-quote --print-width 100 --write \"{src,test}/**/*.js\"",
     "lint": "npm run format && eslint -c ./config/eslint/.eslintrc.json --ignore-path .gitignore src/**",
     "build": "rollup -c && rollup -c --environment DIST",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "copy": "npm pack && move /Y ./ultra-0.0.1.tgz ../react-circuit-example/ "
   },
   "repository": "react-circuit/ultra",
   "author": "Ankit Patel <gt3.someday@gmail.com>",

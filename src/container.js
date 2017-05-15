@@ -3,36 +3,38 @@ import warning from 'warning'
 import { createPopstate, push, replace, recalibrate } from './history'
 
 function recordVisit(msg) {
-  let { ultra, pathname } = msg
-  let historyLength = history.length
-  if(!ultra.visited) ultra.visited = new Map()
-  if(!ultra.visited.has(historyLength)) {
-    ultra.visited.set(historyLength, pathname)
+  let { ultra, pathname } = msg, currentLen = history.length
+  console.log('before:', ultra.visited)
+  if(!ultra.visited) { ultra.visited = [] }
+  let [len, ...visits] = ultra.visited
+  if(!len || currentLen > len) {
+    ultra.visited = [currentLen, pathname]
   }
   else {
-    if(ultra.visited.get(historyLength - 1) === pathname) {
-      ultra.visited.delete(historyLength)
-    }
-    else {
-      ultra.visited.set(historyLength, pathname)
-    }
+    ultra.visited = [currentLen, ...visits.concat(pathname).slice(-currentLen)]
   }
-  return msg
+  console.log('after:', ultra.visited)
 }
 
 function getDispatch(matchers) {
   let actions = matchers.map(matcher => pipe(matcher.match, matcher.process))
-  return msg => actions.some(fn => fn(msg))
+  return msg => { recordVisit(msg); actions.some(fn => fn(msg)) }
 }
 
 function guardDispatch(ultra, dispatch, loc) {
-  let [len, pausePath, confirm] = ultra.pauseRecord, msg = Object.assign({}, loc, { ultra, pausePath })
+  let [len, stickyPath, confirm] = ultra.pauseRecord, { pathname } = loc
+  let msg = Object.assign({}, loc, { ultra, stickyPath })
   let ok = () => {
     ultra.resume()
+    console.log('ok...')
     return dispatch(msg)
   }
-  let cancel = recalibrate.bind(null, null, msg)
-  return (confirm && len === history.length) ? confirm(ok, cancel, msg) : ok()
+  let cancel = recalibrate.bind(null, msg)
+  if(confirm && len === history.length) {
+    if(pathname !== stickyPath) return confirm(ok, cancel, msg)
+    else { console.log('result of go action - do nothing'); }
+  }
+  else return ok()
 }
 
 function verify(matchers, loc) {
