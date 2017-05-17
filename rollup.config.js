@@ -9,7 +9,7 @@ const lib = {
     babel({exclude: 'node_modules/**'})
   ],
   targets: [
-    { format: 'es', dest: './lib/ultra.mjs' },
+    { format: 'es', dest: './lib/ultra.es.js' },
     { format: 'umd', dest: './lib/ultra.js', moduleId: 'ultra', moduleName: 'Ultra' }
   ]
 }

@@ -1,2 +1,9 @@
 # ultra
-Shield your app from routes
+
+## Setup
+
+```Javascript
+npm install --save ultra
+
+import * as Ultra from 'ultra'
+```

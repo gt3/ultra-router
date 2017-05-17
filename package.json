@@ -1,9 +1,9 @@
 {
   "name": "ultra",
   "version": "0.0.1",
-  "description": "Handle a route or two without breaking a sweat!",
+  "description": "Generic pushstate router for React and other component-based frameworks.",
   "main": "./lib/ultra.js",
-  "module": "./lib/ultra.mjs",
+  "module": "./lib/ultra.es.js",
   "scripts": {
     "test": "cross-env BABEL_ENV=test jest --useStderr",
     "cover": "cross-env BABEL_ENV=test jest --coverage",
