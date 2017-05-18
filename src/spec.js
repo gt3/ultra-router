@@ -102,13 +102,16 @@ class PrefixSpec extends PathSpec {
   static strip(prefix, path) {
     return path.replace(prefix, '/').replace('//', '/')
   }
-  get prefix() {
+  get prefixKey() {
     return this.pathKeys[0]
   }
   match(validator, loc) {
-    let { ultra, pathname } = loc, result = { ultra, success: false }
-    if (super.match(validator, pathname))
-      result = super.resolve({ ultra, pathname: PrefixSpec.strip(this.prefix, pathname) }, true)
+    let { ultra, pathname } = loc, result = { ultra, success: false }, match
+    let matches = super.match(validator, pathname)
+    if (matches) {
+      let prefix = matches[this.prefixKey].match
+      result = super.resolve({ ultra, pathname: PrefixSpec.strip(prefix, pathname) }, true)
+    }
     return result
   }
 }
