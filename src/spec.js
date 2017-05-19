@@ -1,4 +1,4 @@
-import { isStr, flattenToObj, hasOwn, empty } from './utils'
+import { isStr, flattenToObj, hasOwn, empty, decodePath } from './utils'
 
 const literalp = `([^\\s/]*)`
 const identifierx = /(:[A-Za-z0-9_:]+)/
@@ -53,7 +53,7 @@ class Path {
   match(validator, pathname) {
     let matches = this.matchx.exec(pathname)
     if (!matches) return {}
-    let match = matches[0], values = matches.slice(1).map(decodeURIComponent)
+    let match = matches[0], values = matches.slice(1).map(decodePath)
     let exact = match.length === pathname.length
     return Object.assign(this.validate(validator, values), { match, exact })
   }

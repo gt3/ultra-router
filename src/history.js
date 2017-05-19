@@ -1,9 +1,6 @@
 import Listener from './listener'
 import warning from 'warning'
-
-function isEncoded(path) {
-  return encodeURI(decodeURI(path)) === path
-}
+import { verifyEncoding } from './utils'
 
 function getPathname() {
   return location.pathname
@@ -28,7 +25,7 @@ function createPopstate() {
 let push = (cb, msg) => {
   let { pathname, state, title } = msg
   if (pathname !== getPathname()) {
-    warning(isEncoded(pathname), 'Incorrect encoding. Use encodeURI on path: %s', pathname)
+    warning(verifyEncoding(pathname), 'Incorrect encoding. Use encodeURI on path: %s', pathname)
     history.pushState(state, title, pathname)
     console.log('push:', pathname, state)
     if (cb) return cb(msg)
@@ -38,7 +35,7 @@ let push = (cb, msg) => {
 let replace = (cb, msg) => {
   let { pathname, state, title } = msg
   if (!(pathname === getPathname() && state === getState())) {
-    warning(isEncoded(pathname), 'Incorrect encoding. Use encodeURI on path: %s', pathname)
+    warning(verifyEncoding(pathname), 'Incorrect encoding. Use encodeURI on path: %s', pathname)
     history.replaceState(state, title, pathname)
     console.log('replace:', pathname, state)
     if (cb) return cb(msg)
