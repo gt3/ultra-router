@@ -1,6 +1,6 @@
 import { isStr, flattenToObj, hasOwn, empty } from './utils'
 
-const literalx = `([^\s/]*)`
+const literalp = `([^\\s/]*)`
 const identifierx = /(:[A-Za-z0-9_:]+)/
 const trailingSlashx = /\/$/
 
@@ -9,7 +9,7 @@ function substitute(literals, values) {
 }
 
 function getMatchX(identifiers, literals) {
-  let subs = new Array(identifiers.length).fill(literalx)
+  let subs = new Array(identifiers.length).fill(literalp)
   return new RegExp(`^${substitute(literals, subs)}`, 'i')
 }
 
