@@ -1,6 +1,6 @@
 {
   "name": "ultra",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Generic pushstate router for React and other component-based frameworks.",
   "main": "./lib/ultra.js",
   "module": "./lib/ultra.es.js",
