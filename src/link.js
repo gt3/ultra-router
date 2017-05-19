@@ -10,9 +10,10 @@ export function createListener(action) {
 }
 
 export const UltraLink = p => {
-  let props = shieldProps(p, 'createElement', 'ultra', 'style', 'defaultStyle')
-  let { href, createElement, ultra, style, defaultStyle } = props
-  props.onClick = createListener(ultra.push.bind(null, encodePath(href)))
+  let props = shieldProps(p, 'createElement', 'ultra', 'style', 'defaultStyle', 'state', 'title')
+  let { href, createElement, ultra, style, defaultStyle, state, title } = props
+  let pathname = encodePath(href)
+  props.onClick = createListener(ultra.push.bind(null, { pathname, state, title }))
   props.style = Object.assign({}, defaultStyle, style)
   return createElement('a', props)
 }

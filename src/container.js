@@ -39,13 +39,13 @@ function verify(matchers, loc) {
   return matchers.some(matcher => matcher.match(loc).success)
 }
 
-function toPath(loc) {
+function toPathObj(loc) {
   return isStr(loc) ? { pathname: loc } : loc
 }
 
 function navigate(ultra, dispatch, navAction, loc) {
   let { matchers } = ultra, action = navAction.bind(null, dispatch)
-  loc = toPath(loc)
+  loc = toPathObj(loc)
   warning(verify(matchers, loc), 'At least one path should be an exact match: %s', loc.pathname)
   return guardDispatch(ultra, action, loc)
 }

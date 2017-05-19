@@ -105,13 +105,15 @@ class PrefixSpec extends PathSpec {
   get prefixKey() {
     return this.pathKeys[0]
   }
-  match(validator, loc) {
-    let { ultra, pathname } = loc, result = { ultra, success: false }, match
+  match(validator, msg) {
+    let { pathname } = msg, result = Object.assign({}, msg)
     let matches = super.match(validator, pathname)
     if (matches) {
       let prefix = matches[this.prefixKey].match
-      result = super.resolve({ ultra, pathname: PrefixSpec.strip(prefix, pathname) }, true)
+      pathname = PrefixSpec.strip(prefix, pathname)
+      result = super.resolve(Object.assign(result, {pathname}), true)
     }
+    else result.success = false
     return result
   }
 }

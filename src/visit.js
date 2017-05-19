@@ -1,3 +1,5 @@
+const idk = '$id'
+
 function place(n) {
   return [10, 100].find(x => n % x === n)
 }
@@ -8,7 +10,7 @@ function makeId(m, n = 0) {
 
 export function makeVisit(ultra, state) {
   let currLen = history.length, visited = ultra.visited || []
-  let origId = state && state.id, id, newState
+  let origId = state && state[idk], id, newState
   let [len, ...visits] = visited
   if (!len || currLen > len) {
     id = makeId(currLen)
@@ -19,15 +21,15 @@ export function makeVisit(ultra, state) {
       visited = [currLen, ...visits, id]
     }
   }
-  if (origId !== id) newState = Object.assign({}, state, { id })
+  if (origId !== id) newState = Object.assign({}, state, { [idk]: id })
   return { visited, newState }
 }
 
 export function recalibrate(msg) {
   let { ultra, state } = msg, currentLen = history.length
   let [len, ...visits] = ultra.visited, delta = 0
-  if (state && state.id && currentLen === len) {
-    delta = visits[visits.length - 1] === state.id ? -1 : 1
+  if (state && state[idk] && currentLen === len) {
+    delta = visits[visits.length - 1] === state[idk] ? -1 : 1
   }
   console.log('recalibrated: ', delta)
   return delta

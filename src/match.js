@@ -17,15 +17,16 @@ function linkFromPathKey(specs, prefix, pathKey, values = [], usePrefix = true) 
   return link || ''
 }
 
-function matcher(specs, validator, loc) {
-  let spec, result, { pathname, ultra } = loc
+function matcher(specs, validator, msg) {
+  let spec, result, { pathname } = msg
   spec = specs.find(spec => !!(result = spec.match(validator, pathname)))
   let success = spec && spec.success(result)
-  return { success, result, spec, ultra }
+  result = Object.assign({}, msg, result)
+  return {result, success, spec}
 }
 
-function process({ success, result, spec, ultra }) {
-  if (spec) spec.resolve(Object.assign(result, { ultra }), success)
+function process({result, success, spec}) {
+  if (spec) spec.resolve(result, success)
   return !!spec
 }
 
