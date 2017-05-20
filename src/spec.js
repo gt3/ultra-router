@@ -123,7 +123,7 @@ export function prefixSpec(prefix, next) {
 }
 
 function rxToFn(rx) {
-  return values => !empty(values.filter(rx.test.bind(rx)))
+  return values => !empty(values.filter(rx.test.bind(rx))) && values
 }
 
 function makeCheck(id, rx) {
