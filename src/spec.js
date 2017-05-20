@@ -1,4 +1,4 @@
-import { isStr, flattenToObj, hasOwn, empty, decodePath } from './utils'
+import { isStr, flattenToObj, hasOwn, empty, escapeRx, decodePath } from './utils'
 
 const literalp = `([^\\s/]*)`
 const identifierx = /(:[A-Za-z0-9_:]+)/
@@ -10,7 +10,7 @@ function substitute(literals, values) {
 
 function getMatchX(identifiers, literals) {
   let subs = new Array(identifiers.length).fill(literalp)
-  return new RegExp(`^${substitute(literals, subs)}`, 'i')
+  return new RegExp(`^${substitute(literals.map(escapeRx), subs)}`, 'i')
 }
 
 let parsePathKey = pathKey => {
