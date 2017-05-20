@@ -42,20 +42,28 @@ class Path {
   }
   findInvalid(checks, values) {
     let ids = this.identifiers, hasCheck = hasOwn.bind(checks)
-    return empty(checks)
-      ? -1
-      : values.findIndex((val, i) => hasCheck(ids[i]) && !checks[ids[i]](values))
+    let checkValues = values.map((v, i) => hasCheck(ids[i]) && checks[ids[i]])
+    let invalid = checkValues.findIndex((check, i) => {
+      if(!check) return true
+      let res = check(values)
+      return !res || (values = res)
+    })
+    return { invalid, values }
   }
-  validate(checks, values) {
-    let invalid = this.findInvalid(checks, values)
-    return invalid === -1 ? { values, passed: true } : { values: values.slice(0, invalid) }
+  validate(checks, data) {
+    if(empty(checks)) {
+      return Object.assign(data, { passed: true })
+    }
+    let {invalid, values: res} = this.findInvalid(checks, values)
+    return invalid === -1 ? { values: res, passed: true } : { values: values.slice(0, invalid) }
   }
   match(checks, pathname) {
     let matches = this.matchx.exec(pathname)
     if (!matches) return {}
     let match = matches[0], values = matches.slice(1).map(decodePath)
     let exact = match.length === pathname.length
-    return Object.assign(this.validate(checks, values), { match, exact })
+    return this.validate(checks, { pathname, match, exact, values })
+    return Object.assign(this.validate(checks, values, match), { match, exact })
   }
   makeLink(values) {
     return substitute(this.literals, values)
