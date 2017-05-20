@@ -121,16 +121,16 @@ export function prefixSpec(prefix, next) {
   return new PrefixSpec(prefix, next)
 }
 
-function rxToFn(rx) {
-  return values => !empty(values.filter(rx.test.bind(rx)))
+function rxFn(rxs) {
+  return values => rxs.every(rx => !empty(values.filter(rx.test.bind(rx))))
 }
 
-function makeCheck(id, rx) {
-  return { [id]: rxToFn(rx) }
+function makeCheck(id, rxs) {
+  return { [id]: rxFn(rxs) }
 }
 
-function rx(ids, rx) {
-  return flattenToObj(ids.map(id => makeCheck(id, rx)))
+function rx(ids, ...rxs) {
+  return flattenToObj(ids.map(id => makeCheck(id, rxs)))
 }
 
 export function check(...ids) {
