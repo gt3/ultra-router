@@ -111,9 +111,8 @@ class PrefixSpec extends PathSpec {
     if (matches) {
       let prefix = matches[this.prefixKey].match
       pathname = PrefixSpec.strip(prefix, pathname)
-      result = super.resolve(Object.assign(result, {pathname}), true)
-    }
-    else result.success = false
+      result = super.resolve(Object.assign(result, { pathname }), true)
+    } else result.success = false
     return result
   }
 }
@@ -127,7 +126,7 @@ function rxToFn(rx) {
 }
 
 function makeCheck(id, rx) {
-  return { [id]: isFn(rx) || rxToFn(rx) }
+  return { [id]: rxToFn(rx) }
 }
 
 function rx(ids, rx) {

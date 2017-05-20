@@ -22,10 +22,10 @@ function matcher(specs, checks, msg) {
   spec = specs.find(spec => !!(result = spec.match(checks, pathname)))
   let success = spec && spec.success(result)
   result = Object.assign({}, msg, result)
-  return {result, success, spec}
+  return { result, success, spec }
 }
 
-function process({result, success, spec}) {
+function process({ result, success, spec }) {
   if (spec) spec.resolve(result, success)
   return !!spec
 }
