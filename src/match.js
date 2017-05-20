@@ -17,9 +17,9 @@ function linkFromPathKey(specs, prefix, pathKey, values = [], usePrefix = true) 
   return link || ''
 }
 
-function matcher(specs, validator, msg) {
+function matcher(specs, checks, msg) {
   let spec, result, { pathname } = msg
-  spec = specs.find(spec => !!(result = spec.match(validator, pathname)))
+  spec = specs.find(spec => !!(result = spec.match(checks, pathname)))
   let success = spec && spec.success(result)
   result = Object.assign({}, msg, result)
   return {result, success, spec}
@@ -31,17 +31,16 @@ function process({result, success, spec}) {
 }
 
 function matchPrefix(matcher) {
-  let { prefix, match, validator } = matcher, result = matcher
+  let { prefix, match, checks } = matcher, result = matcher
   if (isStr(prefix)) {
     let pspec = prefixSpec(prefix, match)
-    result.match = pspec.match.bind(pspec, validator)
+    result.match = pspec.match.bind(pspec, checks)
   }
   return result
 }
 
-export function match(specs, checks = [], prefix) {
+export function match(specs, checks = {}, prefix) {
   if (!Array.isArray(specs)) specs = [].concat(specs)
-  let validator = checks && checks.length ? flattenToObj(checks) : {}
-  let match = matcher.bind(null, specs, validator)
-  return matchPrefix({ match, process, prefix, specs, validator })
+  let match = matcher.bind(null, specs, checks)
+  return matchPrefix({ match, process, prefix, specs, checks })
 }
