@@ -38,12 +38,18 @@ function matchPrefix(matcher) {
   return result
 }
 
-function matchEntry(match, entry) {
-  return isFn(entry) ? pipe(entry, match) : match
+function wrapPrematch(prematch, msg) {
+  let { pathname } = msg
+  pathname = prematch(pathname)
+  return pathname === msg.pathname ? msg : Object.assign({}, msg, { pathname })
 }
 
-export function match(specs, checks = {}, prefix, entry) {
+function prematchEntry(match, prematch) {
+  return !isFn(prematch) ? match : pipe(wrapPrematch.bind(null, prematch), match)
+}
+
+export function match(specs, checks = {}, prefix, prematch) {
   if (!Array.isArray(specs)) specs = [].concat(specs)
-  let match = matchEntry(matcher.bind(null, specs, checks), entry)
+  let match = prematchEntry(matcher.bind(null, specs, checks), prematch)
   return matchPrefix({ match, process, prefix, specs, checks })
 }
