@@ -1,8 +1,8 @@
 import { isStr, flattenToObj, hasOwn, empty, escapeRx, decodePath } from './utils'
+import { removeTrailingSlash } from './utils-path'
 
 const literalp = `([^\\s/]*)`
 const identifierx = /(:[A-Za-z0-9_:]+)/
-const trailingSlashx = /\/$/
 
 function substitute(literals, values) {
   return String.raw({ raw: literals }, ...values)
@@ -14,7 +14,7 @@ function getMatchX(identifiers, literals) {
 }
 
 let parsePathKey = pathKey => {
-  let key = isStr(pathKey) ? pathKey.replace(trailingSlashx, '') : ''
+  let key = isStr(pathKey) ? removeTrailingSlash(pathKey) : ''
   let fragments = key.split(identifierx)
   let identifiers = []
   let literals = fragments.reduce((acc, f) => {
@@ -30,10 +30,6 @@ function assignValues(pathKey, values = []) {
   let { identifiers } = isStr(pathKey) ? parsePathKey(pathKey) : pathKey
   let res = identifiers.map((id, key) => ({ [id]: values[key] }))
   return flattenToObj(res)
-}
-
-function makeMatchPath(path) {
-  return path.replace(trailingSlashx, '')
 }
 
 class Path {
@@ -73,13 +69,12 @@ class PathSpec {
     return idx > -1 && this.paths[idx]
   }
   match(checks, pathname) {
-    let matchPath = makeMatchPath(pathname)
     let [primary, ...subs] = this.paths
-    let result, matches = primary.match(checks, matchPath)
+    let result, matches = primary.match(checks, pathname)
     if (matches.passed) {
       result = { [primary.key]: matches }
       subs.some(sub => {
-        let submatches = sub.match(checks, matchPath)
+        let submatches = sub.match(checks, pathname)
         if (submatches.passed) result[sub.key] = submatches
         return submatches.exact
       })
@@ -99,9 +94,6 @@ export function spec(...pathKeys) {
 }
 
 class PrefixSpec extends PathSpec {
-  static strip(prefix, path) {
-    return path.replace(prefix, '/').replace('//', '/')
-  }
   get prefixKey() {
     return this.pathKeys[0]
   }
@@ -110,8 +102,7 @@ class PrefixSpec extends PathSpec {
     let matches = super.match(checks, pathname)
     if (matches) {
       let prefix = matches[this.prefixKey].match
-      pathname = PrefixSpec.strip(prefix, pathname)
-      result = super.resolve(Object.assign(result, { pathname }), true)
+      result = super.resolve(Object.assign(result, { prefix }), true)
     } else result.success = false
     return result
   }

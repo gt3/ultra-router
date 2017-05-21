@@ -1,4 +1,5 @@
-import { isFn, isStr, empty, pipe } from './utils'
+import { isStr, pipe } from './utils'
+import { normalizePath } from './utils-path'
 import { prefixSpec } from './spec'
 
 function findPath(specs, pathKey) {
@@ -31,25 +32,21 @@ function process({ result, success, spec }) {
 
 function matchPrefix(matcher) {
   let { prefix, match, checks } = matcher, result = matcher
-  if (!empty(prefix)) {
+  if (prefix) {
     let pspec = prefixSpec(prefix, match)
     result.match = pspec.match.bind(pspec, checks)
   }
   return result
 }
 
-function wrapPrespec(prespec, msg) {
-  let { pathname } = msg
-  pathname = prespec(pathname)
+function prematch(prespec, msg) {
+  let { prefix, pathname } = msg
+  pathname = pipe(normalizePath.bind(null, prefix), prespec)(pathname)
   return pathname === msg.pathname ? msg : Object.assign({}, msg, { pathname })
-}
-
-function prespecEntry(match, prespec) {
-  return !isFn(prespec) ? match : pipe(wrapPrespec.bind(null, prespec), match)
 }
 
 export function match(specs, checks = {}, prefix, prespec) {
   if (!Array.isArray(specs)) specs = [].concat(specs)
-  let match = prespecEntry(matcher.bind(null, specs, checks), prespec)
+  let match = pipe(prematch.bind(null, prespec), matcher.bind(null, specs, checks))
   return matchPrefix({ match, process, prefix, specs, checks })
 }

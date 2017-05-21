@@ -10,7 +10,7 @@ function isStr(s) {
 }
 
 function empty(t) {
-  return !t || !(isStr(t) || (Array.isArray(t) ? t : Object.keys(t)).length)
+  return !t || !(Array.isArray(t) ? t : Object.keys(t)).length
 }
 
 const invokeFn = Function.prototype.call.bind(Function.prototype.call)
