@@ -39,8 +39,12 @@ function matchPrefix(matcher) {
   return result
 }
 
-export function match(specs, checks = {}, prefix, mapper) {
+function matchEntry(match, entry) {
+  return isFn(entry) ? pipe(entry, match) : match
+}
+
+export function match(specs, checks = {}, prefix, entry) {
   if (!Array.isArray(specs)) specs = [].concat(specs)
-  let match = pipe(mapper, matcher.bind(null, specs, checks))
+  let match = matchEntry(matcher.bind(null, specs, checks), entry)
   return matchPrefix({ match, process, prefix, specs, checks })
 }
