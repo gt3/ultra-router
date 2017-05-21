@@ -1,4 +1,4 @@
-import { isStr, empty, pipe } from './utils'
+import { isFn, isStr, empty, pipe } from './utils'
 import { prefixSpec } from './spec'
 
 function findPath(specs, pathKey) {
@@ -26,8 +26,7 @@ function matcher(specs, checks, msg) {
 }
 
 function process({ result, success, spec }) {
-  if (spec) spec.resolve(result, success)
-  return !!spec
+  return spec ? spec.resolve(result, success) : false
 }
 
 function matchPrefix(matcher) {
