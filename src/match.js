@@ -38,18 +38,18 @@ function matchPrefix(matcher) {
   return result
 }
 
-function wrapPrematch(prematch, msg) {
+function wrapPrespec(prespec, msg) {
   let { pathname } = msg
-  pathname = prematch(pathname)
+  pathname = prespec(pathname)
   return pathname === msg.pathname ? msg : Object.assign({}, msg, { pathname })
 }
 
-function prematchEntry(match, prematch) {
-  return !isFn(prematch) ? match : pipe(wrapPrematch.bind(null, prematch), match)
+function prespecEntry(match, prespec) {
+  return !isFn(prespec) ? match : pipe(wrapPrespec.bind(null, prespec), match)
 }
 
-export function match(specs, checks = {}, prefix, prematch) {
+export function match(specs, checks = {}, prefix, prespec) {
   if (!Array.isArray(specs)) specs = [].concat(specs)
-  let match = prematchEntry(matcher.bind(null, specs, checks), prematch)
+  let match = prespecEntry(matcher.bind(null, specs, checks), prespec)
   return matchPrefix({ match, process, prefix, specs, checks })
 }
