@@ -1,4 +1,4 @@
-import { isStr, flattenToObj } from './utils'
+import { isStr, empty } from './utils'
 import { prefixSpec } from './spec'
 
 function findPath(specs, pathKey) {
@@ -17,8 +17,9 @@ function linkFromPathKey(specs, prefix, pathKey, values = [], usePrefix = true) 
   return link || ''
 }
 
-function matcher(specs, checks, msg) {
+function matcher(specs, checks, mapper, msg) {
   let spec, result, { pathname } = msg
+  if (mapper) pathname = mapper(msg)
   spec = specs.find(spec => !!(result = spec.match(checks, pathname)))
   let success = spec && spec.success(result)
   result = Object.assign({}, msg, result)
@@ -32,15 +33,15 @@ function process({ result, success, spec }) {
 
 function matchPrefix(matcher) {
   let { prefix, match, checks } = matcher, result = matcher
-  if (isStr(prefix)) {
+  if (!empty(prefix)) {
     let pspec = prefixSpec(prefix, match)
     result.match = pspec.match.bind(pspec, checks)
   }
   return result
 }
 
-export function match(specs, checks = {}, prefix) {
+export function match(specs, checks = {}, prefix, mapper) {
   if (!Array.isArray(specs)) specs = [].concat(specs)
-  let match = matcher.bind(null, specs, checks)
+  let match = matcher.bind(null, specs, checks, mapper)
   return matchPrefix({ match, process, prefix, specs, checks })
 }
