@@ -1,4 +1,4 @@
-import { isStr, empty } from './utils'
+import { isStr, empty, pipe } from './utils'
 import { prefixSpec } from './spec'
 
 function findPath(specs, pathKey) {
