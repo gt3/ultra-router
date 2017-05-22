@@ -41,7 +41,7 @@ function matchPrefix(matcher) {
 
 function prematch(prespec, msg) {
   let { prefix, pathname } = msg
-  pathname = pipe(normalizePath.bind(null, prefix), prespec)(pathname)
+  pathname = pipe(normalizePath(prefix), prespec, normalizePath())(pathname)
   return pathname === msg.pathname ? msg : Object.assign({}, msg, { pathname })
 }
 
