@@ -1,6 +1,6 @@
 import Listener from './listener'
 import warning from 'warning'
-import { verifyEncoding } from './utils'
+import { verifyEncoding } from './utils-path'
 
 function getPathname() {
   return location.pathname

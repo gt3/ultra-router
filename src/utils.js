@@ -36,27 +36,3 @@ function shieldProps(t, ...keys) {
 }
 
 export { noop, isFn, isStr, empty, invokeFn, pipe, flattenToObj, mapOverKeys, hasOwn, shieldProps }
-
-function escapeRx(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-function encodePath(path) {
-  return encodeURI(path).replace(/%5B/g, '[').replace(/%5D/g, ']')
-}
-
-function decodePath(path) {
-  return decodeURIComponent(path)
-}
-
-function verifyEncoding(path) {
-  return encodePath(decodePath(path)) === path
-}
-
-export { escapeRx, encodePath, decodePath, verifyEncoding }
-
-function validateClick(e) {
-  return !(e.defaultPrevented || e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
-}
-
-export { validateClick }

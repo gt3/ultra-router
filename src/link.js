@@ -1,4 +1,9 @@
-import { shieldProps, validateClick, encodePath } from './utils'
+import { shieldProps } from './utils'
+import { encodePath } from './utils-path'
+
+function validateClick(e) {
+  return !(e.defaultPrevented || e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
+}
 
 export function createListener(action) {
   return function clickHandler(e) {

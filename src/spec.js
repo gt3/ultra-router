@@ -1,5 +1,5 @@
-import { isStr, flattenToObj, hasOwn, empty, escapeRx, decodePath } from './utils'
-import { removeTrailingSlash } from './utils-path'
+import { isStr, flattenToObj, hasOwn, empty } from './utils'
+import { removeTrailingSlash, escapeRx, decodePath } from './utils-path'
 
 const literalp = `([^\\s/]*)`
 const identifierx = /(:[A-Za-z0-9_:]+)/
