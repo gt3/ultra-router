@@ -10,7 +10,7 @@ function addLeadingSlash(path) {
 }
 
 function removeTrailingSlash(path) {
-  return path.replace(trailingSlashx, '')
+  return path === '/' ? path : path.replace(trailingSlashx, '')
 }
 
 function normalizePath(prefix) {
