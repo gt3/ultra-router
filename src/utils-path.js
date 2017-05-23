@@ -39,22 +39,22 @@ function verifyEncoding(path) {
 
 export { encodePath, decodePath, verifyEncoding }
 
-function verifyFragmentEncoding(f) {
-  return !f || verifyEncoding(f)
+function verifyHashEncoding(h) {
+  return !h || verifyEncoding(h)
 }
 
-function extractFragment(path) {
-  let [pathwof, ...f] = path.split(/#([^/]+)$/)
-  warning(verifyFragmentEncoding(f[0]), 'Incorrect encoding. Use encodeURI on fragment: %s', f[0])
-  return [pathwof, f[0]]
+function extractHash(loc) {
+  let [pathwof, ...h] = loc.split(/#([^/]+)$/)
+  warning(verifyHashEncoding(h[0]), 'Incorrect encoding. Use encodeURI on hash: %s', h[0])
+  return [pathwof, h[0]]
 }
 
 function verifyQSEncoding(qs) {
   return !qs || verifyEncoding(qs.replace(/=|&/g, ''))
 }
 
-function extractQS(path) {
-  let [pathwoqs, ...qs] = path.split(/\?(?=[^\s/]+=)/)
+function extractQS(loc) {
+  let [pathwoqs, ...qs] = loc.split(/\?(?=[^\s/]+=)/)
   warning(qs.length <= 1, 'Ambiguous path. Matched multiple query strings: %s', qs)
   warning(
     verifyQSEncoding(qs[0]),
@@ -64,20 +64,20 @@ function extractQS(path) {
   return [pathwoqs, qs[0]]
 }
 
-function extractQSFragment(path) {
-  let [pathwof, f] = extractFragment(path)
+function extractQSHash(loc) {
+  let [pathwof, h] = extractHash(loc)
   let [pathwoqs, qs] = extractQS(pathwof)
-  return [pathwoqs, qs, f]
+  return [pathwoqs, qs, h]
 }
 
-function makePathObj(pathname, qs, f) {
-  pathname = substitute([pathname, qs, f], ['?', '#'], true)
-  return Object.assign({ pathname }, qs && { qs }, f && { f })
+function makeLocation(pathname, qs, h) {
+  pathname = substitute([pathname, qs, h], ['?', '#'], true)
+  return Object.assign({ pathname }, qs && { qs }, h && { h })
 }
 
-function makePath(path) {
-  let [pathname, qs, f] = extractQSFragment(path)
-  return makePathObj(encodePath(pathname), qs, f)
+function parseURI(loc) {
+  let [pathname, qs, h] = extractQSHash(loc)
+  return makeLocation(encodePath(pathname), qs, h)
 }
 
-export { makePath }
+export { parseURI }
