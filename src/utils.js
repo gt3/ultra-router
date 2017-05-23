@@ -1,3 +1,5 @@
+import warning from 'warning'
+
 function noop() {}
 
 function isFn(t) {
@@ -51,3 +53,17 @@ function escapeRx(string) {
 }
 
 export { invokeFn, pipe, flattenToObj, mapOverKeys, hasOwn, shieldProps, substitute, escapeRx }
+
+let env = {
+  get window() {
+    warning(typeof window !== 'undefined', 'missing window object in environment')
+    return window || {}
+  },
+  get location() { return this.window.location || {} },
+  get p() { return this.location.pathname },
+  get qs() { return this.location.search.slice(1) },
+  get h() { return this.location.hash.slice(1) },
+  get history() { return this.window.history || {} },
+}
+
+export { env }

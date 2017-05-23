@@ -1,7 +1,7 @@
 let defaultHandler = handlers => (...args) => handlers().forEach(h => h(...args))
 
 export default class Listener extends Set {
-  constructor(eventKey, target = window, handler = defaultHandler) {
+  constructor(eventKey, target, handler = defaultHandler) {
     super()
     this.values = this.values.bind(this)
     handler = handler(this.values)

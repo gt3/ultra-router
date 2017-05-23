@@ -1,4 +1,4 @@
-import { pipe, isStr } from './utils'
+import { pipe, isStr, env } from './utils'
 import warning from 'warning'
 import { createPopstate, push, replace, go } from './history'
 import { makeVisit, recalibrate } from './visit'
@@ -30,7 +30,7 @@ function guardDispatch(ultra, dispatch, loc) {
     return dispatch(msg)
   }
   let cancel = pipe(recalibrate, go).bind(null, msg)
-  if (confirm && len === history.length) {
+  if (confirm && len === env.history.length) {
     if (pathname !== stickyPath) return confirm(ok, cancel, msg)
   } else return ok()
 }
@@ -60,7 +60,7 @@ function run(matchers, popstate) {
       return (_pauseRecord = [])
     },
     pause(cb) {
-      return (_pauseRecord = [history.length, location.pathname, cb])
+      return (_pauseRecord = [env.history.length, env.p, cb])
     },
     stop: popstate.add(loc => guardDispatch(ultra, dispatch, loc)),
     nav: (action, loc) => navigate(ultra, dispatch, action, loc),
@@ -78,7 +78,7 @@ function initialize(matchers, ultraOptions = {}) {
   if (currentMatchers) matchers = currentMatchers.concat(matchers)
   if (!popstate) popstate = createPopstate()
   let ultra = run(matchers, popstate)
-  if (!preventCurrent) ultra.nav((cb, msg) => cb(msg), location.pathname)
+  if (!preventCurrent) ultra.nav((cb, msg) => cb(msg), env.p)
   return ultra
 }
 
