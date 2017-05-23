@@ -1,5 +1,5 @@
 import { pipe } from './utils'
-const trailingSlashx = /\/$/
+import warning from './warning'
 
 function stripPrefix(prefix, path) {
   return prefix ? path.replace(prefix, '') : path
@@ -10,7 +10,7 @@ function addLeadingSlash(path) {
 }
 
 function removeTrailingSlash(path) {
-  return path === '/' ? path : path.replace(trailingSlashx, '')
+  return path === '/' ? path : path.replace(/\/$/, '')
 }
 
 function normalizePath(prefix) {
@@ -19,8 +19,16 @@ function normalizePath(prefix) {
 
 export { removeTrailingSlash, normalizePath }
 
-function escapeRx(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+function extractFragment(path) {
+  let [pathwof, ...f] = path.split(/\/#/)
+  warning(f.length <= 1, 'Ambiguous path detected. Could not parse fragment: %s => %s', path, f)
+  return [pathwof, f[0]]
+}
+
+function extractQS(path) {
+  let [pathwoqs, ...qs] = path.split(/\/\?/)
+  warning(qs.length <= 1, 'Ambiguous path detected. Could not parse query string: %s => %s', path, qs)
+  return [pathwoqs, qs[0]]
 }
 
 function encodePath(path) {
@@ -39,6 +47,10 @@ function verifyEncoding(path) {
     console.error('Error: Could not decode path:', path)
   }
   return result === path
+}
+
+function escapeRx(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 export { escapeRx, encodePath, decodePath, verifyEncoding }
