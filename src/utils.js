@@ -46,4 +46,8 @@ function substitute(literals, values, removeEmpty) {
   return String.raw({ raw: literals }, ...values)
 }
 
-export { invokeFn, pipe, flattenToObj, mapOverKeys, hasOwn, shieldProps, substitute }
+function escapeRx(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+export { invokeFn, pipe, flattenToObj, mapOverKeys, hasOwn, shieldProps, substitute, escapeRx }

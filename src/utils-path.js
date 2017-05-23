@@ -37,11 +37,7 @@ function verifyEncoding(path) {
   return result === path
 }
 
-function escapeRx(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-export { escapeRx, encodePath, decodePath, verifyEncoding }
+export { encodePath, decodePath, verifyEncoding }
 
 function verifyFragmentEncoding(f) {
   return !f || verifyEncoding(f)
