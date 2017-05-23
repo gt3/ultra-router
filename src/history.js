@@ -1,12 +1,11 @@
 import Listener from './listener'
 import warning from 'warning'
-import { verifyEncoding } from './utils-path'
-import { env } from './utils'
+import { verifyEncoding, env } from './utils-path'
 
 function invokeHandlers(handlers) {
   function invoke(event, fn) {
-    let pathname = env.p, state = event.state
-    return fn({ pathname, state, event })
+    let p = env.p, qs = env.qs, h = env.h, state = event.state
+    return fn({ p, qs, h, state, event })
   }
   return event => handlers().forEach(invoke.bind(null, event))
 }
@@ -16,23 +15,23 @@ function createPopstate() {
 }
 
 let push = (cb, msg) => {
-  let { pathname, state, title } = msg
-  if (pathname !== env.p) {
-    warning(verifyEncoding(pathname), 'Incorrect encoding. Use encodeURI on path: %s', pathname)
-    env.history.pushState(state, title, pathname)
-    console.log('push:', pathname, state)
+  let { p, state, title } = msg
+  if (p !== env.p) {
+    warning(verifyEncoding(p), 'Incorrect encoding. Use encodeURI on path: %s', p)
+    env.history.pushState(state, title, p)
+    console.log('push:', p, state)
     if (cb) return cb(msg)
-  } else warning(false, 'Attempt to push path identical to current path: %s', pathname)
+  } else warning(false, 'Attempt to push path identical to current path: %s', p)
 }
 
 let replace = (cb, msg) => {
-  let { pathname, state, title } = msg
-  if (!(pathname === env.p && state === env.state)) {
-    warning(verifyEncoding(pathname), 'Incorrect encoding. Use encodeURI on path: %s', pathname)
-    env.history.replaceState(state, title, pathname)
-    console.log('replace:', pathname, state)
+  let { p, state, title } = msg
+  if (!(p === env.p && state === env.state)) {
+    warning(verifyEncoding(p), 'Incorrect encoding. Use encodeURI on path: %s', p)
+    env.history.replaceState(state, title, p)
+    console.log('replace:', p, state)
     if (cb) return cb(msg)
-  } else warning(false, 'Attempt to push path identical to current path: %s', pathname)
+  } else warning(false, 'Attempt to push path identical to current path: %s', p)
 }
 
 let go = val => val && env.history.go(val)

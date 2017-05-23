@@ -19,8 +19,8 @@ function linkFromPathKey(specs, prefix, pathKey, values = [], usePrefix = true) 
 }
 
 function matcher(specs, checks, msg) {
-  let spec, result, { pathname } = msg
-  spec = specs.find(spec => !!(result = spec.match(checks, pathname)))
+  let spec, result, { p } = msg
+  spec = specs.find(spec => !!(result = spec.match(checks, p)))
   let success = spec && spec.success(result)
   result = Object.assign({}, msg, result)
   return { result, success, spec }
@@ -40,9 +40,9 @@ function matchPrefix(matcher) {
 }
 
 function prematch(prespec, msg) {
-  let { prefix, pathname } = msg
-  pathname = pipe(normalizePath(prefix), prespec, normalizePath())(pathname)
-  return pathname === msg.pathname ? msg : Object.assign({}, msg, { pathname })
+  let { prefix, p } = msg
+  p = pipe(normalizePath(prefix), prespec, normalizePath())(p)
+  return p === msg.p ? msg : Object.assign({}, msg, { p })
 }
 
 export function match(specs, checks = {}, prefix, prespec) {

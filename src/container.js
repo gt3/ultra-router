@@ -1,15 +1,16 @@
-import { pipe, isStr, env } from './utils'
 import warning from 'warning'
+import { pipe, isStr } from './utils'
+import { parseURI, env } from './utils-path'
 import { createPopstate, push, replace, go } from './history'
 import { makeVisit, recalibrate } from './visit'
 
 export function recordVisit(msg) {
-  let { ultra, pathname, state } = msg
+  let { ultra, p, state } = msg
   console.log('before:', ultra.visited)
   let { visited, newState } = makeVisit(ultra, state)
   ultra.visited = visited
   if (newState) {
-    replace(null, { pathname, state: newState })
+    replace(null, { p, state: newState })
   }
   console.log('after:', ultra.visited)
 }
@@ -23,15 +24,15 @@ function getDispatch(matchers) {
 }
 
 function guardDispatch(ultra, dispatch, loc) {
-  let [len, stickyPath, confirm] = ultra.pauseRecord, { pathname } = loc
-  let msg = Object.assign({}, loc, { ultra, stickyPath })
+  let [len, pauseTarget, confirm] = ultra.pauseRecord, { p } = loc
+  let msg = Object.assign({}, loc, { ultra })
   let ok = () => {
     ultra.resume()
     return dispatch(msg)
   }
   let cancel = pipe(recalibrate, go).bind(null, msg)
   if (confirm && len === env.history.length) {
-    if (pathname !== stickyPath) return confirm(ok, cancel, msg)
+    if (p !== pauseTarget) return confirm(ok, cancel, msg)
   } else return ok()
 }
 
@@ -39,14 +40,10 @@ function verify(matchers, loc) {
   return matchers.some(matcher => matcher.match(loc).success)
 }
 
-function toPathObj(loc) {
-  return isStr(loc) ? { pathname: loc } : loc
-}
-
 function navigate(ultra, dispatch, navAction, loc) {
   let { matchers } = ultra, action = navAction.bind(null, dispatch)
-  loc = toPathObj(loc)
-  warning(verify(matchers, loc), 'At least one path should be an exact match: %s', loc.pathname)
+  loc = isStr(loc) ? parseURI(loc) : loc
+  warning(verify(matchers, loc), 'At least one path should be an exact match: %s', loc.p)
   return guardDispatch(ultra, action, loc)
 }
 
