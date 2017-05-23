@@ -24,8 +24,7 @@ function verifyFragmentEncoding(f) {
 }
 
 function extractFragment(path) {
-  let [pathwof, ...f] = path.split(/\/#/)
-  warning(f.length <= 1, 'Ambiguous path. Could not parse fragment: %s', f)
+  let [pathwof, ...f] = path.split(/#([^/]+)$/)
   warning(verifyFragmentEncoding(f[0]), 'Incorrect encoding. Use encodeURI on fragment: %s', f[0])
   return [pathwof, f[0]]
 }
@@ -35,16 +34,16 @@ function verifyQSEncoding(qs) {
 }
 
 function extractQS(path) {
-  let [pathwoqs, ...qs] = path.split(/\/\?/)
-  warning(qs.length <= 1, 'Ambiguous path. Could not parse query string: %s', qs)
+  let [pathwoqs, ...qs] = path.split(/\?(?=[^\s/]+=)/)
+  warning(qs.length <= 1, 'Ambiguous path. Matched multiple query strings: %s', qs)
   warning(verifyQSEncoding(qs[0]), 'Incorrect encoding. Use encodeURIComponent on query string: %s', qs[0])
   return [pathwoqs, qs[0]]
 }
 
 function makePath(path, qs, f) {
   let res = path
-  if(qs) res = res.concat('/?', qs)
-  if(f) res = res.concat('/#', f)
+  if(qs) res = res.concat('?', qs)
+  if(f) res = res.concat('#', f)
   return res
 }
 
