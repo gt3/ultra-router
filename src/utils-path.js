@@ -30,20 +30,24 @@ function extractFragment(path) {
 }
 
 function verifyQSEncoding(qs) {
-  return !qs || verifyEncoding(qs.replace(/=|&/g,''))
+  return !qs || verifyEncoding(qs.replace(/=|&/g, ''))
 }
 
 function extractQS(path) {
   let [pathwoqs, ...qs] = path.split(/\?(?=[^\s/]+=)/)
   warning(qs.length <= 1, 'Ambiguous path. Matched multiple query strings: %s', qs)
-  warning(verifyQSEncoding(qs[0]), 'Incorrect encoding. Use encodeURIComponent on query string: %s', qs[0])
+  warning(
+    verifyQSEncoding(qs[0]),
+    'Incorrect encoding. Use encodeURIComponent on query string: %s',
+    qs[0]
+  )
   return [pathwoqs, qs[0]]
 }
 
 function makePath(path, qs, f) {
   let res = path
-  if(qs) res = res.concat('?', qs)
-  if(f) res = res.concat('#', f)
+  if (qs) res = res.concat('?', qs)
+  if (f) res = res.concat('#', f)
   return res
 }
 
