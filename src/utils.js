@@ -10,8 +10,10 @@ function isStr(s) {
 }
 
 function empty(t) {
-  return !t || !(Array.isArray(t) ? t : Object.keys(t)).length
+  return !t || (!t.length && !Object.keys(t).length)
 }
+
+export { noop, isFn, isStr, empty }
 
 const invokeFn = Function.prototype.call.bind(Function.prototype.call)
 
@@ -35,4 +37,13 @@ function shieldProps(t, ...keys) {
   return Object.setPrototypeOf(keep, t)
 }
 
-export { noop, isFn, isStr, empty, invokeFn, pipe, flattenToObj, mapOverKeys, hasOwn, shieldProps }
+function substitute(literals, values, removeEmpty) {
+  if (removeEmpty && literals.length > values.length) {
+    values = Array.from(values)
+    literals = Array.from(literals)
+    literals = [literals[0], ...literals.slice(1).map((l, i) => l || (values[i] = ''))]
+  }
+  return String.raw({ raw: literals }, ...values)
+}
+
+export { invokeFn, pipe, flattenToObj, mapOverKeys, hasOwn, shieldProps, substitute }

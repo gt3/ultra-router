@@ -1,12 +1,8 @@
-import { isStr, flattenToObj, hasOwn, empty } from './utils'
+import { isStr, flattenToObj, hasOwn, empty, substitute } from './utils'
 import { removeTrailingSlash, escapeRx, decodePath } from './utils-path'
 
 const literalp = `([^\\s/]*)`
 const identifierx = /(:[A-Za-z0-9_:]+)/
-
-function substitute(literals, values) {
-  return String.raw({ raw: literals }, ...values)
-}
 
 function getMatchX(identifiers, literals) {
   let subs = new Array(identifiers.length).fill(literalp)
