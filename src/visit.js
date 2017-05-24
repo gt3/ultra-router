@@ -32,6 +32,5 @@ export function recalibrate(msg) {
   if (state && state[idk] && currentLen === len) {
     delta = visits[visits.length - 1] === state[idk] ? -1 : 1
   }
-  console.log('recalibrated: ', delta)
   return delta
 }

@@ -19,7 +19,6 @@ let push = (cb, msg) => {
   if (p !== env.p) {
     warning(verifyEncoding(p), 'Incorrect encoding. Use encodeURI on path: %s', p)
     env.history.pushState(state, title, p)
-    console.log('push:', p, state)
     if (cb) return cb(msg)
   } else warning(false, 'Attempt to push path identical to current path: %s', p)
 }
@@ -29,7 +28,6 @@ let replace = (cb, msg) => {
   if (!(p === env.p && state === env.state)) {
     warning(verifyEncoding(p), 'Incorrect encoding. Use encodeURI on path: %s', p)
     env.history.replaceState(state, title, p)
-    console.log('replace:', p, state)
     if (cb) return cb(msg)
   } else warning(false, 'Attempt to push path identical to current path: %s', p)
 }

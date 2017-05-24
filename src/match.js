@@ -1,3 +1,4 @@
+import warning from 'warning'
 import { isStr, pipe } from './utils'
 import { normalizePath } from './utils-path'
 import { prefixSpec } from './spec'
@@ -26,7 +27,8 @@ function matcher(specs, checks, msg) {
   return { result, success, spec }
 }
 
-function process({ result, success, spec }) {
+function resolve({ result, success, spec }) {
+  warning(!(spec && !success), 'Path resolves with a partial match: %s', result && result.p)
   return spec ? spec.resolve(result, success) : false
 }
 
@@ -48,5 +50,5 @@ function prematch(prespec, msg) {
 export function match(specs, checks = {}, prefix, prespec) {
   if (!Array.isArray(specs)) specs = [].concat(specs)
   let match = pipe(prematch.bind(null, prespec), matcher.bind(null, specs, checks))
-  return matchPrefix({ match, process, prefix, specs, checks })
+  return matchPrefix({ match, resolve, prefix, specs, checks })
 }

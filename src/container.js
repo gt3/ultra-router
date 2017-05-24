@@ -4,23 +4,26 @@ import { parseURI, env } from './utils-path'
 import { createPopstate, push, replace, go } from './history'
 import { makeVisit, recalibrate } from './visit'
 
-export function recordVisit(msg) {
-  let { ultra, p, state } = msg
-  console.log('before:', ultra.visited)
-  let { visited, newState } = makeVisit(ultra, state)
-  ultra.visited = visited
-  if (newState) {
-    replace(null, { p, state: newState })
-  }
-  console.log('after:', ultra.visited)
+function dispatcher(actions, msg) {
+  let resolved = actions.some(fn => fn(msg))
+  warning(resolved, 'Could not resolve path: %s', msg.p)
+  return resolved
 }
 
-function getDispatch(matchers) {
-  let actions = matchers.map(matcher => pipe(matcher.match, matcher.process))
-  return msg => {
-    recordVisit(msg)
-    return actions.some(fn => fn(msg))
+function getDispatcher(matchers) {
+  let actions = matchers.map(matcher => pipe(matcher.match, matcher.resolve))
+  return recordVisit.bind(null, dispatcher.bind(null, actions))
+}
+
+export function recordVisit(dispatch, msg) {
+  let { ultra, state } = msg
+  let { visited, newState } = makeVisit(ultra, state)
+  ultra.visited = visited
+  if(newState) {
+    msg = Object.assign({}, msg, { state: newState })
+    return replace(dispatch, msg)
   }
+  return dispatch(msg)
 }
 
 function guardDispatch(ultra, dispatch, loc) {
@@ -36,19 +39,13 @@ function guardDispatch(ultra, dispatch, loc) {
   } else return ok()
 }
 
-function verify(matchers, loc) {
-  return matchers.some(matcher => matcher.match(loc).success)
-}
-
 function navigate(ultra, dispatch, navAction, loc) {
-  let { matchers } = ultra, action = navAction.bind(null, dispatch)
   loc = isStr(loc) ? parseURI(loc) : loc
-  warning(verify(matchers, loc), 'At least one path should be an exact match: %s', loc.p)
-  return guardDispatch(ultra, action, loc)
+  return guardDispatch(ultra, navAction.bind(null, dispatch), loc)
 }
 
 function run(matchers, popstate) {
-  let _pauseRecord = [], dispatch = getDispatch(matchers)
+  let _pauseRecord = [], dispatch = getDispatcher(matchers)
   let ultra = {
     get pauseRecord() {
       return _pauseRecord
