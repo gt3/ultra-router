@@ -38,10 +38,11 @@ function shieldProps(t, ...keys) {
 }
 
 function substitute(literals, values, removeEmpty) {
+  let falsyToEmpty = v => v || ''
+  values = Array.from(values, falsyToEmpty)
+  literals = Array.from(literals, falsyToEmpty)
   if (removeEmpty && literals.length > values.length) {
-    values = Array.from(values)
-    literals = Array.from(literals)
-    literals = [literals[0], ...literals.slice(1).map((l, i) => l || (values[i] = ''))]
+    literals = Array.from(literals, (l, i) => (i === 0 || l ? l : (values[i] = l)))
   }
   return String.raw({ raw: literals }, ...values)
 }
