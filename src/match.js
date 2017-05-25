@@ -41,9 +41,18 @@ function matchPrefix(matcher) {
   return result
 }
 
+function makePathFromQS(qs, ids, path='', delim=',') {
+  let values = ids.map(id => {
+    let rx = new RegExp(`${escapeRx(id)}=([^&#]+)`, 'i')
+    return q.split(rx).slice(1).filter(s => !/^[&#]/.test(s)).join(delim)
+  })
+  return substitute([path, ...values], new Array(ids.length).fill('/'))
+}
+
 function prematch(prespec, msg) {
-  let { prefix, p } = msg
-  p = pipe(normalizePath(prefix), prespec, normalizePath())(p)
+  let { prefix, p, qs, path } = msg
+  let makePath = makePathFromQS.bind(null, q)
+  p = pipe(normalizePath(prefix), prespec.bind(null, makePath, path), normalizePath())(p)
   return p === msg.p ? msg : Object.assign({}, msg, { p })
 }
 
