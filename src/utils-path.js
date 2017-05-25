@@ -82,12 +82,12 @@ function parseHref(loc) {
 
 function parseQS(qs, ids, path = '', delim = ',') {
   if (qs[0] !== '?') qs = '?' + qs
-  if (path === '/') path = ''
   let values = ids.map(id => {
     let rx = new RegExp('[?&]+' + escapeRx(id) + '=([^&#]+)', 'i')
     return qs.split(rx).slice(1).filter(s => /^[^&#]/.test(s)).join(delim)
   })
-  return substitute([path, ...values], new Array(ids.length).fill('/'))
+  let slashes = new Array(ids.length).fill('/', [path[path.length - 1]] === '/' ? 1 : 0)
+  return substitute([path, ...values], slashes)
 }
 
 export { parseHref, parseQS }
