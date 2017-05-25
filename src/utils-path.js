@@ -54,7 +54,7 @@ function verifyQSEncoding(qs) {
 }
 
 function extractQS(loc) {
-  let [path, ...qs] = loc.split(/\?(?=[^\s/]+=)/)
+  let [path, ...qs] = loc.split(/\?(?=[^\s/]+=|[^\s/]+)|\?$/)
   warning(qs.length <= 1, 'Ambiguous URI. Matched multiple query strings: %s', qs)
   warning(
     verifyQSEncoding(qs[0]),
