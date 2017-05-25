@@ -1,12 +1,12 @@
 import warning from 'warning'
 import { pipe, isStr } from './utils'
-import { parseURI, env } from './utils-path'
+import { parseHref, env } from './utils-path'
 import { createPopstate, push, replace, go } from './history'
 import { makeVisit, recalibrate } from './visit'
 
 function dispatcher(actions, msg) {
   let resolved = actions.some(fn => fn(msg))
-  warning(resolved, 'Could not resolve path: %s', msg.p)
+  warning(resolved, 'Could not resolve location: %s', msg.href)
   return resolved
 }
 
@@ -19,7 +19,7 @@ export function recordVisit(dispatch, msg) {
   let { ultra, state } = msg
   let { visited, newState } = makeVisit(ultra, state)
   ultra.visited = visited
-  if(newState) {
+  if (newState) {
     msg = Object.assign({}, msg, { state: newState })
     return replace(dispatch, msg)
   }
@@ -27,7 +27,7 @@ export function recordVisit(dispatch, msg) {
 }
 
 function guardDispatch(ultra, dispatch, loc) {
-  let [len, pauseTarget, confirm] = ultra.pauseRecord, { p } = loc
+  let [len, pausedHref, confirm] = ultra.pauseRecord, { href } = loc
   let msg = Object.assign({}, loc, { ultra })
   let ok = () => {
     ultra.resume()
@@ -35,12 +35,12 @@ function guardDispatch(ultra, dispatch, loc) {
   }
   let cancel = pipe(recalibrate, go).bind(null, msg)
   if (confirm && len === env.history.length) {
-    if (p !== pauseTarget) return confirm(ok, cancel, msg)
+    if (href !== pausedHref) return confirm(ok, cancel, msg)
   } else return ok()
 }
 
 function navigate(ultra, dispatch, navAction, loc) {
-  loc = isStr(loc) ? parseURI(loc) : loc
+  loc = isStr(loc) ? parseHref(loc) : loc
   return guardDispatch(ultra, navAction.bind(null, dispatch), loc)
 }
 
@@ -54,7 +54,7 @@ function run(matchers, popstate) {
       return (_pauseRecord = [])
     },
     pause(cb) {
-      return (_pauseRecord = [env.history.length, env.p, cb])
+      return (_pauseRecord = [env.history.length, env.href, cb])
     },
     stop: popstate.add(loc => guardDispatch(ultra, dispatch, loc)),
     nav: (action, loc) => navigate(ultra, dispatch, action, loc),
@@ -72,7 +72,7 @@ function initialize(matchers, ultraOptions = {}) {
   if (currentMatchers) matchers = currentMatchers.concat(matchers)
   if (!popstate) popstate = createPopstate()
   let ultra = run(matchers, popstate)
-  if (!preventCurrent) ultra.nav((cb, msg) => cb(msg), env.p)
+  if (!preventCurrent) ultra.nav((cb, msg) => cb(msg), env.href)
   return ultra
 }
 

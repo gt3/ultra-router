@@ -1,4 +1,4 @@
-import { pipe, substitute } from './utils'
+import { pipe, substitute, escapeRx } from './utils'
 import warning from 'warning'
 
 function stripPrefix(prefix, path) {
@@ -13,11 +13,11 @@ function removeTrailingSlash(path) {
   return path === '/' ? path : path.replace(/\/$/, '')
 }
 
-function normalizePath(prefix) {
+function normalizeHref(prefix) {
   return pipe(stripPrefix.bind(null, prefix), addLeadingSlash, removeTrailingSlash)
 }
 
-export { removeTrailingSlash, normalizePath }
+export { removeTrailingSlash, normalizeHref }
 
 function encodePath(path) {
   return encodeURI(path).replace(/%5B/g, '[').replace(/%5D/g, ']')
@@ -44,9 +44,9 @@ function verifyHashEncoding(h) {
 }
 
 function extractHash(loc) {
-  let [pathwof, ...h] = loc.split(/#([^/]+)$/)
+  let [locwof, ...h] = loc.split(/#([^/]+)$/)
   warning(verifyHashEncoding(h[0]), 'Incorrect URI encoding. Use encodeURI on hash: %s', h[0])
-  return [pathwof, h[0]]
+  return [locwof, h[0]]
 }
 
 function verifyQSEncoding(qs) {
@@ -54,33 +54,43 @@ function verifyQSEncoding(qs) {
 }
 
 function extractQS(loc) {
-  let [pathwoqs, ...qs] = loc.split(/\?(?=[^\s/]+=)/)
+  let [path, ...qs] = loc.split(/\?(?=[^\s/]+=)/)
   warning(qs.length <= 1, 'Ambiguous URI. Matched multiple query strings: %s', qs)
   warning(
     verifyQSEncoding(qs[0]),
     'Incorrect URI encoding. Use encodeURIComponent on query string values: %s',
     qs[0]
   )
-  return [pathwoqs, qs[0]]
+  return [path, qs[0]]
 }
 
 function extractQSHash(loc) {
-  let [pathwof, h] = extractHash(loc)
-  let [pathwoqs, qs] = extractQS(pathwof)
-  return [pathwoqs, qs, h]
+  let [locwof, h] = extractHash(loc)
+  let [path, qs] = extractQS(locwof)
+  return [path, qs, h]
 }
 
-function makeLocation(p, qs, h) {
-  p = substitute([p, qs, h], ['?', '#'], true)
-  return Object.assign({ p }, qs && { qs }, h && { h })
+function makeLocation(path, qs, hash) {
+  let href = substitute([path, qs, hash], ['?', '#'], true)
+  return Object.assign({ path, href }, qs && { qs }, hash && { hash })
 }
 
-function parseURI(loc) {
-  let [p, qs, h] = extractQSHash(loc)
-  return makeLocation(encodePath(p), qs, h)
+function parseHref(loc) {
+  let [path, qs, hash] = extractQSHash(loc)
+  return makeLocation(encodePath(path), qs, hash)
 }
 
-export { parseURI }
+function parseQS(qs, ids, path = '', delim = ',') {
+  if (qs[0] !== '?') qs = '?' + qs
+  if (path === '/') path = ''
+  let values = ids.map(id => {
+    let rx = new RegExp('[?&]+' + escapeRx(id) + '=([^&#]+)', 'i')
+    return qs.split(rx).slice(1).filter(s => /^[^&#]/.test(s)).join(delim)
+  })
+  return substitute([path, ...values], new Array(ids.length).fill('/'))
+}
+
+export { parseHref, parseQS }
 
 let env = {
   get window() {
@@ -96,11 +106,11 @@ let env = {
   get qs() {
     return this.location.search.slice(1)
   },
-  get h() {
+  get hash() {
     return this.location.hash.slice(1)
   },
-  get p() {
-    return substitute([this.path, this.qs, this.h], ['?', '#'], true)
+  get href() {
+    return substitute([this.path, this.qs, this.hash], ['?', '#'], true)
   },
   get history() {
     return this.window.history || {}

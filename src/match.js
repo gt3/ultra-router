@@ -1,8 +1,8 @@
 import warning from 'warning'
-import { isStr, pipe } from './utils'
-import { normalizePath } from './utils-path'
+import { pipe } from './utils'
+import { normalizeHref, parseQS } from './utils-path'
 import { prefixSpec } from './spec'
-
+/*
 function findPath(specs, pathKey) {
   let result
   specs.find(spec => !!(result = spec.find(pathKey)))
@@ -18,17 +18,17 @@ function linkFromPathKey(specs, prefix, pathKey, values = [], usePrefix = true) 
   if (usePrefix && path) link = addPrefix(prefix, path.makeLink(values))
   return link || ''
 }
-
+*/
 function matcher(specs, checks, msg) {
-  let spec, result, { p } = msg
-  spec = specs.find(spec => !!(result = spec.match(checks, p)))
+  let spec, result, { href } = msg
+  spec = specs.find(spec => !!(result = spec.match(checks, href)))
   let success = spec && spec.success(result)
   result = Object.assign({}, msg, result)
   return { result, success, spec }
 }
 
 function resolve({ result, success, spec }) {
-  warning(!(spec && !success), 'Path resolves with a partial match: %s', result && result.p)
+  warning(!(spec && !success), 'Resolve location with a partial match: %s', result && result.href)
   return spec ? spec.resolve(result, success) : false
 }
 
@@ -41,23 +41,18 @@ function matchPrefix(matcher) {
   return result
 }
 
-function makePathFromQS(qs, ids, path='', delim=',') {
-  let values = ids.map(id => {
-    let rx = new RegExp(`${escapeRx(id)}=([^&#]+)`, 'i')
-    return q.split(rx).slice(1).filter(s => !/^[&#]/.test(s)).join(delim)
-  })
-  return substitute([path, ...values], new Array(ids.length).fill('/'))
+function prematch(specCheck, msg) {
+  let { prefix, href, path, qs } = msg
+  href = normalizeHref(prefix)(href)
+  path = normalizeHref(prefix)(path)
+  if (specCheck) {
+    href = normalizeHref()(specCheck(parseQS.bind(null, qs), path, href))
+  }
+  return href === msg.href ? msg : Object.assign({}, msg, { href })
 }
 
-function prematch(prespec, msg) {
-  let { prefix, p, qs, path } = msg
-  let makePath = makePathFromQS.bind(null, q)
-  p = pipe(normalizePath(prefix), prespec.bind(null, makePath, path), normalizePath())(p)
-  return p === msg.p ? msg : Object.assign({}, msg, { p })
-}
-
-export function match(specs, checks = {}, prefix, prespec) {
+export function match(specs, checks = {}, prefix, specCheck) {
   if (!Array.isArray(specs)) specs = [].concat(specs)
-  let match = pipe(prematch.bind(null, prespec), matcher.bind(null, specs, checks))
+  let match = pipe(prematch.bind(null, specCheck), matcher.bind(null, specs, checks))
   return matchPrefix({ match, resolve, prefix, specs, checks })
 }

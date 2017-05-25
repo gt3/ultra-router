@@ -42,11 +42,11 @@ class Path {
     let invalid = this.findInvalid(checks, values)
     return invalid === -1 ? { values, passed: true } : { values: values.slice(0, invalid) }
   }
-  match(checks, p) {
-    let matches = this.matchx.exec(p)
+  match(checks, href) {
+    let matches = this.matchx.exec(href)
     if (!matches) return {}
     let match = matches[0], values = matches.slice(1).map(decodePath)
-    let exact = match.length === p.length
+    let exact = match.length === href.length
     return Object.assign(this.validate(checks, values), { match, exact })
   }
   makeLink(values) {
@@ -64,13 +64,13 @@ class PathSpec {
     let idx = this.pathKeys.indexOf(pathKey)
     return idx > -1 && this.paths[idx]
   }
-  match(checks, p) {
+  match(checks, href) {
     let [primary, ...subs] = this.paths
-    let result, matches = primary.match(checks, p)
+    let result, matches = primary.match(checks, href)
     if (matches.passed) {
       result = { [primary.key]: matches }
       subs.some(sub => {
-        let submatches = sub.match(checks, p)
+        let submatches = sub.match(checks, href)
         if (submatches.passed) result[sub.key] = submatches
         return submatches.exact
       })
@@ -94,8 +94,8 @@ class PrefixSpec extends PathSpec {
     return this.pathKeys[0]
   }
   match(checks, msg) {
-    let { p } = msg, result = Object.assign({}, msg)
-    let matches = super.match(checks, p)
+    let { path } = msg, result = Object.assign({}, msg)
+    let matches = super.match(checks, path)
     if (matches) {
       let prefix = matches[this.prefixKey].match
       result = super.resolve(Object.assign(result, { prefix }), true)
