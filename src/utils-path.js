@@ -44,7 +44,7 @@ function verifyHashEncoding(h) {
 }
 
 function extractHash(loc) {
-  let [locwof, ...h] = loc.split(/#([^/]+)$/)
+  let [locwof, ...h] = loc.slice(-1) == '#' ? [loc.slice(0, -1)] : loc.split(/#([^/]+)$/)
   warning(verifyHashEncoding(h[0]), 'Incorrect URI encoding. Use encodeURI on hash: %s', h[0])
   return [locwof, h[0]]
 }
