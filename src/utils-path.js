@@ -52,7 +52,7 @@ function verifyHashEncoding(h) {
 }
 
 function extractHash(loc) {
-  let [locwof, h] = loc.split(/#(.*)$/,2)
+  let [locwof, h] = loc.split(/#(.*)$/, 2)
   warning(verifyHashEncoding(h), 'Use encodeURIComponent to encode fragment data: %s', h)
   return [locwof, h]
 }
