@@ -1,4 +1,4 @@
-import { shieldProps } from './utils'
+import { isFn, shieldProps } from './utils'
 import { parseHref } from './utils-path'
 
 function validateClick(e) {
@@ -22,5 +22,5 @@ export const Anchor = p => {
   let loc = Object.assign(parseHref(href), { state, title })
   props.onClick = createListener(ultra.push.bind(null, loc))
   props.style = Object.assign({}, defaultStyle, style)
-  return createElement('a', props)
+  return isFn(createElement) ? createElement('a', props) : props
 }
