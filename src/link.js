@@ -14,17 +14,13 @@ export function createListener(action) {
   }
 }
 
+const defaultStyle = { touchAction: 'manipulation', msTouchAction: 'manipulation' }
+
 export const UltraLink = p => {
-  let props = shieldProps(p, 'createElement', 'ultra', 'style', 'defaultStyle', 'state', 'title')
-  let { href, createElement, ultra, style, defaultStyle, state, title } = props
+  let props = shieldProps(p, 'createElement', 'ultra', 'style', 'state', 'title')
+  let { href, createElement, ultra, style, state, title } = props
   let loc = Object.assign(parseHref(href), { state, title })
   props.onClick = createListener(ultra.push.bind(null, loc))
   props.style = Object.assign({}, defaultStyle, style)
   return createElement('a', props)
-}
-UltraLink.defaultProps = {
-  defaultStyle: {
-    touchAction: 'manipulation',
-    msTouchAction: 'manipulation'
-  }
 }
