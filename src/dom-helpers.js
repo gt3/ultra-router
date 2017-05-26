@@ -16,7 +16,7 @@ export function createListener(action) {
 
 const defaultStyle = { touchAction: 'manipulation', msTouchAction: 'manipulation' }
 
-export const UltraLink = p => {
+export const Anchor = p => {
   let props = shieldProps(p, 'createElement', 'ultra', 'style', 'state', 'title')
   let { href, createElement, ultra, style, state, title } = props
   let loc = Object.assign(parseHref(href), { state, title })
