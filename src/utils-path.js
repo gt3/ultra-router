@@ -23,6 +23,10 @@ function encodePath(path) {
   return encodeURI(path).replace(/%5B/g, '[').replace(/%5D/g, ']')
 }
 
+function encodeData(loc) {
+  return encodeURIComponent(loc)
+}
+
 function decodePath(path) {
   let result = path
   try {
@@ -33,35 +37,34 @@ function decodePath(path) {
   return result
 }
 
-function verifyEncoding(path) {
+function verifyURIEncoding(path) {
   return encodePath(decodePath(path)) === path
 }
 
-export { encodePath, decodePath, verifyEncoding }
+function verifyDataEncoding(loc) {
+  return encodeData(decodePath(loc)) === loc
+}
+
+export { encodePath, decodePath, verifyURIEncoding }
 
 function verifyHashEncoding(h) {
-  return !h || verifyEncoding(h)
+  return !h || verifyDataEncoding(h)
 }
 
 function extractHash(loc) {
-  let [locwof, ...h] = loc.slice(-1) == '#' ? [loc.slice(0, -1)] : loc.split(/#([^/]+)$/)
-  warning(verifyHashEncoding(h[0]), 'Incorrect URI encoding. Use encodeURI on hash: %s', h[0])
-  return [locwof, h[0]]
+  let [locwof, h] = loc.split(/#(.*)$/,2)
+  warning(verifyHashEncoding(h), 'Use encodeURIComponent to encode fragment data: %s', h)
+  return [locwof, h]
 }
 
 function verifyQSEncoding(qs) {
-  return !qs || verifyEncoding(qs.replace(/=|&/g, ''))
+  return !qs || verifyDataEncoding(qs.replace(/=|&/g, ''))
 }
 
 function extractQS(loc) {
-  let [path, ...qs] = loc.split(/\?(?=[^\s/]+=|[^\s/]+)|\?$/)
-  warning(qs.length <= 1, 'Ambiguous URI. Matched multiple query strings: %s', qs)
-  warning(
-    verifyQSEncoding(qs[0]),
-    'Incorrect URI encoding. Use encodeURIComponent on query string values: %s',
-    qs[0]
-  )
-  return [path, qs[0]]
+  let [path, qs] = loc.split(/\?(.*)$/, 2)
+  warning(verifyQSEncoding(qs), 'Use encodeURIComponent to encode query string data: %s', qs)
+  return [path, qs]
 }
 
 function extractQSHash(loc) {
