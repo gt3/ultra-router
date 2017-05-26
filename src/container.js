@@ -60,6 +60,7 @@ function run(matchers, popstate) {
     nav: (action, loc) => navigate(ultra, dispatch, action, loc),
     push: loc => ultra.nav(push, loc),
     replace: loc => ultra.nav(replace, loc),
+    visited: null,
     popstate,
     matchers
   }
@@ -67,12 +68,12 @@ function run(matchers, popstate) {
 }
 
 function initialize(matchers, ultraOptions = {}) {
-  let { stop, matchers: currentMatchers, popstate, preventCurrent } = ultraOptions
-  if (stop) stop.call(ultraOptions)
+  let { stop, matchers: currentMatchers, popstate, visited } = ultraOptions
   if (currentMatchers) matchers = currentMatchers.concat(matchers)
   if (!popstate) popstate = createPopstate()
+  if (stop) stop.call(ultraOptions)
   let ultra = run(matchers, popstate)
-  if (!preventCurrent) ultra.nav((cb, msg) => cb(msg), env.href)
+  if (!visited) ultra.nav((cb, msg) => cb(msg), env.href)
   return ultra
 }
 
