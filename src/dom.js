@@ -17,10 +17,10 @@ export function createListener(action) {
 const defaultStyle = { touchAction: 'manipulation', msTouchAction: 'manipulation' }
 
 export const Anchor = p => {
-  let props = shieldProps(p, 'createElement', 'ultra', 'style', 'state', 'title')
-  let { href, createElement, ultra, style, state, title } = props
+  let props = shieldProps(p, 'createElement', 'getUltra', 'style', 'state', 'title')
+  let { href, createElement, getUltra, style, state, title } = props
   let loc = Object.assign(parseHref(href), { state, title })
-  props.onClick = createListener(ultra.push.bind(null, loc))
+  props.onClick = createListener(() => getUltra().push(loc))
   props.style = Object.assign({}, defaultStyle, style)
   return isFn(createElement) ? createElement('a', props) : props
 }
