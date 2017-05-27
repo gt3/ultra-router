@@ -44,9 +44,16 @@ function navigate(ultra, dispatch, navAction, loc) {
   return guardDispatch(ultra, navAction.bind(null, dispatch), loc)
 }
 
-function run(matchers, popstate) {
-  let _pauseRecord = [], dispatch = getDispatcher(matchers)
+function run(_matchers, _popstate) {
+  let _pauseRecord = [], dispatch = getDispatcher(_matchers)
   let ultra = {
+    visited: null,
+    get popstate() {
+      return _popstate
+    },
+    get matchers() {
+      return _matchers
+    },
     get pauseRecord() {
       return _pauseRecord
     },
@@ -56,27 +63,19 @@ function run(matchers, popstate) {
     pause(cb) {
       return (_pauseRecord = [env.history.length, env.href, cb])
     },
-    stop: popstate.add(loc => guardDispatch(ultra, dispatch, loc)),
+    stop: _popstate.add(loc => guardDispatch(ultra, dispatch, loc)),
     nav: (action, loc) => navigate(ultra, dispatch, action, loc),
     push: loc => ultra.nav(push, loc),
-    replace: loc => ultra.nav(replace, loc),
-    visited: null,
-    popstate,
-    matchers
+    replace: loc => ultra.nav(replace, loc)
   }
   return ultra
 }
 
-function initialize(matchers, ultraOptions = {}) {
-  let { stop, matchers: currentMatchers, popstate, visited } = ultraOptions
-  if (currentMatchers) matchers = currentMatchers.concat(matchers)
+export function container(matchers, instance = {}) {
+  let { stop, popstate, visited } = instance
   if (!popstate) popstate = createPopstate()
-  if (stop) stop.call(ultraOptions)
   let ultra = run(matchers, popstate)
+  if (stop) stop.call(instance)
   if (!visited) ultra.nav((cb, msg) => cb(msg), env.href)
   return ultra
-}
-
-export function container(...matchers) {
-  return initialize.bind(null, matchers)
 }
