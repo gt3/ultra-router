@@ -20,6 +20,15 @@ function linkFromPathKey(specs, prefix, pathKey, values = [], usePrefix = true) 
   return link || ''
 }
 */
+
+function toggle(match) {
+  let { off } = match, on = off
+  if (!off) {
+    on = { $off: match, match: () => false, resolve: () => false }
+  }
+  return on
+}
+
 function matcher(specs, checks, msg) {
   let spec, result, { href } = msg
   spec = specs.find(spec => !!(result = spec.match(checks, href)))
@@ -54,16 +63,7 @@ function prematch(specCheck, msg) {
 
 export function match(specs, checks = {}, prefix, specCheck, key) {
   if (!Array.isArray(specs)) specs = [].concat(specs)
-  let match = pipe(prematch.bind(null, specCheck), matcher.bind(null, specs, checks))
-  return matchPrefix({ match, resolve, prefix, specs, checks, key })
-}
-
-function falsy() { return false }
-
-export function toggle(match) {
-  let { off } = match, on = off
-  if(!off) {
-    on = { $off: match, match: falsy, resolve: falsy }
-  }
-  return on
+  let match = pipe(prematch.bind(null, specCheck), result.bind(null, specs, checks))
+  let result = { match, resolve, prefix, specs, checks, key }
+  return matchPrefix(Object.assign(result, { toggle: toggle.bind(null, result) }))
 }
