@@ -21,13 +21,16 @@ function linkFromPathKey(specs, prefix, pathKey, values = [], usePrefix = true) 
 }
 */
 
-function toggle(match) {
+export function toggle(match) {
   let { off, key } = match, on = off
   if (!off) {
     on = { key, off: match, match: () => false, resolve: () => false }
-    on.toggle = toggle.bind(null, on)
   }
   return on
+}
+
+export function toggleMany(matchers, ...keys) {
+  return matchers.map(m => (m.key !== undefined && keys.indexOf(m.key) !== -1 ? toggle(m) : m))
 }
 
 function matcher(specs, checks, msg) {
@@ -65,6 +68,5 @@ function prematch(specCheck, msg) {
 export function match(specs, checks = {}, prefix, specCheck, key) {
   if (!Array.isArray(specs)) specs = [].concat(specs)
   let match = pipe(prematch.bind(null, specCheck), matcher.bind(null, specs, checks))
-  let result = { match, resolve, prefix, specs, checks, key }
-  return matchPrefix(Object.assign({ toggle: toggle.bind(null, result) }, result))
+  return matchPrefix({ match, resolve, prefix, specs, checks, key })
 }

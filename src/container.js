@@ -1,5 +1,5 @@
 import warning from 'warning'
-import { pipe, isStr, isFn } from './utils'
+import { pipe, isStr } from './utils'
 import { parseHref, env } from './utils-path'
 import { createPopstate, push, replace, go } from './history'
 import { makeVisit, recalibrate } from './visit'
@@ -76,12 +76,7 @@ export function container(matchers, instance = {}) {
   if (!popstate) popstate = createPopstate()
   let ultra = run(matchers, popstate)
   if (stop) stop.call(instance)
-  if (!visited) ultra.nav((cb, msg) => cb(msg), env.href)
+  if (Array.isArray(visited)) ultra.visited = visited
+  else ultra.nav((cb, msg) => cb(msg), env.href)
   return ultra
-}
-
-export function toggleMatchers(ultra, ...keys) {
-  let { matchers } = ultra
-  matchers = matchers.map(m => (keys.indexOf(m.key) !== -1 && isFn(m.toggle) ? m.toggle() : m))
-  return container(matchers, ultra)
 }
