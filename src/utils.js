@@ -13,7 +13,7 @@ function empty(t) {
   return !t || (!t.length && !Object.keys(t).length)
 }
 
-export { noop, isFn, isStr, empty }
+export { noop, id, isFn, isStr, empty }
 
 const invokeFn = Function.prototype.call.bind(Function.prototype.call)
 
