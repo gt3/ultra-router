@@ -30,9 +30,9 @@ export function toggle(match, toggleKey) {
   return on
 }
 
-export function toggleMatchers(matchers, ...toggleKeys) {
+export function toggleSelector(matchers, ...selectKeys) {
   return matchers.map(
-    m => (m.key !== undefined && toggleKeys.indexOf(m.key) !== -1 ? toggle(m) : m)
+    m => (m.key !== undefined && selectKeys.indexOf(m.key) !== -1 ? toggle(m) : m)
   )
 }
 
