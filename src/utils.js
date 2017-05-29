@@ -1,5 +1,3 @@
-function noop() {}
-
 function isFn(t) {
   return typeof t === 'function' ? t : void 0
 }
@@ -13,9 +11,7 @@ function empty(t) {
   return !t || (!t.length && !Object.keys(t).length)
 }
 
-export { noop, isFn, isStr, empty }
-
-const invokeFn = Function.prototype.call.bind(Function.prototype.call)
+export { isFn, isStr, empty }
 
 function pipe(...fns) {
   function invoke(v) {
@@ -24,18 +20,7 @@ function pipe(...fns) {
   return invoke
 }
 
-const m2f = (mKey, fn) => fn && (arr => Array.prototype[mKey].call(arr, fn))
-
 const flattenToObj = (arr, base = {}) => Object.assign(base, ...arr)
-const pipeOverKeys = (obj, ...fns) => obj && pipe(...fns)(Object.keys(obj))
-const mapOverKeys = (obj, mapper) => pipeOverKeys(obj, m2f('map', mapper))
-
-const hasOwn = Object.prototype.hasOwnProperty
-
-function shieldProps(t, ...keys) {
-  let keep = flattenToObj(Object.keys(t).filter(k => !keys.includes(k)).map(k => ({ [k]: t[k] })))
-  return Object.setPrototypeOf(keep, t)
-}
 
 function substitute(literals, values, removeEmpty) {
   let falsyToEmpty = v => v || ''
@@ -51,4 +36,4 @@ function escapeRx(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-export { invokeFn, pipe, flattenToObj, mapOverKeys, hasOwn, shieldProps, substitute, escapeRx }
+export { pipe, flattenToObj, substitute, escapeRx }

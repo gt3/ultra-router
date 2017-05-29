@@ -80,3 +80,18 @@ export function container(matchers, instance = {}) {
   else ultra.nav((cb, msg) => cb(msg), env.href)
   return ultra
 }
+
+function validateClick(e) {
+  return !(e.defaultPrevented || e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
+}
+
+export function makeClickHandler({ href, state, title }, action) {
+  function clickHandler(e) {
+    if (validateClick(e)) {
+      e.preventDefault()
+      action(clickHandler.loc)
+    }
+  }
+  clickHandler.loc = Object.assign(parseHref(href), { state, title })
+  return clickHandler
+}

@@ -1,4 +1,4 @@
-import { isStr, flattenToObj, hasOwn, empty, substitute, escapeRx } from './utils'
+import { isStr, flattenToObj, empty, substitute, escapeRx } from './utils'
 import { removeTrailingSlash, decodePath } from './utils-path'
 
 const literalp = `([^\\s/]*)`
@@ -33,7 +33,7 @@ class Path {
     Object.assign(this, parsePathKey(key))
   }
   findInvalid(checks, values) {
-    let ids = this.identifiers, hasCheck = hasOwn.bind(checks)
+    let ids = this.identifiers, hasCheck = Object.prototype.hasOwnProperty.bind(checks)
     return empty(checks)
       ? -1
       : values.findIndex((val, i) => hasCheck(ids[i]) && !checks[ids[i]](values))
