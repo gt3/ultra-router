@@ -1,7 +1,8 @@
 import babel from 'rollup-plugin-babel'
-import babili from 'rollup-plugin-babili'
+import { minify } from 'uglify-es'
+import uglify from 'rollup-plugin-uglify'
 
-const minify = process.env.DIST === 'true'
+const compress = process.env.DIST === 'true'
 
 const lib = {
   entry: './src/index.js',
@@ -17,11 +18,11 @@ const lib = {
 const dist = {
   entry: './lib/ultra.js',
   plugins: [
-    babili()
+    uglify({}, minify)
   ],
   targets: [
     { format: 'umd', dest: './dist/ultra.min.js', moduleId: 'ultra', moduleName: 'Ultra' }
   ]
 }
 
-export default minify ? dist: lib
+export default compress ? dist: lib

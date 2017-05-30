@@ -20,7 +20,6 @@
     "babel-plugin-dev-expression": "^0.2.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
-    "babel-preset-babili": "^1.0.0",
     "babel-preset-es2016": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "cross-env": "^4.0.0",
@@ -29,15 +28,16 @@
     "prettier": "^1.1.0",
     "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
-    "rollup-plugin-babili": "^2.0.0"
+    "rollup-plugin-uglify": "^2.0.1",
+    "uglify-es": "^3.0.13"
   },
   "jest": {
     "testRegex": "(/test/.*\\.test\\.js$)",
     "testEnvironment": "node"
   },
-  "dependencies": {
-    "warning": "^3.0.0"
-  },
+  "bundleDependencies": [
+    "warning"
+  ],
   "files": [
     "dist",
     "lib"
