@@ -6,6 +6,7 @@ const compress = process.env.DIST === 'true'
 
 const lib = {
   entry: './src/index.js',
+  external: [ 'warning' ],
   plugins: [
     babel({exclude: 'node_modules/**'})
   ],
@@ -15,14 +16,14 @@ const lib = {
   ]
 }
 
-const dist = {
-  entry: './lib/ultra.js',
+const dist = Object.assign({}, lib, {
   plugins: [
+    babel({exclude: 'node_modules/**'}),
     uglify({}, minify)
   ],
   targets: [
     { format: 'umd', dest: './dist/ultra.min.js', moduleId: 'ultra', moduleName: 'Ultra' }
   ]
-}
+})
 
 export default compress ? dist: lib
