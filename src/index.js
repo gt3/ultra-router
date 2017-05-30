@@ -1,3 +1,3 @@
 export { spec, check } from './spec'
-export { match, toggle, toggleSelector } from './match'
+export { match, toggle, toggleSelected } from './match'
 export { container, makeClickHandler } from './container'

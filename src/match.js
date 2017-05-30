@@ -21,18 +21,18 @@ function linkFromPathKey(specs, prefix, pathKey, values = [], usePrefix = true) 
 }
 */
 
-export function toggle(match, toggleKey) {
-  let { off, key = toggleKey } = match, on = off
+export function toggle(newKey, match) {
+  let { off, key = newKey } = match, on = off
   if (!off) {
     on = { off: match, match: () => false, resolve: () => false }
   }
-  on.key = key
+  if(key) on.key = key
   return on
 }
 
-export function toggleSelector(matchers, ...selectKeys) {
+export function toggleSelected(matchers, ...selectKeys) {
   return matchers.map(
-    m => (m.key !== undefined && selectKeys.indexOf(m.key) !== -1 ? toggle(m) : m)
+    m => (m.key !== undefined && selectKeys.indexOf(m.key) !== -1 ? toggle(m.key, m) : m)
   )
 }
 
