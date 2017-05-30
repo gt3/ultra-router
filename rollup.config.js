@@ -7,6 +7,7 @@ const compress = process.env.DIST === 'true'
 const lib = {
   entry: './src/index.js',
   external: [ 'warning' ],
+  globals: { warning: 'warning' },
   plugins: [
     babel({exclude: 'node_modules/**'})
   ],
