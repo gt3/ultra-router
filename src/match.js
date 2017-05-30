@@ -26,7 +26,7 @@ export function toggle(newKey, match) {
   if (!off) {
     on = { off: match, match: () => false, resolve: () => false }
   }
-  if(key) on.key = key
+  if (key) on.key = key
   return on
 }
 
