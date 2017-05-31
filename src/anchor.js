@@ -1,3 +1,5 @@
+import { parseHref } from './utils-path'
+
 const flattenToObj = (arr, base = {}) => Object.assign(base, ...arr)
 
 function shieldProps(t, ...keys) {
@@ -5,14 +7,27 @@ function shieldProps(t, ...keys) {
   return Object.setPrototypeOf(keep, t)
 }
 
+function validateClick(e) {
+  return !(e.defaultPrevented || e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
+}
+
+export function makeClickHandler({ href, state, title }, action) {
+  function clickHandler(e) {
+    if (validateClick(e)) {
+      e.preventDefault()
+      action(clickHandler.loc)
+    }
+  }
+  clickHandler.loc = Object.assign(parseHref(href), { state, title })
+  return clickHandler
+}
+
 const defaultStyle = { touchAction: 'manipulation', msTouchAction: 'manipulation' }
 
-const Anchor = p => {
-  let props = shieldProps(p, 'createElement', 'ultra', 'style', 'state', 'title')
-  let { href, createElement, ultra, style, state, title } = props
-  props.onClick = ultra.navOnClick({ href, state, title })
+export function Anchor(p) {
+  let props = shieldProps(p, 'createElement', 'getUltra', 'style', 'state', 'title', 'navAction')
+  let { href, createElement, getUltra, style, state, title, navAction = 'push' } = props
+  props.onClick = makeClickHandler({ href, state, title }, loc => getUltra()[navAction](loc))
   props.style = Object.assign({}, defaultStyle, style)
   return createElement('a', props)
 }
-
-export { Anchor }

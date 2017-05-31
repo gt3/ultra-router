@@ -1,23 +1,8 @@
 import warning from 'warning'
-import { pipe, isStr, isFn } from './utils'
+import { pipe, isStr } from './utils'
 import { parseHref, env } from './utils-path'
 import { createPopstate, push, replace, go } from './history'
 import { makeVisit, recalibrate } from './visit'
-
-function validateClick(e) {
-  return !(e.defaultPrevented || e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
-}
-
-function makeClickHandler({ href, state, title }, action) {
-  function clickHandler(e) {
-    if (validateClick(e)) {
-      e.preventDefault()
-      action(clickHandler.loc)
-    }
-  }
-  clickHandler.loc = Object.assign(parseHref(href), { state, title })
-  return clickHandler
-}
 
 function dispatcher(actions, msg) {
   let resolved = actions.some(fn => fn(msg))
@@ -80,12 +65,8 @@ function run(_matchers, _popstate) {
     },
     stop: _popstate.add(loc => guardDispatch(ultra, dispatch, loc)),
     nav: (action, loc) => navigate(ultra, dispatch, action, loc),
-    replace: loc => ultra.nav(replace, loc),
     push: loc => ultra.nav(push, loc),
-    navOnClick: (loc, cb, navAction = 'push') => {
-      cb = isFn(cb) ? cb : parsed => ultra[navAction] && ultra[navAction](parsed)
-      return makeClickHandler(loc, cb)
-    }
+    replace: loc => ultra.nav(replace, loc)
   }
   return ultra
 }
