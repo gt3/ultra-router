@@ -46,8 +46,8 @@ class Path {
     let matches = this.matchx.exec(href)
     if (!matches) return {}
     let match = matches[0], values = matches.slice(1).map(decodePath)
-    let exact = match.length === href.length && match
-    return Object.assign(this.validate(checks, values), { match, exact })
+    let exact = match.length === href.length, {pathKey, identifiers} = this
+    return Object.assign(this.validate(checks, values), { match, exact, pathKey, identifiers })
   }
   makeLink(values) {
     return substitute(this.literals, values)
