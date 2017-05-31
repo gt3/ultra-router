@@ -22,6 +22,11 @@ function pipe(...fns) {
 
 const flattenToObj = (arr, base = {}) => Object.assign(base, ...arr)
 
+function shieldProps(t, ...keys) {
+  let keep = flattenToObj(Object.keys(t).filter(k => !keys.includes(k)).map(k => ({ [k]: t[k] })))
+  return Object.setPrototypeOf(keep, t)
+}
+
 function substitute(literals, values, removeEmpty) {
   let falsyToEmpty = v => v || ''
   let vals = Array.from(values, falsyToEmpty)
@@ -36,4 +41,4 @@ function escapeRx(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-export { pipe, flattenToObj, substitute, escapeRx }
+export { pipe, flattenToObj, shieldProps, substitute, escapeRx }

@@ -1,11 +1,5 @@
 import { parseHref } from './utils-path'
-
-const flattenToObj = (arr, base = {}) => Object.assign(base, ...arr)
-
-function shieldProps(t, ...keys) {
-  let keep = flattenToObj(Object.keys(t).filter(k => !keys.includes(k)).map(k => ({ [k]: t[k] })))
-  return Object.setPrototypeOf(keep, t)
-}
+import { shieldProps } from './utils'
 
 function validateClick(e) {
   return !(e.defaultPrevented || e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
