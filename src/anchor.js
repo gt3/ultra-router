@@ -1,5 +1,5 @@
 import { parseHref } from './utils-path'
-import { shieldProps } from './utils'
+import { exclude } from './utils'
 
 function validateClick(e) {
   return !(e.defaultPrevented || e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
@@ -17,10 +17,11 @@ export function makeClickHandler({ href, state, title }, action) {
 }
 
 const defaultStyle = { touchAction: 'manipulation', msTouchAction: 'manipulation' }
+const ownKeys = ['createElement', 'getUltra', 'style', 'state', 'title', 'navAction', 'onClick']
 
-export function Anchor(p) {
-  let props = shieldProps(p, 'createElement', 'getUltra', 'style', 'state', 'title', 'navAction')
+export function Anchor(props) {
   let { href, createElement, getUltra, style, state, title, navAction = 'push' } = props
+  props = exclude(props, ...ownKeys)
   props.onClick = makeClickHandler({ href, state, title }, loc => getUltra()[navAction](loc))
   props.style = Object.assign({}, defaultStyle, style)
   return createElement('a', props)
