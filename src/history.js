@@ -15,19 +15,19 @@ function createPopstate() {
 }
 
 let push = (cb, msg) => {
-  let { href, path, state, title } = msg
+  let { href, path, state, docTitle } = msg
   if (href !== env.href) {
     warning(verifyURIEncoding(path), 'Incorrect encoding. Use encodeURI on path: %s', path)
-    env.history.pushState(state, title, href)
+    env.history.pushState(state, docTitle, href)
     if (cb) return cb(msg)
   } else warning(false, 'Attempt to push location identical to current one: %s', href)
 }
 
 let replace = (cb, msg) => {
-  let { href, path, state, title } = msg
+  let { href, path, state, docTitle } = msg
   if (!(href === env.href && state === env.state)) {
     warning(verifyURIEncoding(path), 'Incorrect encoding. Use encodeURI on path: %s', path)
-    env.history.replaceState(state, title, href)
+    env.history.replaceState(state, docTitle, href)
     if (cb) return cb(msg)
   } else warning(false, 'Attempt to replace current location with the same one: %s', href)
 }
