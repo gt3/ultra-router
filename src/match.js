@@ -3,24 +3,6 @@ import { pipe } from './utils'
 import { normalizeHref, parseQS } from './utils-path'
 import { prefixSpec } from './spec'
 
-/*
-function findPath(specs, pathKey) {
-  let result
-  specs.find(spec => !!(result = spec.find(pathKey)))
-  return result
-}
-
-function addPrefix(prefix, path) {
-  return isStr(prefix) && path.indexOf(prefix) !== 0 ? `${prefix}${path}` : path
-}
-
-function linkFromPathKey(specs, prefix, pathKey, values = [], usePrefix = true) {
-  let link, path = findPath(specs, pathKey)
-  if (usePrefix && path) link = addPrefix(prefix, path.makeLink(values))
-  return link || ''
-}
-*/
-
 export function toggle(newKey, match) {
   let { off, key = newKey } = match, on = off
   if (!off) {
