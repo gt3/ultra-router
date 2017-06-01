@@ -42,4 +42,30 @@ describe('path utils', function() {
     eq(verify('%'), false)
     eq(verify(''), true)
   })
+  it('parseQS', function() {
+    let parse = u.parseQS
+    eq(parse('?x=42', ['x']), '/42')
+    
+    eq(parse('x=42', ['x']), '/42')
+    eq(parse('x=42', ['x'], '/'), '/42')
+    eq(parse('x=42', ['y'], '/'), '/')
+    eq(parse('?&&;x=42', ['x']), '/42')
+
+    eq(parse('?x=42&x=42', ['x']), '/42,42')
+    eq(parse('?x=43&y=007&x=42', ['x','y']), '/43,42/007')
+    eq(parse('x=42&x=42&y=007', ['y','x'], '/abc', '&'), '/abc/007/42&42')
+    eq(parse('?x=42;y=007', ['x','y']), '/42/007')
+
+    eq(parse('?x=43&&&x=42', ['x']), '/43,42')
+    eq(parse('?x=42&x=42', ['x'], '/abc'), '/abc/42,42')
+    eq(parse('?x=42&x=42', ['x'], '/abc', '&'), '/abc/42&42')
+    
+    eq(parse('', [], 'abc'), 'abc')
+    eq(parse('?', [''], '/'), '/')
+    eq(parse('?', ['x'], 'abc'), 'abc/')
+    eq(parse('?blahblahblah', ['x','y','z'], '/abc'), '/abc///')
+  })
+  it('parseHref', function() {
+    
+  })
 })
