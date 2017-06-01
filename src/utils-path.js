@@ -2,7 +2,7 @@ import { pipe, substitute, escapeRx } from './utils'
 import warning from 'warning'
 
 function stripPrefix(prefix, path) {
-  return prefix ? path.replace(prefix, '') : path
+  return prefix ? path.replace(new RegExp(`^${escapeRx(prefix)}`), '') : path
 }
 
 function addLeadingSlash(path) {
@@ -28,11 +28,12 @@ function encodeData(loc) {
 }
 
 function decodePath(path) {
-  let result = path
+  let result
   try {
     result = decodeURIComponent(path)
   } catch (ex) {
     console.error('Error: Could not decode path:', path)
+    result = ''
   }
   return result
 }
@@ -45,7 +46,7 @@ function verifyDataEncoding(loc) {
   return encodeData(decodePath(loc)) === loc
 }
 
-export { encodePath, decodePath, verifyURIEncoding }
+export { encodePath, decodePath, verifyURIEncoding, verifyDataEncoding }
 
 function verifyHashEncoding(h) {
   return !h || verifyDataEncoding(h)

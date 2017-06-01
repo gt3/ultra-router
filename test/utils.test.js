@@ -67,5 +67,6 @@ describe('utils', function() {
     let escapeAll = `.*+?^$()|[]\{}`
     let escaped = u.escapeRx(escapeAll)
     eq(escaped, '\\'.concat(escapeAll.split('').join('\\')))
+    assert.doesNotThrow(() => new RegExp(escaped))
   })
 })
