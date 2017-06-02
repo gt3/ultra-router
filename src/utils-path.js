@@ -17,7 +17,7 @@ function normalizeHref(prefix) {
   return pipe(stripPrefix.bind(null, prefix), addLeadingSlash, removeTrailingSlash)
 }
 
-export { removeTrailingSlash, normalizeHref }
+export { addLeadingSlash, removeTrailingSlash, normalizeHref }
 
 function encodePath(path) {
   return encodeURI(path).replace(/%5B/g, '[').replace(/%5D/g, ']')
@@ -100,10 +100,10 @@ export { parseHref, parseQS }
 let env = {
   get window() {
     warning(typeof window !== 'undefined', 'missing window object in environment')
-    return window || {}
+    return window
   },
   get location() {
-    return this.window.location || {}
+    return this.window.location
   },
   get path() {
     return removeTrailingSlash(this.location.pathname)
@@ -118,7 +118,7 @@ let env = {
     return substitute([this.path, this.qs, this.hash], ['?', '#'], true)
   },
   get history() {
-    return this.window.history || {}
+    return this.window.history
   }
 }
 
