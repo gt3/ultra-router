@@ -2,6 +2,7 @@ import { isStr, flattenToObj, empty, substitute, escapeRx } from './utils'
 import { removeTrailingSlash, decodePath } from './utils-path'
 
 const literalp = `([^\\s/]*)`
+const allx = /(?:)/
 const identifierx = /(:[A-Za-z0-9_:]+)/
 
 function getMatchX(identifiers, literals) {
@@ -18,7 +19,7 @@ let parsePathKey = pathKey => {
     else acc.push(f)
     return acc
   }, [])
-  let matchx = key == '' ? new RegExp('') : getMatchX(identifiers, literals)
+  let matchx = key == '' ? allx : getMatchX(identifiers, literals)
   return { key: pathKey, identifiers, literals, matchx }
 }
 
