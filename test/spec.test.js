@@ -118,7 +118,7 @@ describe('Path: match', function() {
   })
 })
 
-describe('PathSpec', function() {
+describe.only('PathSpec', function() {
   it('should create pathspec for empty key', function() {
     let instance = spec()()
     eq(instance.paths.length, 1)
@@ -171,5 +171,30 @@ describe('PathSpec', function() {
       assert(c.passed && c.exact)
       assert(!d)
     })
+  })
+  it("success should return true on exact match", function() {
+    let instance = spec()()
+    let result = { '/x': { }, '/xy': { exact: true } }
+    assert(instance.success(result))
+    result = { '/x': { }, '/xy': { } }
+    assert(!instance.success(result))
+  })
+  it.only("resolve should call success/error callback based on result", function() {
+    let next = mock('next'), err = mock('err')
+    let instance = spec()(next, err)
+    let result = { '/x': { }, '/xy': { exact: true } }
+    eq(instance.resolve(result), 'next')
+    result = { '/x': { }, '/xy': { } }
+    eq(instance.resolve(result), 'err')
+    instance = spec()(next)
+    eq(instance.resolve(result), 'next')
+  })
+  it.only("resolve should call success/error callback based on success", function() {
+    let next = mock('next'), err = mock('err')
+    let instance = spec()(next, err)
+    let result = { '/x': { }, '/xy': { } }
+    eq(instance.resolve(result, true), 'next')
+    instance = spec()(next)
+    eq(instance.resolve(result, false), 'next')
   })
 })
