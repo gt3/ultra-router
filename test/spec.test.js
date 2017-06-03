@@ -1,10 +1,12 @@
 import assert from 'assert'
 import { eq, neq, oeq, oneq, mock } from './helpers'
-import Spec from '../src/spec'
-const getMatchX = Spec.__GetDependency__('getMatchX')
-const litp = Spec.__GetDependency__('literalp')
-const allx = Spec.__GetDependency__('allx')
-const parsePathKey = Spec.__GetDependency__('parsePathKey')
+import SpecRewired from '../src/spec'
+import { spec, check, assignValues } from '../src/spec'
+
+const getMatchX = SpecRewired.__GetDependency__('getMatchX')
+const litp = SpecRewired.__GetDependency__('literalp')
+const allx = SpecRewired.__GetDependency__('allx')
+const parsePathKey = SpecRewired.__GetDependency__('parsePathKey')
 
 function escape(path, ...ids) {
   path = ids.reduce((acc, id) => acc.replace(id, litp), path)
@@ -46,5 +48,18 @@ describe('spec', function() {
       oeq(identifiers, [])
       oeq(literals, [''])
     })
+  })
+  it('assignValues', function() {
+    let expected = {':x': 42, ':y': 43}
+    oeq(assignValues('/:x', [42]), {':x': 42})
+    oeq(assignValues('/:x/:y', [42,43]), expected)
+    oeq(assignValues('/:x/:y/', [42,43]), expected)
+    oeq(assignValues(parsePathKey('/:x/:y'), [42,43]), expected)
+    oeq(assignValues('/:x/abc/:y', [42,43]), expected)
+    oeq(assignValues('/abc', [42,43]), {})
+    oeq(assignValues('/', [42,43]), {})
+    oeq(assignValues('/:x', []), {})
+  })
+  it('spec', function() {
   })
 })

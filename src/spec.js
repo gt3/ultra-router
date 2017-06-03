@@ -23,7 +23,7 @@ let parsePathKey = pathKey => {
   return { key: pathKey, identifiers, literals, matchx }
 }
 
-export function assignValuesToIds(pathKey, values = []) {
+export function assignValues(pathKey, values = []) {
   let { identifiers } = isStr(pathKey) ? parsePathKey(pathKey) : pathKey
   return flattenToObj(identifiers.map((id, key) => ({ [id]: values[key] })))
 }
