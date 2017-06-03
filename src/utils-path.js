@@ -117,6 +117,10 @@ let env = {
   get href() {
     return substitute([this.path, this.qs, this.hash], ['?', '#'], true)
   },
+  get origin() {
+    let {protocol, hostname, port} = this.location
+    return substitute([protocol, hostname, port], ['//', ':'], true)
+  },
   get history() {
     return this.window.history
   }
