@@ -35,9 +35,8 @@ class Path {
   findInvalid(checks, values) {
     let ids = this.identifiers, hasCheck = Object.prototype.hasOwnProperty.bind(checks)
     let mapped = assignValues(this.key, values)
-    return empty(checks)
-      ? -1
-      : values.findIndex((val, i) => hasCheck(ids[i]) && !checks[ids[i]](values, mapped))
+    let callCheck = id => hasCheck(id) && !checks[id](mapped[id], mapped)
+    return empty(checks) ? -1 : values.findIndex((v, i) => callCheck(ids[i]))
   }
   validate(checks, values) {
     let invalid = this.findInvalid(checks, values)
@@ -110,7 +109,7 @@ export function prefixSpec(prefix, next) {
 }
 
 function rxFn(rxs) {
-  return values => rxs.every(rx => !empty(values.filter(rx.test.bind(rx))))
+  return value => rxs.every(rx => rx.test(value))
 }
 
 function makeCheck(id, rxs) {

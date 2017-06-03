@@ -62,6 +62,18 @@ describe('spec', function() {
     oeq(assignValues('/', [42, 43]), {})
     oeq(assignValues('/:x', []), {})
   })
+  it('check', function() {
+    let fn = check('x')(/42/)
+    assert(fn.x('42'))
+    assert(!fn.x('43'))
+  })
+  it('check multiple', function() {
+    let fn = check('x', 'y')(/^4/, /[2,3]$/)
+    assert(fn.x('42'))
+    assert(fn.x('43'))
+    assert(!fn.x('44'))
+    assert(fn.y('42'))
+  })
 })
 
 describe('Path: match', function() {
@@ -81,11 +93,11 @@ describe('Path: match', function() {
   })
   it('should validate values', function() {
     let valid = mock(true), invalid = mock(false)
-    assert(new Path('/:x').match({ ':x': valid }, '/blah').passed)
+    assert(new Path('/:x').match({ ':x': valid }, '/xxx').passed)
     eq(valid.mock.calls.length, 1)
-    oeq(valid.mock.calls[0][0], ['blah'])
-    oeq(valid.mock.calls[0][1], { ':x': 'blah' })
-    assert(!new Path('/:x').match({ ':x': invalid }, '/blah').passed)
+    eq(valid.mock.calls[0][0], 'xxx')
+    oeq(valid.mock.calls[0][1], { ':x': 'xxx' })
+    assert(!new Path('/:x').match({ ':x': invalid }, '/xxx').passed)
     eq(invalid.mock.calls.length, 1)
   })
   it('should validate multiple values in a pathKey', function() {
@@ -95,7 +107,9 @@ describe('Path: match', function() {
     )
     eq(valid.mock.calls.length, 2)
     eq(invalid.mock.calls.length, 1)
-    oeq(valid.mock.calls[0][0], ['xxx', '', 'zzz'])
+    oeq(valid.mock.calls[0][0], 'xxx')
+    oeq(valid.mock.calls[1][0], '')
+    oeq(invalid.mock.calls[0][0], 'zzz')
     oeq(valid.mock.calls[0][1], { ':x': 'xxx', ':y': '', ':z': 'zzz' })
   })
   it('should not invoke remaining checks once validation fails', function() {
