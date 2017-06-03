@@ -69,11 +69,13 @@ class PathSpec {
     let result, matches = primary.match(checks, href)
     if (matches.passed) {
       result = { [primary.key]: matches }
-      subs.some(sub => {
-        let submatches = sub.match(checks, href)
-        if (submatches.passed) result[sub.key] = submatches
-        return submatches.exact
-      })
+      if (!matches.exact) {
+        subs.some(sub => {
+          let submatches = sub.match(checks, href)
+          if (submatches.passed) result[sub.key] = submatches
+          return submatches.exact
+        })
+      }
     }
     return result
   }

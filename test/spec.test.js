@@ -66,9 +66,7 @@ describe('spec', function() {
     let fn = check('x')(/42/)
     assert(fn.x('42'))
     assert(!fn.x('43'))
-  })
-  it('check multiple', function() {
-    let fn = check('x', 'y')(/^4/, /[2,3]$/)
+    fn = check('x', 'y')(/^4/, /[2,3]$/)
     assert(fn.x('42'))
     assert(fn.x('43'))
     assert(!fn.x('44'))
@@ -121,7 +119,7 @@ describe('Path: match', function() {
 })
 
 describe('PathSpec', function() {
-  it('should create pathspec when no keys are provided', function() {
+  it('should create pathspec for empty key', function() {
     let instance = spec()()
     eq(instance.paths.length, 1)
     eq(instance.paths[0].key, '')
@@ -138,5 +136,40 @@ describe('PathSpec', function() {
     let instance = spec('/xyz', '')()
     assert(instance.find(''))
     assert(instance.find('/xyz'))
+  })
+  describe('match', function() {
+    it('should match all paths for empty key', function() {
+      let instance = spec()()
+      assert(instance.match(null, ''))
+      assert(instance.match(null, '/'))
+      assert(instance.match(null, '/abc/def'))
+    })
+    it('should match path only when primary pathKey matches', function() {
+      let instance = spec('/abc', '/xyz')()
+      assert(!instance.match(null, '/xyz'))
+      assert(instance.match(null, '/abc'))
+    })
+    it('should match primary and sub pathkeys', function() {
+      let instance = spec('/', '/x', '/xy', '/xxx')()
+      let { '/': a, '/x': b, '/xy': c, '/xxx': d } = instance.match(null, '/xxx')
+      assert(a.passed && !a.exact)
+      assert(b.passed && !b.exact)
+      assert(d.passed && d.exact)
+      assert(!c)
+    })
+    it('should stop matching if primary pathkey matched exactly', function() {
+      let instance = spec('/xx', '/x')()
+      let { '/xx': a, '/x': b } = instance.match(null, '/xx')
+      assert(a.passed && a.exact)
+      assert(!b)
+    })
+    it('should stop matching on first exact match', function() {
+      let instance = spec('/', '/x', '/xy', '/xyy')()
+      let { '/': a, '/x': b, '/xy': c, '/xyy': d } = instance.match(null, '/xy')
+      assert(a.passed && !a.exact)
+      assert(b.passed && !b.exact)
+      assert(c.passed && c.exact)
+      assert(!d)
+    })
   })
 })
