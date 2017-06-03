@@ -5,6 +5,14 @@ import assert from 'assert'
 import { eq, neq, oeq, oneq, mock } from './helpers'
 import * as u from '../src/utils-path'
 
+function setOrigin(protocol, hostname, port) {
+  return Object.defineProperties(window.location, {
+    protocol: { writable: true, value: protocol },
+    hostname: { writable: true, value: hostname },
+    port: { writable: true, value: port || '' }
+  })
+}
+
 function setLocation(loc) {
   let { href, path: pathname, qs: search = '', hash = '' } = u.parseHref(loc)
   href = u.addLeadingSlash(href)
@@ -28,6 +36,12 @@ let testEnv = (loc = window.location) => {
 
 describe('path utils: env', function() {
   //window.location.assign = jest.fn()
+  it('origin', function() {
+    setOrigin('http:','foo.com')
+    eq(u.env.origin, 'http://foo.com')
+    setOrigin('http:','foo.com','8080')
+    eq(u.env.origin, 'http://foo.com:8080')
+  })
   it('location', function() {
     eq(u.env.location, window.location)
     testEnv('/xyz?q=42#skipto')
