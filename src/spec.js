@@ -34,9 +34,10 @@ class Path {
   }
   findInvalid(checks, values) {
     let ids = this.identifiers, hasCheck = Object.prototype.hasOwnProperty.bind(checks)
+    let mapped = assignValues(this.key, values)
     return empty(checks)
       ? -1
-      : values.findIndex((val, i) => hasCheck(ids[i]) && !checks[ids[i]](values))
+      : values.findIndex((val, i) => hasCheck(ids[i]) && !checks[ids[i]](values, mapped))
   }
   validate(checks, values) {
     let invalid = this.findInvalid(checks, values)
@@ -49,9 +50,9 @@ class Path {
     let exact = match.length === href.length
     return Object.assign(this.validate(checks, values), { match, exact })
   }
-  makeLink(values) {
+  /*makeLink(values) {
     return substitute(this.literals, values)
-  }
+  }*/
 }
 
 class PathSpec {
