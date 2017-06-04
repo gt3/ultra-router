@@ -118,7 +118,7 @@ let env = {
     return substitute([this.path, this.qs, this.hash], ['?', '#'], true)
   },
   get origin() {
-    let {protocol, hostname, port} = this.location
+    let { protocol, hostname, port } = this.location
     return substitute([protocol, hostname, port], ['//', ':'], true)
   },
   get history() {

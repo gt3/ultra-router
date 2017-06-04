@@ -37,9 +37,9 @@ let testEnv = (loc = window.location) => {
 describe('path utils: env', function() {
   //window.location.assign = jest.fn()
   it('origin', function() {
-    setOrigin('http:','foo.com')
+    setOrigin('http:', 'foo.com')
     eq(u.env.origin, 'http://foo.com')
-    setOrigin('http:','foo.com','8080')
+    setOrigin('http:', 'foo.com', '8080')
     eq(u.env.origin, 'http://foo.com:8080')
   })
   it('location', function() {

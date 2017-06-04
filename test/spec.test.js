@@ -1,7 +1,7 @@
 import assert from 'assert'
 import { eq, neq, oeq, oneq, mock } from './helpers'
 import SpecRewired from '../src/spec'
-import { spec, check, assignValues } from '../src/spec'
+import { prefixSpec, spec, check, assignValues } from '../src/spec'
 
 const getMatchX = SpecRewired.__GetDependency__('getMatchX')
 const litp = SpecRewired.__GetDependency__('literalp')
@@ -37,10 +37,10 @@ describe('spec', function() {
       eq(key, '/:x/')
       oeq(identifiers, [':x'])
       oeq(literals, ['/', ''])
-      ;({ key, identifiers, literals } = parsePathKey('/'))
-      eq(key, '/')
+      ;({ key, identifiers, literals } = parsePathKey())
+      eq(key, undefined)
       oeq(identifiers, [])
-      oeq(literals, ['/'])
+      oeq(literals, [''])
     })
     it('should parse empty path and return match all regexp', function() {
       let key, identifiers, literals, matchx
@@ -60,7 +60,7 @@ describe('spec', function() {
     oeq(assignValues('/:x/abc/:y', [42, 43]), expected)
     oeq(assignValues('/abc', [42, 43]), {})
     oeq(assignValues('/', [42, 43]), {})
-    oeq(assignValues('/:x', []), {})
+    oeq(assignValues('/:x'), {})
   })
   it('check', function() {
     let fn = check('x')(/42/)
@@ -118,7 +118,7 @@ describe('Path: match', function() {
   })
 })
 
-describe.only('PathSpec', function() {
+describe('PathSpec', function() {
   it('should create pathspec for empty key', function() {
     let instance = spec()()
     eq(instance.paths.length, 1)
@@ -172,29 +172,63 @@ describe.only('PathSpec', function() {
       assert(!d)
     })
   })
-  it("success should return true on exact match", function() {
+  it('success should return true on exact match', function() {
     let instance = spec()()
-    let result = { '/x': { }, '/xy': { exact: true } }
+    let result = { '/x': {}, '/xy': { exact: true } }
     assert(instance.success(result))
-    result = { '/x': { }, '/xy': { } }
+    result = { '/x': {}, '/xy': {} }
     assert(!instance.success(result))
   })
-  it.only("resolve should call success/error callback based on result", function() {
+  it('resolve should call success/error callback based on result', function() {
     let next = mock('next'), err = mock('err')
     let instance = spec()(next, err)
-    let result = { '/x': { }, '/xy': { exact: true } }
+    let result = { '/x': {}, '/xy': { exact: true } }
     eq(instance.resolve(result), 'next')
-    result = { '/x': { }, '/xy': { } }
+    result = { '/x': {}, '/xy': {} }
     eq(instance.resolve(result), 'err')
     instance = spec()(next)
     eq(instance.resolve(result), 'next')
   })
-  it.only("resolve should call success/error callback based on success", function() {
+  it('resolve should call success/error callback based on success', function() {
     let next = mock('next'), err = mock('err')
     let instance = spec()(next, err)
-    let result = { '/x': { }, '/xy': { } }
+    let result = { '/x': {}, '/xy': {} }
     eq(instance.resolve(result, true), 'next')
     instance = spec()(next)
     eq(instance.resolve(result, false), 'next')
+  })
+})
+
+describe('PrefixSpec', function() {
+  it('on match should invoke callback with matched prefix', function() {
+    let next = mock()
+    let instance = prefixSpec('/x', next)
+    instance.match(null, { path: '/xyz' })
+    eq(next.mock.calls.length, 1)
+    eq(next.mock.calls[0][0].prefix, '/x')
+    eq(next.mock.calls[0][0].path, '/xyz')
+  })
+  it('should substitute identifier for values', function() {
+    let next = mock()
+    let instance = prefixSpec('/:x/000/:y', next)
+    instance.match(null, { path: '/xxx/000/yyy/zzz' })
+    eq(next.mock.calls.length, 1)
+    eq(next.mock.calls[0][0].prefix, '/xxx/000/yyy')
+    instance.match(null, { path: '/xxx/000//zzz' })
+    eq(next.mock.calls.length, 2)
+    eq(next.mock.calls[1][0].prefix, '/xxx/000/')
+  })
+  it('should run checks on values to determine match', function() {
+    let next = mock(), valid = mock(true), invalid = mock(false)
+    let instance = prefixSpec('/:x/:y', next)
+    assert(!instance.match({ ':x': invalid, ':y': valid }, { path: '/xxx/yyy/zzz' }).success)
+    eq(next.mock.calls.length, 0)
+    instance.match({ ':x': valid, ':y': valid }, { path: '/xxx/yyy/zzz' })
+    eq(next.mock.calls.length, 1)
+    eq(next.mock.calls[0][0].prefix, '/xxx/yyy')
+  })
+  it('should return success false if prefix does not match', function() {
+    let instance = prefixSpec('/x', mock(null))
+    assert(!instance.match(null, { path: '/000' }).success)
   })
 })
