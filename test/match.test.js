@@ -45,8 +45,12 @@ describe('match: toggle', function() {
 })
 
 describe.only('match', function() {
-  it('basic', function() {
-    let next = mock(), err = mock()
+  let next, err
+  beforeEach(function() {
+    next = mock()
+    err = mock()
+  })
+  it('specs', function() {
     let matcher = match(spec('/a')(next, err))
     let run = u.pipe(matcher.match, matcher.resolve)
     run({href: '/a'})
@@ -59,5 +63,26 @@ describe.only('match', function() {
     assert(res.passed)
     assert(!res.exact)
     eq(res.match, '/a')
+  })
+  it.only('specs+checks', function() {
+    let specs = [spec('/abc', '/abc/:x')(next, err), spec('/xyz', '/xyz/:x/:y')(next, err)]
+    let checks = check(':x', ':y')(/^4/, /[2,3]$/)
+    let matcher = match(specs, checks)
+    let res, run = u.pipe(matcher.match, matcher.resolve)
+    run({href: '/abc/42'})
+    eq(next.mock.calls.length, 1)
+    res = next.mock.calls[0][0]['/abc/:x']
+    assert(res.exact)
+    eq(res.values[0], '42')
+    run({href: '/xyz/42/43'})
+    eq(next.mock.calls.length, 2)
+    res = next.mock.calls[1][0]['/xyz/:x/:y']
+    assert(res.exact)
+    oeq(res.values, ['42','43'])
+    run({href: '/xyz/42/44'})
+    eq(err.mock.calls.length, 1)
+    assert(!err.mock.calls[0][0]['/xyz/:x/:y'])
+    res = err.mock.calls[0][0]['/xyz']
+    assert(res.passed)
   })
 })
