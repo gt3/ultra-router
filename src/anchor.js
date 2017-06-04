@@ -1,13 +1,17 @@
-import { parseHref } from './utils-path'
+import { parseHref, env } from './utils-path'
 import { exclude } from './utils'
 
-function validateClick(e) {
+function verifyOrigin(href) {
+  return href.indexOf(env.location.protocol) !== 0 || href.indexOf(env.origin) === 0
+}
+
+function verifyClick(e) {
   return !(e.defaultPrevented || e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
 }
 
 export function makeClickHandler({ href, state, docTitle }, action) {
   function clickHandler(e) {
-    if (validateClick(e)) {
+    if (verifyClick(e) && verifyOrigin(href)) {
       e.preventDefault()
       action(clickHandler.loc)
     }

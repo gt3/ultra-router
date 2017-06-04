@@ -1,6 +1,8 @@
 import { pipe, substitute, escapeRx } from './utils'
 import warning from 'warning'
 
+let urlx = /^http.?:[\/]{2}[^\/]+/
+
 function stripPrefix(prefix, path) {
   return prefix ? path.replace(new RegExp(`^${escapeRx(prefix)}`), '') : path
 }
@@ -74,14 +76,18 @@ function extractQSHash(loc) {
   return [path, qs, h]
 }
 
+function extractPath(path) {
+  return path ? encodePath(path.replace(urlx, '')) : ''
+}
+
 function makeLocation(path, qs, hash) {
+  path = extractPath(path)
   let href = substitute([path, qs, hash], ['?', '#'], true)
   return Object.assign({ path, href }, qs && { qs }, hash && { hash })
 }
 
 function parseHref(loc) {
-  let [path, qs, hash] = extractQSHash(loc)
-  return makeLocation(encodePath(path), qs, hash)
+  return makeLocation(...extractQSHash(loc))
 }
 
 function parseQS(qs, ids, path = '', delim = ',') {
