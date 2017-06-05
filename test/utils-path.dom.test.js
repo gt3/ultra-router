@@ -3,7 +3,7 @@
  */
 import assert from 'assert'
 import { eq, neq, oeq, oneq, mock } from './helpers'
-import * as u from '../src/utils-path'
+import * as u from '../src/router/utils-path'
 
 function setOrigin(protocol, hostname, port) {
   return Object.defineProperties(window.location, {

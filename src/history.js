@@ -1,6 +1,6 @@
 import Listener from './listener'
 import warning from 'warning'
-import { verifyURIEncoding, env } from './utils-path'
+import { verifyURIEncoding, env } from './router/utils-path'
 
 function invokeHandlers(handlers) {
   function invoke(event, fn) {

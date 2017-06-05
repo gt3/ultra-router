@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { eq, neq, oeq, oneq, mock } from './helpers'
-import * as u from '../src/utils'
+import * as u from '../src/router/utils'
 
 describe('utils', function() {
   it('pipe', function() {

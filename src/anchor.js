@@ -1,5 +1,5 @@
-import { parseHref, env } from './utils-path'
-import { exclude } from './utils'
+import { parseHref, env } from './router/utils-path'
+import { exclude } from './router/utils'
 
 function verifyOrigin(href) {
   return href.indexOf(env.location.protocol) !== 0 || href.indexOf(env.origin) === 0

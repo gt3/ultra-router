@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { eq, neq, oeq, oneq, mock } from './helpers'
-import * as u from '../src/utils-path'
+import * as u from '../src/router/utils-path'
 
 let verifyMatch = (xhref, xpath, xqs, xhash) => actual => {
   let { href, path, qs = '', hash = '' } = actual

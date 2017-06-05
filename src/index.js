@@ -1,4 +1,4 @@
-export { spec, check, assignValues } from './spec'
-export { match, toggle, toggleSelected } from './match'
+export { spec, check, assignValues } from './router/spec'
+export { match, toggle, toggleSelected } from './router/match'
 export { container } from './container'
 export { Anchor } from './anchor'

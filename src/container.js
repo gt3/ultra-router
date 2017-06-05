@@ -1,6 +1,6 @@
 import warning from 'warning'
-import { pipe, isStr } from './utils'
-import { parseHref, env } from './utils-path'
+import { pipe, isStr } from './router/utils'
+import { parseHref, env } from './router/utils-path'
 import { createPopstate, push, replace, go } from './history'
 import { makeVisit, recalibrate } from './visit'
 

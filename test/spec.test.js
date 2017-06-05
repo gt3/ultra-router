@@ -1,7 +1,7 @@
 import assert from 'assert'
 import { eq, neq, oeq, oneq, mock } from './helpers'
-import SpecRewired from '../src/spec'
-import { prefixSpec, spec, check, assignValues } from '../src/spec'
+import SpecRewired from '../src/router/spec'
+import { prefixSpec, spec, check, assignValues } from '../src/router/spec'
 
 const getMatchX = SpecRewired.__GetDependency__('getMatchX')
 const litp = SpecRewired.__GetDependency__('literalp')

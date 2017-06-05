@@ -1,11 +1,8 @@
 import assert from 'assert'
 import { eq, neq, oeq, oneq, mock } from './helpers'
-import * as u from '../src/utils'
-//import MatchRewired from '../src/match'
-import { prefixSpec, spec, check, assignValues } from '../src/spec'
-import { toggle, toggleSelected, match } from '../src/match'
-
-//const matcher = MatchRewired.__GetDependency__('matcher')
+import * as u from '../src/router/utils'
+import { prefixSpec, spec, check, assignValues } from '../src/router/spec'
+import { toggle, toggleSelected, match } from '../src/router/match'
 
 function testToggle(id, match) {
   let testOn = t => {

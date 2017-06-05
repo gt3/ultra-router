@@ -1,4 +1,4 @@
-import { env } from './utils-path'
+import { env } from './router/utils-path'
 const idk = '$id'
 
 function place(n) {
