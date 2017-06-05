@@ -44,7 +44,7 @@ describe('match: toggle', function() {
   })
 })
 
-describe.only('match', function() {
+describe('match', function() {
   let next, err
   beforeEach(function() {
     next = mock()
@@ -99,6 +99,23 @@ describe.only('match', function() {
     eq(next.mock.calls.length, 2)
     res = next.mock.calls[1][0]['/c']
     assert(res.exact)
+  })
+  it('spec + specCheck', function() {
+    let s = spec('/c')(next, err)
+    let specCheck = mock('/c')
+    let matcher = match(s, null, null, specCheck)
+    let res, run = u.pipe(matcher.match, matcher.resolve)
+    run({path: '/xxx', href: '/xxx', qs: '', hash: '', prefix: ''})
+    eq(next.mock.calls.length, 1)
+    res = next.mock.calls[0][0]['/c']
+    assert(res.exact)
+    eq(specCheck.mock.calls.length, 1)
+    res = specCheck.mock.calls[0][0]
+    eq(res.path, '/xxx')
+    eq(res.href, '/xxx')
+    eq(res.qs, '')
+    eq(res.hash, '')
+    eq(res.prefix, '')
   })
   it('spec + specCheck + QS', function() {
     let s = spec('/c/:d')(next, err)
