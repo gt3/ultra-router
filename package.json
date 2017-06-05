@@ -12,7 +12,7 @@
     "build": "rollup -c && rollup -c --environment DIST",
     "prepublishOnly": "npm run lint && npm run build",
     "local": "npm run prepublishOnly && npm pack",
-    "preversion": "cd ./router && cross-env npm version $npm_package_version && cd .."
+    "preversion": "cd ./src/router && cross-env npm version $npm_package_version && cd ../.."
   },
   "repository": "react-circuit/ultra",
   "author": "Ankit Patel <gt3.someday@gmail.com>",
