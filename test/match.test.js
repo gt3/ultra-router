@@ -64,7 +64,7 @@ describe.only('match', function() {
     assert(!res.exact)
     eq(res.match, '/a')
   })
-  it.only('specs+checks', function() {
+  it('specs+checks', function() {
     let specs = [spec('/abc', '/abc/:x')(next, err), spec('/xyz', '/xyz/:x/:y')(next, err)]
     let checks = check(':x', ':y')(/^4/, /[2,3]$/)
     let matcher = match(specs, checks)
@@ -84,5 +84,20 @@ describe.only('match', function() {
     assert(!err.mock.calls[0][0]['/xyz/:x/:y'])
     res = err.mock.calls[0][0]['/xyz']
     assert(res.passed)
+  })
+  it.only('specs+prefix', function() {
+    let s = spec('/c')(next, err)
+    let a = match(s, null, '/a')
+    let b = match(s, null, '/b')
+    let res, run = u.pipe(a.match, a.resolve)
+    run({path: '/a/c', href: '/a/c'})
+    eq(next.mock.calls.length, 1)
+    res = next.mock.calls[0][0]['/c']
+    assert(res.exact)
+    run = u.pipe(b.match, b.resolve)
+    run({path: '/b/c', href: '/b/c'})
+    eq(next.mock.calls.length, 2)
+    res = next.mock.calls[1][0]['/c']
+    assert(res.exact)
   })
 })
