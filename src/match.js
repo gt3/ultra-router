@@ -45,7 +45,7 @@ function prematch(specCheck, msg) {
   href = normalizeHref(prefix)(href)
   path = normalizeHref(prefix)(path)
   if (specCheck) {
-    let specCheckMsg = {prefix, href, path, qs, hash}
+    let specCheckMsg = { prefix, href, path, qs, hash }
     href = normalizeHref()(specCheck(specCheckMsg, parseQS.bind(null, qs)))
   }
   return href === msg.href ? msg : Object.assign({}, msg, { href, path })

@@ -85,11 +85,8 @@ describe('path utils', function() {
     verifyMatch('/abc?x=42#xyz', '/abc', 'x=42', 'xyz')(u.parseHref('http://foo.com/abc?x=42#xyz'))
   })
   it('parseHref path encode', function() {
-    verifyMatch(
-      '/%5Eabc?x=42#xyz',
-      '/%5Eabc',
-      'x=42',
-      'xyz'
-    )(u.parseHref('http://foo.com/^abc?x=42#xyz'))
+    verifyMatch('/%5Eabc?x=42#xyz', '/%5Eabc', 'x=42', 'xyz')(
+      u.parseHref('http://foo.com/^abc?x=42#xyz')
+    )
   })
 })
