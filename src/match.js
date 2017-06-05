@@ -41,13 +41,14 @@ function matchPrefix(matcher) {
 }
 
 function prematch(specCheck, msg) {
-  let { prefix, href, path, qs } = msg
+  let { prefix, href, path, qs, hash } = msg
   href = normalizeHref(prefix)(href)
   path = normalizeHref(prefix)(path)
   if (specCheck) {
-    href = normalizeHref()(specCheck(parseQS.bind(null, qs), path, href))
+    let specCheckMsg = {prefix, href, path, qs, hash}
+    href = normalizeHref()(specCheck(specCheckMsg, parseQS.bind(null, qs)))
   }
-  return href === msg.href ? msg : Object.assign({}, msg, { href })
+  return href === msg.href ? msg : Object.assign({}, msg, { href, path })
 }
 
 export function match(specs, checks = {}, prefix, specCheck) {

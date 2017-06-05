@@ -85,7 +85,7 @@ describe.only('match', function() {
     res = err.mock.calls[0][0]['/xyz']
     assert(res.passed)
   })
-  it.only('specs+prefix', function() {
+  it('specs+prefix', function() {
     let s = spec('/c')(next, err)
     let a = match(s, null, '/a')
     let b = match(s, null, '/b')
@@ -99,5 +99,22 @@ describe.only('match', function() {
     eq(next.mock.calls.length, 2)
     res = next.mock.calls[1][0]['/c']
     assert(res.exact)
+  })
+  it('spec + specCheck + QS', function() {
+    let s = spec('/c/:d')(next, err)
+    let checks = check(':aorb')(/^[a,b]$/)
+    let specCheck = ({path}, parseQS) => parseQS(['q'], path)
+    let aorb = match(s, checks, '/:aorb', specCheck)
+    let res, run = u.pipe(aorb.match, aorb.resolve)
+    run({path: '/a/c', href: '/a/c?q=42&q=43', qs: '?q=42&q=43'})
+    eq(next.mock.calls.length, 1)
+    res = next.mock.calls[0][0]['/c/:d']
+    assert(res.exact)
+    assert(res.values[0], '42,43')
+    run({path: '/b/c', href: '/b/c?q=42', qs: '?q=42'})
+    eq(next.mock.calls.length, 2)
+    res = next.mock.calls[1][0]['/c/:d']
+    assert(res.exact)
+    assert(res.values[0], '42')
   })
 })
