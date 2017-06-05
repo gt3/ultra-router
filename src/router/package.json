@@ -3,7 +3,6 @@
   "version": "0.3.1",
   "description": "Routing rules API for Ultra",
   "scripts": {
-    "preversion": "node -e \"throw new Error('do not version this package using: npm version')\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": "react-circuit/ultra",
