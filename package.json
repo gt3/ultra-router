@@ -1,6 +1,6 @@
 {
   "name": "ultra",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Generic pushstate router for React and other component-based frameworks.",
   "main": "./lib/ultra.js",
   "module": "./lib/ultra.es.js",
@@ -35,7 +35,10 @@
   },
   "jest": {
     "testRegex": "(/test/.*\\.test\\.js$)",
-    "coveragePathIgnorePatterns" : ["/test/", "/node_modules/"],
+    "coveragePathIgnorePatterns": [
+      "/test/",
+      "/node_modules/"
+    ],
     "testEnvironment": "node"
   },
   "bundleDependencies": [
