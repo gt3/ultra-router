@@ -1,5 +1,5 @@
 {
-  "plugins": [ "dev-expression" ],
+  "plugins": [ "dev-expression", "transform-es2015-destructuring", "external-helpers" ],
   "presets": ["es2016", "stage-2"],
   "env": {
     "test": {

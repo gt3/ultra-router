@@ -21,7 +21,9 @@
   "devDependencies": {
     "babel-jest": "^20.0.3",
     "babel-plugin-dev-expression": "^0.2.1",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-rewire": "^1.1.0",
+    "babel-plugin-transform-es2015-destructuring": "^6.23.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
     "babel-preset-es2016": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
