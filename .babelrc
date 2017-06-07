@@ -1,5 +1,5 @@
 {
-  "plugins": ["dev-expression","transform-es2015-destructuring","transform-es2015-template-literals","external-helpers"],
+  "plugins": ["transform-es2015-destructuring","transform-es2015-template-literals","external-helpers"],
   "presets": [
     "es2016",
     "stage-2"
