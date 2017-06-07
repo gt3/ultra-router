@@ -1,11 +1,19 @@
 {
-  "plugins": [ "dev-expression", "transform-es2015-destructuring", "external-helpers" ],
-  "presets": ["es2016", "stage-2"],
+  "plugins": ["dev-expression","transform-es2015-destructuring","transform-es2015-template-literals","external-helpers"],
+  "presets": [
+    "es2016",
+    "stage-2"
+  ],
   "env": {
     "test": {
       "plugins": [
         "rewire",
-        ["transform-es2015-modules-commonjs", { "loose": true }]
+        [
+          "transform-es2015-modules-commonjs",
+          {
+            "loose": true
+          }
+        ]
       ]
     }
   }
