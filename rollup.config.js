@@ -1,6 +1,7 @@
 import babel from 'rollup-plugin-babel'
 import { minify } from 'uglify-es'
 import uglify from 'rollup-plugin-uglify'
+import replace from 'rollup-plugin-replace';
 
 const compress = process.env.DIST === 'true'
 
@@ -20,6 +21,7 @@ const lib = {
 const dist = Object.assign({}, lib, {
   plugins: [
     babel({exclude: 'node_modules/**'}),
+    replace({ 'process.env.NODE_ENV': `"production"` }),
     uglify({}, minify)
   ],
   targets: [

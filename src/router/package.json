@@ -9,9 +9,6 @@
   "keywords": [],
   "author": "Ankit Patel <gt3.someday@gmail.com>",
   "license": "MIT",
-  "dependencies": {
-    "warning": "^3.0.0"
-  },
   "files": [
     "spec.js",
     "match.js",

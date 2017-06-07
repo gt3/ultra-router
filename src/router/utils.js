@@ -1,3 +1,5 @@
+function noop() {}
+
 function isFn(t) {
   return typeof t === 'function' ? t : void 0
 }
@@ -40,4 +42,12 @@ function escapeRx(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-export { pipe, flattenToObj, exclude, substitute, escapeRx }
+function warnOn(truthy, msg) {
+  return truthy && console.error(msg)
+}
+let devWarnOn = noop
+if (process.env.NODE_ENV !== 'production') {
+  devWarnOn = warnOn
+}
+
+export { pipe, flattenToObj, exclude, substitute, escapeRx, devWarnOn }

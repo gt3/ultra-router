@@ -33,6 +33,7 @@
     "prettier": "^1.1.0",
     "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-replace": "^1.1.1",
     "rollup-plugin-uglify": "^2.0.1",
     "uglify-es": "^3.0.13"
   },
@@ -44,9 +45,6 @@
     ],
     "testEnvironment": "node"
   },
-  "bundleDependencies": [
-    "warning"
-  ],
   "files": [
     "dist",
     "lib"

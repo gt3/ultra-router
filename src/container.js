@@ -1,12 +1,11 @@
-import warning from 'warning'
-import { pipe, isStr } from './router/utils'
+import { pipe, isStr, devWarnOn } from './router/utils'
 import { parseHref, env } from './router/utils-path'
 import { createPopstate, push, replace, go } from './history'
 import { makeVisit, recalibrate } from './visit'
 
 function dispatcher(actions, msg) {
   let resolved = actions.some(fn => fn(msg))
-  warning(resolved, 'Could not resolve location: %s', msg.href)
+  devWarnOn(!resolved, `Could not resolve location: ${msg.href}`)
   return resolved
 }
 

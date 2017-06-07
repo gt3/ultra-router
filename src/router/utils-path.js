@@ -1,5 +1,4 @@
-import { pipe, substitute, escapeRx } from './utils'
-import warning from 'warning'
+import { pipe, substitute, escapeRx, devWarnOn } from './utils'
 
 let urlx = /^http.?:[\/]{2}[^\/]+/
 
@@ -56,7 +55,7 @@ function verifyHashEncoding(h) {
 
 function extractHash(loc) {
   let [locwof, h] = loc.split(/#(.*)$/, 2)
-  warning(verifyHashEncoding(h), 'Use encodeURIComponent to encode fragment data: %s', h)
+  devWarnOn(!verifyHashEncoding(h), `Use encodeURIComponent to encode fragment data: ${h}`)
   return [locwof, h]
 }
 
@@ -66,7 +65,7 @@ function verifyQSEncoding(qs) {
 
 function extractQS(loc) {
   let [path, qs] = loc.split(/\?(.*)$/, 2)
-  warning(verifyQSEncoding(qs), 'Use encodeURIComponent to encode query string data: %s', qs)
+  devWarnOn(!verifyQSEncoding(qs), `Use encodeURIComponent to encode query string data: ${qs}`)
   return [path, qs]
 }
 
@@ -105,7 +104,7 @@ export { parseHref, parseQS }
 
 let env = {
   get window() {
-    warning(typeof window !== 'undefined', 'missing window object in environment')
+    devWarnOn(typeof window === 'undefined', 'missing window object in environment')
     return window
   },
   get location() {
