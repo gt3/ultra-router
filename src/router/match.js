@@ -1,4 +1,4 @@
-import { pipe, devWarnOn } from './utils'
+import { pipe, $devWarnOn } from './utils'
 import { normalizeHref, parseQS } from './utils-path'
 import { prefixSpec } from './spec'
 
@@ -26,7 +26,7 @@ function matcher(specs, checks, msg) {
 }
 
 function resolve({ result, success, spec }) {
-  devWarnOn(spec && !success, `Resolve location with a partial match: ${result && result.href}`)
+  $devWarnOn(spec && !success, `Resolve location with a partial match: ${result && result.href}`)
   return spec ? (spec.resolve(result, success), true) : false
 }
 

@@ -45,9 +45,9 @@ function escapeRx(string) {
 function warnOn(truthy, msg) {
   return truthy && console.error(msg)
 }
-let devWarnOn = noop
+let $devWarnOn = noop
 if (process.env.NODE_ENV !== 'production') {
-  devWarnOn = warnOn
+  $devWarnOn = warnOn
 }
 
-export { pipe, flattenToObj, exclude, substitute, escapeRx, devWarnOn }
+export { pipe, flattenToObj, exclude, substitute, escapeRx, $devWarnOn }

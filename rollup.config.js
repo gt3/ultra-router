@@ -13,7 +13,7 @@ const lib = {
     babel({exclude: 'node_modules/**'}),
     replace({
       patterns: [
-        { test: /devWarnOn(?:[\s]*\(|\.)/g, replace: $m => '/*@__PURE__*/' + $m }
+        { test: /\$devWarnOn\s*\(/g, replace: m => '/*@__PURE__*/' + m }
       ]
     })
   ],
@@ -28,7 +28,7 @@ const dist = Object.assign({}, lib, {
     babel({exclude: 'node_modules/**'}),
     replace({
       patterns: [
-        { test: /devWarnOn(?:[\s]*\(|\.)/g, replace: $m => '/*@__PURE__*/' + $m },
+        { test: /\$devWarnOn\s*\(/g, replace: m => '/*@__PURE__*/' + m },
         { test: 'process.env.NODE_ENV', replace: "'production'" }
       ]
     }),
