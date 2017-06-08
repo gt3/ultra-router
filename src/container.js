@@ -4,9 +4,9 @@ import { createPopstate, push, replace, go } from './history'
 import { makeVisit, recalibrate } from './visit'
 
 function dispatcher(actions, msg) {
-  let resolved = actions.some(fn => fn(msg))
+  let result, resolved = actions.some(fn => !!(result = fn(msg)))
   $devWarnOn(!resolved, `Could not resolve location: ${msg.href}`)
-  return resolved
+  return result
 }
 
 function getDispatcher(matchers) {

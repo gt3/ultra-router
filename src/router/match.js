@@ -27,7 +27,7 @@ function matcher(specs, checks, msg) {
 
 function resolve({ result, success, spec }) {
   $devWarnOn(spec && !success, `Resolve location with a partial match: ${result && result.href}`)
-  return spec ? (spec.resolve(result, success), true) : false
+  return spec ? (spec.resolve(result, success), result) : false
 }
 
 function matchPrefix(matcher) {
