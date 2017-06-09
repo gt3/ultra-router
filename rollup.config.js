@@ -10,7 +10,7 @@ const lib = {
   external: [ 'warning' ],
   globals: { warning: 'warning' },
   plugins: [
-    babel({exclude: 'node_modules/**'}),
+    babel({exclude: 'node_modules/**', plugins: ["external-helpers"]}),
     replace({
       patterns: [
         { test: /\$devWarnOn\s*\(/g, replace: m => '/*@__PURE__*/' + m }
@@ -25,7 +25,7 @@ const lib = {
 
 const dist = Object.assign({}, lib, {
   plugins: [
-    babel({exclude: 'node_modules/**'}),
+    babel({exclude: 'node_modules/**', plugins: ["external-helpers"]}),
     replace({
       patterns: [
         { test: /\$devWarnOn\s*\(/g, replace: m => '/*@__PURE__*/' + m },
