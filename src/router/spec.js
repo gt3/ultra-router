@@ -55,10 +55,10 @@ class Path {
 }
 
 class PathSpec {
-  constructor(pathKeys, next, err) {
+  constructor(pathKeys, next, err, fail) {
     if (!Array.isArray(pathKeys) || !pathKeys.length) pathKeys = [isStr(pathKeys) ? pathKeys : '']
     let paths = pathKeys.map(k => new Path(k))
-    Object.assign(this, { pathKeys, paths, next, err })
+    Object.assign(this, { pathKeys, paths, next, err, fail })
   }
   find(pathKey) {
     let idx = this.pathKeys.indexOf(pathKey)
@@ -85,10 +85,13 @@ class PathSpec {
   resolve(result, success = this.success(result)) {
     return !this.err || success ? this.next(result) : this.err(result)
   }
+  reject(result) {
+    return this.fail && this.fail(result)
+  }
 }
 
 export function spec(...pathKeys) {
-  return (next, err) => new PathSpec(pathKeys, next, err)
+  return (next, err, fail) => new PathSpec(pathKeys, next, err, fail)
 }
 
 class PrefixSpec extends PathSpec {

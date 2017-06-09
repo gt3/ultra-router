@@ -9,9 +9,14 @@ function dispatcher(actions, msg) {
   return result
 }
 
+function rejector(matchers, msg) {
+  if (msg && !msg.abandon) matchers.forEach(matcher => matcher.reject(msg))
+}
+
 function getDispatcher(matchers) {
   let actions = matchers.map(matcher => pipe(matcher.match, matcher.resolve))
-  return recordVisit.bind(null, dispatcher.bind(null, actions))
+  let dispatch = pipe(dispatcher.bind(null, actions), rejector.bind(null, matchers))
+  return recordVisit.bind(null, dispatch)
 }
 
 export function recordVisit(dispatch, msg) {

@@ -2,10 +2,12 @@ import { pipe, $devWarnOn } from './utils'
 import { normalizeHref, parseQS } from './utils-path'
 import { prefixSpec } from './spec'
 
+let fail = () => false
+
 export function toggle(newKey, match) {
   let { off, key = newKey } = match, on = off
   if (!off) {
-    on = { off: match, match: () => false, resolve: () => false }
+    on = { off: match, match: fail, resolve: fail, reject: fail }
   }
   if (key) on.key = key
   return on
@@ -19,15 +21,22 @@ export function toggleSelected(matchers, ...selectKeys) {
 
 function matcher(specs, checks, msg) {
   let spec, result, { href } = msg
-  spec = specs.find(spec => !!(result = spec.match(checks, href)))
+  spec = specs.find(s => !!(result = s.match(checks, href)))
   let success = spec && spec.success(result)
   result = Object.assign({}, msg, result)
   return { result, success, spec }
 }
 
-function resolve({ result, success, spec }) {
+function resolve(msg) {
+  let abandon, { result, success, spec } = msg
   $devWarnOn(spec && !success, `Resolve location with a partial match: ${result && result.href}`)
-  return spec ? (spec.resolve(result, success), result) : false
+  if (spec) abandon = spec.resolve(result, success) === false
+  return spec ? Object.assign({}, msg, { abandon }) : false
+}
+
+function reject(specs, msg) {
+  let { result, spec } = msg
+  specs.forEach(s => s !== spec && s.reject(result))
 }
 
 function matchPrefix(matcher) {
@@ -53,5 +62,6 @@ function prematch(specCheck, msg) {
 export function match(specs, checks = {}, prefix, specCheck) {
   if (!Array.isArray(specs)) specs = [].concat(specs)
   let match = pipe(prematch.bind(null, specCheck), matcher.bind(null, specs, checks))
-  return matchPrefix({ match, resolve, prefix, specs, checks })
+  let rejectBound = reject.bind(null, specs)
+  return matchPrefix({ match, resolve, prefix, specs, checks, reject: rejectBound })
 }
