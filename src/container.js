@@ -70,7 +70,11 @@ function run(_matchers, _popstate) {
     stop: _popstate.add(loc => guardDispatch(ultra, dispatch, loc)),
     nav: (action, loc) => navigate(ultra, dispatch, action, loc),
     push: loc => ultra.nav(push, loc),
-    replace: loc => ultra.nav(replace, loc)
+    replace: loc => ultra.nav(replace, loc),
+    redirect: loc => {
+      setTimeout(() => ultra.replace(loc))
+      return false
+    }
   }
   return ultra
 }
