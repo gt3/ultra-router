@@ -1,4 +1,4 @@
-import { isStr, flattenToObj, empty, substitute, escapeRx } from './utils'
+import { isStr, flattenToObj, empty, substitute, escapeRx, exclude, Timer } from './utils'
 import { removeTrailingSlash, decodePath } from './utils-path'
 
 const literalp = `([^\\s/]*)`
@@ -55,6 +55,9 @@ class Path {
 }
 
 class PathSpec {
+  static makeRedirect(ultra) {
+    return loc => new Timer(() => ultra.replace(loc))
+  }
   constructor(pathKeys, next, err, fail) {
     if (!Array.isArray(pathKeys) || !pathKeys.length) pathKeys = [isStr(pathKeys) ? pathKeys : '']
     let paths = pathKeys.map(k => new Path(k))
@@ -83,10 +86,16 @@ class PathSpec {
     return result && Object.keys(result).some(k => result[k].exact)
   }
   resolve(result, success = this.success(result)) {
-    return !this.err || success ? this.next(result) : this.err(result)
+    let { ultra } = result, redirect = PathSpec.makeRedirect(ultra)
+    result = exclude(result, 'ultra')
+    return !this.err || success ? this.next(result, redirect) : this.err(result, redirect)
   }
   reject(result) {
-    return this.fail && this.fail(result)
+    if (this.fail) {
+      let { ultra } = result, redirect = PathSpec.makeRedirect(ultra)
+      result = exclude(result, 'ultra')
+      return this.fail(result, redirect)
+    }
   }
 }
 
@@ -103,7 +112,7 @@ class PrefixSpec extends PathSpec {
     let matches = super.match(checks, path)
     if (matches) {
       let prefix = matches[this.prefixKey].match
-      result = super.resolve(Object.assign(result, { prefix }), true)
+      result = this.next(Object.assign(result, { prefix }))
     } else result.success = false
     return result
   }

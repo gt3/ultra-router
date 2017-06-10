@@ -51,3 +51,23 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export { pipe, flattenToObj, exclude, substitute, escapeRx, $devWarnOn }
+
+export class Timer {
+  static isActive(timer) {
+    return timer && timer instanceof Timer && timer.active
+  }
+  constructor(cb, ms = 0, autoRun = true) {
+    if (autoRun) this.run(cb, ms)
+  }
+  get active() {
+    return !!this.timer
+  }
+  run(cb, ms) {
+    return (this.timer = setTimeout(this.stop.bind(this, cb), ms))
+  }
+  stop(cb) {
+    clearTimeout(this.timer)
+    this.timer = undefined
+    return cb && cb()
+  }
+}

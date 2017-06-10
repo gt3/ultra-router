@@ -10,7 +10,7 @@ function dispatcher(actions, msg) {
 }
 
 function rejector(matchers, msg) {
-  if (msg && !msg.abandon) matchers.forEach(matcher => matcher.reject(msg))
+  if (msg && !msg.abandon) matchers.some(matcher => matcher.reject(msg))
 }
 
 function getDispatcher(matchers) {

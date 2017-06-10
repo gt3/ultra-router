@@ -1,13 +1,13 @@
-import { pipe, $devWarnOn } from './utils'
+import { pipe, Timer, $devWarnOn } from './utils'
 import { normalizeHref, parseQS } from './utils-path'
 import { prefixSpec } from './spec'
 
-let fail = () => false
+let falsy = () => false
 
 export function toggle(newKey, match) {
   let { off, key = newKey } = match, on = off
   if (!off) {
-    on = { off: match, match: fail, resolve: fail, reject: fail }
+    on = { off: match, match: falsy, resolve: falsy, reject: falsy }
   }
   if (key) on.key = key
   return on
@@ -28,15 +28,18 @@ function matcher(specs, checks, msg) {
 }
 
 function resolve(msg) {
-  let abandon, { result, success, spec } = msg
+  let { result, success, spec } = msg
   $devWarnOn(spec && !success, `Resolve location with a partial match: ${result && result.href}`)
-  if (spec) abandon = spec.resolve(result, success) === false
-  return spec ? Object.assign({}, msg, { abandon }) : false
+  if (spec) {
+    let abandon = Timer.isActive(spec.resolve(result, success))
+    if (abandon) msg = Object.assign({}, msg, { abandon })
+  }
+  return spec ? msg : false
 }
 
 function reject(specs, msg) {
   let { result, spec } = msg
-  specs.forEach(s => s !== spec && s.reject(result))
+  return specs.some(s => s !== spec && Timer.isActive(s.reject(result)))
 }
 
 function matchPrefix(matcher) {
