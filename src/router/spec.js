@@ -1,4 +1,4 @@
-import { isStr, flattenToObj, empty, substitute, escapeRx, exclude, Timer } from './utils'
+import { isStr, flattenToObj, empty, substitute, escapeRx, Timer } from './utils'
 import { removeTrailingSlash, decodePath } from './utils-path'
 
 const literalp = `([^\\s/]*)`
@@ -56,7 +56,7 @@ class Path {
 
 class PathSpec {
   static makeRedirect(ultra) {
-    return loc => new Timer(() => ultra.replace(loc))
+    return (loc, wait) => new Timer(() => ultra.replace(loc), 0, !wait)
   }
   constructor(pathKeys, next, err, fail) {
     if (!Array.isArray(pathKeys) || !pathKeys.length) pathKeys = [isStr(pathKeys) ? pathKeys : '']
@@ -85,17 +85,12 @@ class PathSpec {
   success(result) {
     return result && Object.keys(result).some(k => result[k].exact)
   }
-  resolve(result, success = this.success(result)) {
-    let { ultra } = result, redirect = PathSpec.makeRedirect(ultra)
-    result = exclude(result, 'ultra')
+  resolve(result, ultra, success = this.success(result)) {
+    let redirect = PathSpec.makeRedirect(ultra)
     return !this.err || success ? this.next(result, redirect) : this.err(result, redirect)
   }
   reject(result) {
-    if (this.fail) {
-      let { ultra } = result, redirect = PathSpec.makeRedirect(ultra)
-      result = exclude(result, 'ultra')
-      return this.fail(result, redirect)
-    }
+    return this.fail && this.fail(result)
   }
 }
 

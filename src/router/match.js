@@ -1,4 +1,4 @@
-import { pipe, Timer, $devWarnOn } from './utils'
+import { pipe, exclude, Timer, $devWarnOn } from './utils'
 import { normalizeHref, parseQS } from './utils-path'
 import { prefixSpec } from './spec'
 
@@ -31,15 +31,17 @@ function resolve(msg) {
   let { result, success, spec } = msg
   $devWarnOn(spec && !success, `Resolve location with a partial match: ${result && result.href}`)
   if (spec) {
-    let abandon = Timer.isActive(spec.resolve(result, success))
-    if (abandon) msg = Object.assign({}, msg, { abandon })
+    let { ultra } = result
+    result = exclude(result, 'ultra')
+    let timer = Timer.isTimer(spec.resolve(result, ultra, success))
+    msg = Object.assign({}, msg, { result }, timer && { timer })
   }
   return spec ? msg : false
 }
 
 function reject(specs, msg) {
   let { result, spec } = msg
-  return specs.some(s => s !== spec && Timer.isActive(s.reject(result)))
+  specs.forEach(s => s !== spec && s.reject(result))
 }
 
 function matchPrefix(matcher) {
