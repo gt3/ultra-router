@@ -13,7 +13,7 @@ function rejector(matchers, msg) {
   let { timer, result } = msg
   if (!(timer && timer.active)) {
     matchers.forEach(matcher => matcher.reject(result))
-    if (timer && !timer.active) timer.run()
+    if (timer) timer.run()
   }
 }
 

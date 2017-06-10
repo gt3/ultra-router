@@ -104,7 +104,7 @@ class PrefixSpec extends PathSpec {
     let matches = super.match(checks, path)
     if (matches) {
       let prefix = matches[this.prefixKey].match
-      result = this.next(Object.assign(result, { prefix }))
+      result = super.resolve(Object.assign(result, { prefix }), null, true)
     } else result.success = false
     return result
   }
