@@ -1,4 +1,4 @@
-import { isStr, flattenToObj, empty, substitute, escapeRx, Timer } from './utils'
+import { isStr, flattenToObj, empty, substitute, escapeRx, $devWarnOn } from './utils'
 import { removeTrailingSlash, decodePath } from './utils-path'
 
 const literalp = `([^\\s/]*)`
@@ -55,9 +55,6 @@ class Path {
 }
 
 class PathSpec {
-  static makeRedirect(ultra) {
-    return (loc, wait) => new Timer(() => ultra.replace(loc), 0, !wait)
-  }
   constructor(pathKeys, next, err, fail) {
     if (!Array.isArray(pathKeys) || !pathKeys.length) pathKeys = [isStr(pathKeys) ? pathKeys : '']
     let paths = pathKeys.map(k => new Path(k))
@@ -85,8 +82,8 @@ class PathSpec {
   success(result) {
     return result && Object.keys(result).some(k => result[k].exact)
   }
-  resolve(result, ultra, success = this.success(result)) {
-    let redirect = PathSpec.makeRedirect(ultra)
+  resolve(result, redirect, success = this.success(result)) {
+    $devWarnOn(!success, `Resolve location with a partial match: ${result && result.href}`)
     return !this.err || success ? this.next(result, redirect) : this.err(result, redirect)
   }
   reject(result) {

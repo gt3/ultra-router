@@ -1,4 +1,4 @@
-import { pipe, exclude, Timer, $devWarnOn } from './utils'
+import { pipe, exclude, Timer } from './utils'
 import { normalizeHref, parseQS } from './utils-path'
 import { prefixSpec } from './spec'
 
@@ -27,16 +27,19 @@ function matcher(specs, checks, msg) {
   return { result, success, spec }
 }
 
+function makeRedirect(ultra) {
+  return (loc, wait) => new Timer(() => ultra.replace(loc), 0, !wait)
+}
+
+function resolveSpec({ result, success, spec }) {
+  let { ultra } = result, redirect = makeRedirect(ultra)
+  result = exclude(result, 'ultra')
+  let timer = Timer.isTimer(spec.resolve(result, redirect, success))
+  return timer ? { result, timer } : { result }
+}
+
 function resolve(msg) {
-  let { result, success, spec } = msg
-  $devWarnOn(spec && !success, `Resolve location with a partial match: ${result && result.href}`)
-  if (spec) {
-    let { ultra } = result
-    result = exclude(result, 'ultra')
-    let timer = Timer.isTimer(spec.resolve(result, ultra, success))
-    msg = Object.assign({}, msg, { result }, timer && { timer })
-  }
-  return spec ? msg : false
+  return msg.spec ? Object.assign({}, msg, resolveSpec(msg)) : false
 }
 
 function reject(specs, msg) {
