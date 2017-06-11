@@ -129,3 +129,16 @@ function rx(ids, ...rxs) {
 export function check(...ids) {
   return rx.bind(null, ids)
 }
+
+class MissSpec extends PathSpec {
+  match(result) {
+    let hasCheck = Object.prototype.hasOwnProperty.bind(result)
+    let miss = this.paths.filter(({ key }) => !hasCheck(key)).map(({ key }) => key)
+    let matched = miss.length === this.paths.length
+    return matched && super.resolve(Object.assign({}, result, { miss }), null, true)
+  }
+}
+
+export function miss(next, ...pathKeys) {
+  return new MissSpec(pathKeys, next)
+}

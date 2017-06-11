@@ -15,6 +15,10 @@ function empty(t) {
 
 export { isFn, isStr, empty }
 
+function makeArray(arr) {
+  return Array.isArray(arr) ? arr : empty(arr) ? [] : [arr]
+}
+
 function pipe(...fns) {
   function invoke(v) {
     return fns.reduce((acc, fn) => (fn ? fn.call(this, acc) : acc), v)
@@ -50,7 +54,7 @@ if (process.env.NODE_ENV !== 'production') {
   $devWarnOn = warnOn
 }
 
-export { pipe, flattenToObj, exclude, substitute, escapeRx, $devWarnOn }
+export { makeArray, pipe, flattenToObj, exclude, substitute, escapeRx, $devWarnOn }
 
 export class Timer {
   static isTimer(timer) {

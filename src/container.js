@@ -1,27 +1,8 @@
-import { pipe, isStr, $devWarnOn } from './router/utils'
+import { isStr, makeArray, pipe } from './router/utils'
 import { parseHref, env } from './router/utils-path'
+import { dispatcher } from './router/dispatch'
 import { createPopstate, push, replace, go } from './history'
 import { makeVisit, recalibrate } from './visit'
-
-function dispatcher(actions, msg) {
-  let result, resolved = actions.some(fn => !!(result = fn(msg)))
-  $devWarnOn(!resolved, `Could not resolve location: ${msg.href}`)
-  return result
-}
-
-function rejector(matchers, msg) {
-  let { timer, result } = msg
-  if (!(timer && timer.active)) {
-    matchers.forEach(matcher => matcher.reject(result))
-    if (timer) timer.run()
-  }
-}
-
-function getDispatcher(matchers) {
-  let actions = matchers.map(matcher => pipe(matcher.match, matcher.resolve))
-  let dispatch = pipe(dispatcher.bind(null, actions), rejector.bind(null, matchers))
-  return recordVisit.bind(null, dispatch)
-}
 
 export function recordVisit(dispatch, msg) {
   let { ultra, state } = msg
@@ -52,8 +33,8 @@ function navigate(ultra, dispatch, navAction, loc) {
   return guardDispatch(ultra, navAction.bind(null, dispatch), loc)
 }
 
-function run(_matchers, _popstate) {
-  let _pauseRecord = [], dispatch = getDispatcher(_matchers)
+function run(_matchers, _mismatchers, _popstate) {
+  let _pauseRecord = [], dispatch = recordVisit.bind(null, dispatcher(_matchers, _mismatchers))
   let ultra = {
     visited: null,
     get popstate() {
@@ -61,6 +42,9 @@ function run(_matchers, _popstate) {
     },
     get matchers() {
       return _matchers
+    },
+    get mismatchers() {
+      return _mismatchers
     },
     get pauseRecord() {
       return _pauseRecord
@@ -79,10 +63,10 @@ function run(_matchers, _popstate) {
   return ultra
 }
 
-export function container(matchers, instance = {}) {
+export function container(matchers, mismatchers, instance = {}) {
   let { stop, popstate, visited } = instance
   if (!popstate) popstate = createPopstate()
-  let ultra = run(matchers, popstate)
+  let ultra = run(makeArray(matchers), makeArray(mismatchers), popstate)
   if (stop) stop.call(instance)
   if (Array.isArray(visited)) ultra.visited = visited
   else ultra.nav((cb, msg) => cb(msg), env.href)

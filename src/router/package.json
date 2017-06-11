@@ -12,6 +12,7 @@
   "files": [
     "spec.js",
     "match.js",
+    "dispatch.js",
     "utils.js",
     "utils-path.js"
   ]
