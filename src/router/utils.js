@@ -33,9 +33,8 @@ function exclude(t, ...keys) {
 }
 
 function substitute(literals, values, removeEmpty) {
-  let falsyToEmpty = v => v || ''
-  let vals = Array.from(values, falsyToEmpty)
-  let lits = Array.from(literals, falsyToEmpty)
+  let vals = Array.from(values, v => v || '')
+  let lits = Array.from(literals, v => v || '')
   if (removeEmpty && lits.length > vals.length) {
     lits = [lits[0], ...lits.slice(1).map((l, i) => l || (vals[i] = ''))]
   }

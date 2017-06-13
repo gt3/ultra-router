@@ -33,7 +33,7 @@ function makeRedirect(ultra) {
 
 function resolveSpec({ result, success, spec }) {
   let { ultra } = result, redirect = makeRedirect(ultra)
-  result = exclude(result, 'ultra', 'path', 'href')
+  result = exclude(result, 'ultra')
   let timer = Timer.isTimer(spec.resolve(result, redirect, success))
   return timer ? { result, timer } : { result }
 }
