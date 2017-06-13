@@ -4,6 +4,7 @@ import {
   empty,
   substitute,
   escapeRx,
+  exclude,
   trimIdsValues,
   $devWarnOn
 } from './utils'
@@ -79,7 +80,7 @@ class PathSpec {
       result = {
         ids: primary.identifiers,
         values: matches.values,
-        [primary.key]: matches
+        [primary.key]: exclude(matches, 'passed')
       }
       if (!matches.exact) {
         subs.some(sub => {
@@ -88,7 +89,7 @@ class PathSpec {
             let [ids, vals] = trimIdsValues(result.ids, sub.identifiers, submatches.values)
             result.ids = result.ids.concat(ids)
             result.values = result.values.concat(vals)
-            result[sub.key] = submatches
+            result[sub.key] = exclude(submatches, 'passed')
           }
           return submatches.exact
         })
