@@ -46,6 +46,12 @@ function escapeRx(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
+function trimIdsValues(sourceIds, targetIds, targetValues) {
+  let stopReplaceIndex = sourceIds.findIndex((sid, i) => targetIds[i] !== sid)
+  if (stopReplaceIndex === -1) stopReplaceIndex = sourceIds.length
+  return [targetIds.slice(stopReplaceIndex), targetValues.slice(stopReplaceIndex)]
+}
+
 function warnOn(truthy, msg) {
   return truthy && console.error(msg)
 }
@@ -54,7 +60,7 @@ if (process.env.NODE_ENV !== 'production') {
   $devWarnOn = warnOn
 }
 
-export { makeArray, pipe, flattenToObj, exclude, substitute, escapeRx, $devWarnOn }
+export { makeArray, pipe, flattenToObj, exclude, substitute, escapeRx, trimIdsValues, $devWarnOn }
 
 export class Timer {
   static isTimer(timer) {

@@ -1,4 +1,12 @@
-import { isStr, flattenToObj, empty, substitute, escapeRx, $devWarnOn } from './utils'
+import {
+  isStr,
+  flattenToObj,
+  empty,
+  substitute,
+  escapeRx,
+  trimIdsValues,
+  $devWarnOn
+} from './utils'
 import { removeTrailingSlash, decodePath } from './utils-path'
 
 const literalp = `([^\\s/]*)`
@@ -68,11 +76,20 @@ class PathSpec {
     let [primary, ...subs] = this.paths
     let result, matches = primary.match(checks, href)
     if (matches.passed) {
-      result = { [primary.key]: matches }
+      result = {
+        ids: primary.identifiers,
+        values: matches.values,
+        [primary.key]: matches
+      }
       if (!matches.exact) {
         subs.some(sub => {
           let submatches = sub.match(checks, href)
-          if (submatches.passed) result[sub.key] = submatches
+          if (submatches.passed) {
+            let [ids, vals] = trimIdsValues(result.ids, sub.identifiers, submatches.values)
+            result.ids = result.ids.concat(ids)
+            result.values = result.values.concat(vals)
+            result[sub.key] = submatches
+          }
           return submatches.exact
         })
       }
