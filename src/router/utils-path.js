@@ -90,7 +90,6 @@ function parseHref(loc) {
 }
 
 function parseQS(qs, ids, path = '', delim = ',') {
-  if (!qs) return path
   if (qs[0] !== '?') qs = '?' + qs
   let values = ids.map(id => {
     let rx = new RegExp('[?&;]+' + escapeRx(id) + '=([^&;#]+)', 'i')

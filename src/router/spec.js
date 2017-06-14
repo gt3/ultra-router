@@ -49,14 +49,16 @@ class Path {
   }
   validate(checks, values) {
     let invalid = this.findInvalid(checks, values)
-    return invalid === -1 ? { values, passed: true } : { values: values.slice(0, invalid) }
+    return invalid === -1
+      ? { values, passed: true }
+      : { values: values.slice(0, invalid), exact: false }
   }
   match(checks, href) {
     let matches = this.matchx.exec(href)
     if (!matches) return {}
     let match = matches[0], values = matches.slice(1).map(decodePath)
     let exact = match.length === href.length
-    return Object.assign(this.validate(checks, values), { match, exact })
+    return Object.assign({ match, exact }, this.validate(checks, values))
   }
   /*makeLink(values) {
     return substitute(this.literals, values)
