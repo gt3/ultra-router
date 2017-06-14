@@ -23,12 +23,12 @@ export function makeClickHandler({ href, state, docTitle, retain }, action) {
 }
 
 function retainQS(retain, currQS) {
-  let qs = /\bqs\b/.test(retain) ? env.qs : ''
+  let qs = retain && /\bqs\b/.test(retain) ? env.qs : ''
   return currQS ? substitute([currQS, qs], ['&'], true) : qs
 }
 
 function retainHash(retain, currHash) {
-  return /\bhash\b/.test(retain) ? env.hash : currHash
+  return retain && /\bhash\b/.test(retain) ? env.hash : currHash
 }
 
 function retainQSHash(retain, loc) {
