@@ -13,13 +13,33 @@ export function makeClickHandler({ href, state, docTitle, retain }, action) {
   function clickHandler(e) {
     if (verifyClick(e) && verifyOrigin(href)) {
       let loc = clickHandler.loc
-      if (retain) Object.assign(loc, getQSHash(retain, loc))
+      if (retain) Object.assign(loc, retainQSHash(retain, loc))
       e.preventDefault()
       action(loc)
     }
   }
   clickHandler.loc = Object.assign(parseHref(href), { state, docTitle })
   return clickHandler
+}
+
+function retainQS(retain, currQS) {
+  let qs = /\bqs\b/.test(retain) ? env.qs : ''
+  return currQS ? substitute([currQS, qs], ['&'], true) : qs
+}
+
+function retainHash(retain, currHash) {
+  return /\bhash\b/.test(retain) ? env.hash : currHash
+}
+
+function retainQSHash(retain, loc) {
+  let qs = retainQS(retain, loc.qs)
+  let hash = retainHash(retain, loc.hash)
+  let href = substitute([loc.path, qs, hash], ['?', '#'], true)
+  return { href, qs, hash }
+}
+
+function getNavAction(retain) {
+  return retain && /\bhistory\b/.test(retain) ? 'replace' : 'push'
 }
 
 const defaultStyle = { touchAction: 'manipulation', msTouchAction: 'manipulation' }
@@ -34,24 +54,4 @@ export function Anchor(props) {
   )
   props.style = Object.assign({}, defaultStyle, style)
   return createElement('a', props)
-}
-
-function getNavAction(retain) {
-  return retain && /\bhistory\b/.test(retain) ? 'replace' : 'push'
-}
-
-function getQSHash(retain, loc) {
-  let qs = getQS(retain, loc.qs)
-  let hash = getHash(retain, loc.hash)
-  let href = substitute([loc.path, qs, hash], ['?', '#'], true)
-  return { href, qs, hash }
-}
-
-function getQS(retain, currQS) {
-  let qs = /\bqs\b/.test(retain) ? env.qs : ''
-  return currQS ? substitute([currQS, qs], ['&'], true) : qs
-}
-
-function getHash(retain, currHash) {
-  return /\bhash\b/.test(retain) ? env.hash : currHash
 }
