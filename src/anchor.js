@@ -1,5 +1,5 @@
 import { parseHref, env } from './router/utils-path'
-import { exclude } from './router/utils'
+import { exclude, substitute } from './router/utils'
 
 function verifyOrigin(href) {
   return href.indexOf(env.location.protocol) !== 0 || href.indexOf(env.origin) === 0
@@ -9,11 +9,13 @@ function verifyClick(e) {
   return !(e.defaultPrevented || e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
 }
 
-export function makeClickHandler({ href, state, docTitle }, action) {
+export function makeClickHandler({ href, state, docTitle, retain }, action) {
   function clickHandler(e) {
     if (verifyClick(e) && verifyOrigin(href)) {
+      let loc = clickHandler.loc
+      if (retain) Object.assign(loc, getQSHash(retain, loc))
       e.preventDefault()
-      action(clickHandler.loc)
+      action(loc)
     }
   }
   clickHandler.loc = Object.assign(parseHref(href), { state, docTitle })
@@ -21,12 +23,35 @@ export function makeClickHandler({ href, state, docTitle }, action) {
 }
 
 const defaultStyle = { touchAction: 'manipulation', msTouchAction: 'manipulation' }
-const ownKeys = ['createElement', 'getUltra', 'style', 'state', 'docTitle', 'navAction', 'onClick']
+const ownKeys = ['createElement', 'getUltra', 'style', 'state', 'docTitle', 'retain', 'onClick']
 
 export function Anchor(props) {
-  let { href, createElement, getUltra, style, state, docTitle, navAction = 'push' } = props
+  let { href, createElement, getUltra, style, state, docTitle, retain } = props
   props = exclude(props, ...ownKeys)
-  props.onClick = makeClickHandler({ href, state, docTitle }, loc => getUltra()[navAction](loc))
+  let navAction = getNavAction(retain)
+  props.onClick = makeClickHandler({ href, state, docTitle, retain }, loc =>
+    getUltra()[navAction](loc)
+  )
   props.style = Object.assign({}, defaultStyle, style)
   return createElement('a', props)
+}
+
+function getNavAction(retain) {
+  return retain && /\bhistory\b/.test(retain) ? 'replace' : 'push'
+}
+
+function getQSHash(retain, loc) {
+  let qs = getQS(retain, loc.qs)
+  let hash = getHash(retain, loc.hash)
+  let href = substitute([loc.path, qs, hash], ['?', '#'], true)
+  return { href, qs, hash }
+}
+
+function getQS(retain, currQS) {
+  let qs = /\bqs\b/.test(retain) ? env.qs : ''
+  return currQS ? substitute([currQS, qs], ['&'], true) : qs
+}
+
+function getHash(retain, currHash) {
+  return /\bhash\b/.test(retain) ? env.hash : currHash
 }
