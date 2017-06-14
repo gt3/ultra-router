@@ -1,13 +1,4 @@
-import {
-  isStr,
-  flattenToObj,
-  empty,
-  substitute,
-  escapeRx,
-  exclude,
-  trimIdsValues,
-  $devWarnOn
-} from './utils'
+import { isStr, flattenToObj, empty, substitute, escapeRx, exclude, $devWarnOn } from './utils'
 import { removeTrailingSlash, decodePath } from './utils-path'
 
 const literalp = `([^\\s/]*)`
@@ -43,9 +34,8 @@ class Path {
   }
   findInvalid(checks, values) {
     let ids = this.identifiers, hasCheck = Object.prototype.hasOwnProperty.bind(checks)
-    let mapped = assignValues(this.key, values)
-    let callCheck = id => hasCheck(id) && !checks[id](mapped[id], mapped)
-    return empty(checks) ? -1 : values.findIndex((v, i) => callCheck(ids[i]))
+    let callCheck = (id, val) => hasCheck(id) && !checks[id](val, ids, values)
+    return empty(checks) ? -1 : values.findIndex((val, i) => callCheck(ids[i], val))
   }
   validate(checks, values) {
     let invalid = this.findInvalid(checks, values)
@@ -57,12 +47,18 @@ class Path {
     let matches = this.matchx.exec(href)
     if (!matches) return {}
     let match = matches[0], values = matches.slice(1).map(decodePath)
-    let exact = match.length === href.length
-    return Object.assign({ match, exact }, this.validate(checks, values))
+    let exact = match.length === href.length, ids = this.identifiers
+    return Object.assign({ ids, match, exact }, this.validate(checks, values))
   }
   /*makeLink(values) {
     return substitute(this.literals, values)
   }*/
+}
+
+function trimIdsValues(sourceIds, targetIds, targetValues) {
+  let stopReplaceIndex = sourceIds.findIndex((sid, i) => targetIds[i] !== sid)
+  if (stopReplaceIndex === -1) stopReplaceIndex = sourceIds.length
+  return [targetIds.slice(stopReplaceIndex), targetValues.slice(stopReplaceIndex)]
 }
 
 class PathSpec {
@@ -80,7 +76,7 @@ class PathSpec {
     let result, matches = primary.match(checks, href)
     if (matches.passed) {
       result = {
-        ids: primary.identifiers,
+        ids: matches.ids,
         values: matches.values,
         [primary.key]: exclude(matches, 'passed')
       }
@@ -88,7 +84,7 @@ class PathSpec {
         subs.some(sub => {
           let submatches = sub.match(checks, href)
           if (submatches.passed) {
-            let [ids, vals] = trimIdsValues(result.ids, sub.identifiers, submatches.values)
+            let [ids, vals] = trimIdsValues(result.ids, submatches.ids, submatches.values)
             result.ids = result.ids.concat(ids)
             result.values = result.values.concat(vals)
             result[sub.key] = exclude(submatches, 'passed')
