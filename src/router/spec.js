@@ -43,11 +43,11 @@ class Path {
       ? { values, passed: true }
       : { values: values.slice(0, invalid), exact: false }
   }
-  match(checks, href) {
-    let matches = this.matchx.exec(href)
+  match(checks, path) {
+    let matches = this.matchx.exec(path)
     if (!matches) return {}
     let match = matches[0], values = matches.slice(1).map(decodePath)
-    let exact = match.length === href.length, ids = this.identifiers
+    let exact = match.length === path.length, ids = this.identifiers
     return Object.assign({ ids, match, exact }, this.validate(checks, values))
   }
   /*makeLink(values) {
@@ -71,9 +71,9 @@ class PathSpec {
     let idx = this.pathKeys.indexOf(pathKey)
     return idx > -1 && this.paths[idx]
   }
-  match(checks, href) {
+  match(checks, path) {
     let [primary, ...subs] = this.paths
-    let result, matches = primary.match(checks, href)
+    let result, matches = primary.match(checks, path)
     if (matches.passed) {
       result = {
         ids: matches.ids,
@@ -82,7 +82,7 @@ class PathSpec {
       }
       if (!matches.exact) {
         subs.some(sub => {
-          let submatches = sub.match(checks, href)
+          let submatches = sub.match(checks, path)
           if (submatches.passed) {
             let [ids, vals] = trimIdsValues(result.ids, submatches.ids, submatches.values)
             result.ids = result.ids.concat(ids)

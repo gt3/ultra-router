@@ -20,8 +20,8 @@ export function toggleSelected(matchers, ...selectKeys) {
 }
 
 function matcher(specs, checks, msg) {
-  let spec, result, { href } = msg
-  spec = specs.find(s => !!(result = s.match(checks, href)))
+  let spec, result, { path } = msg
+  spec = specs.find(s => !!(result = s.match(checks, path)))
   let success = spec && spec.success(result)
   result = Object.assign({}, msg, result)
   return { result, success, spec }
@@ -62,9 +62,9 @@ function prematch(specCheck, msg) {
   path = normalizeHref(prefix)(path)
   if (specCheck) {
     let specCheckMsg = { prefix, href, path, qs, hash }
-    href = specCheck(specCheckMsg, parseQS.bind(null, qs))
+    path = specCheck(specCheckMsg, parseQS.bind(null, qs))
   }
-  return href === msg.href ? msg : Object.assign({}, msg, { href, path })
+  return path === msg.path ? msg : Object.assign({}, msg, { href, path })
 }
 
 export function match(specs, checks = {}, prefix, specCheck) {
