@@ -1,5 +1,5 @@
 import { isStr, flattenToObj, empty, substitute, escapeRx, exclude, $devWarnOn } from './utils'
-import { removeTrailingSlash, decodePath } from './utils-path'
+import { removeTrailingSlash, decode } from './utils-path'
 
 const literalp = `([^\\s/]*)`
 const allx = /(?:)/
@@ -46,7 +46,7 @@ class Path {
   match(checks, path) {
     let matches = this.matchx.exec(path)
     if (!matches) return {}
-    let match = matches[0], values = matches.slice(1).map(decodePath)
+    let match = matches[0], values = matches.slice(1).map(decode)
     let exact = match.length === path.length, ids = this.identifiers
     return Object.assign({ ids, match, exact }, this.validate(checks, values))
   }

@@ -20,15 +20,17 @@ function normalizeHref(prefix) {
 
 export { addLeadingSlash, removeTrailingSlash, normalizeHref }
 
-function encodePath(path) {
+function encodePath(path, decoded) {
+  if (!decoded) path = decode(path)
   return encodeURI(path).replace(/%5B/g, '[').replace(/%5D/g, ']')
 }
 
-function encodeData(loc) {
-  return encodeURIComponent(loc)
+function encodeData(data, decoded) {
+  if (!decoded) data = decode(data)
+  return encodeURIComponent(data)
 }
 
-function decodePath(path) {
+function decode(path) {
   let result
   try {
     result = decodeURIComponent(path)
@@ -39,18 +41,10 @@ function decodePath(path) {
   return result
 }
 
-function verifyURIEncoding(path) {
-  return encodePath(decodePath(path)) === path
-}
-
-function verifyDataEncoding(loc) {
-  return encodeData(decodePath(loc)) === loc
-}
-
-export { encodePath, decodePath, verifyURIEncoding, verifyDataEncoding }
+export { encodePath, decode }
 
 function verifyHashEncoding(h) {
-  return !h || verifyDataEncoding(h)
+  return !h || encodeData(h) === h
 }
 
 function extractHash(loc) {
@@ -60,7 +54,8 @@ function extractHash(loc) {
 }
 
 function verifyQSEncoding(qs) {
-  return !qs || verifyDataEncoding(qs.replace(/=|&/g, ''))
+  if (qs) qs = qs.replace(/[=&,]/g, '')
+  return !qs || encodeData(qs) === qs
 }
 
 function extractQS(loc) {
