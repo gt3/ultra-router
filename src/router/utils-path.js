@@ -84,13 +84,12 @@ function parseHref(loc) {
   return makeLocation(...extractQSHash(loc))
 }
 
-function parseQS(qs, ids, path = '', { delim = ',', decodeValues } = {}) {
+function parseQS(qs, ids, path = '', delim = ',') {
   if (qs[0] !== '?') qs = '?' + qs
   let values = ids.map(id => {
     let rx = new RegExp('[?&;]+' + escapeRx(id) + '=([^&;#]+)', 'i')
     return qs.split(rx).slice(1).filter(s => /^[^&;#]/.test(s)).join(delim)
   })
-  if (decodeValues) values = values.map(decode)
   let slashes = new Array(ids.length).fill('/', path.slice(-1) === '/' ? 1 : 0)
   return substitute([path, ...values], slashes)
 }
