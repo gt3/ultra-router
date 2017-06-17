@@ -47,19 +47,21 @@ function reject(specs, msg) {
   specs.forEach(s => s !== spec && s.reject(result))
 }
 
-function matchPrefix(matcher) {
-  let { prefix, match, checks } = matcher, result = matcher
+function matchPrefix(prefix, matcher) {
+  let { match, checks } = matcher, result = matcher
   if (prefix) {
     let pspec = prefixSpec(prefix, match)
-    result.match = pspec.match.bind(pspec, checks)
+    result = Object.assign({}, result, { prefix, match: pspec.match.bind(pspec, checks) })
   }
   return result
 }
 
 function prematch(specCheck, msg) {
   let { prefix, href, path, qs = '', hash = '' } = msg
-  href = normalizeHref(prefix)(href)
-  path = normalizeHref(prefix)(path)
+  if (prefix) {
+    href = normalizeHref(prefix)(href)
+    path = normalizeHref(prefix)(path)
+  }
   if (specCheck) {
     let specCheckMsg = { prefix, href, path, qs, hash }
     path = specCheck(specCheckMsg, parseQS.bind(null, qs))
@@ -67,9 +69,15 @@ function prematch(specCheck, msg) {
   return path === msg.path ? msg : Object.assign({}, msg, { href, path })
 }
 
-export function match(specs, checks = {}, prefix, specCheck) {
+export function match(specs, checks = {}, specCheck) {
   if (!Array.isArray(specs)) specs = [].concat(specs)
   let match = pipe(prematch.bind(null, specCheck), matcher.bind(null, specs, checks))
-  let rejectBound = reject.bind(null, specs)
-  return matchPrefix({ match, resolve, prefix, specs, checks, reject: rejectBound })
+  return { match, resolve, specs, checks, reject: reject.bind(null, specs) }
+}
+
+export function prefixMatch(prefix, matcher, matchCheck) {
+  let prefixed = matchPrefix(prefix, matcher)
+  let { match } = prefixed
+  prefixed.match = pipe(prematch.bind(null, matchCheck), match)
+  return prefixed
 }
