@@ -50,7 +50,7 @@ function reject(specs, msg) {
 function matchPrefix(prefix, matcher) {
   let { match, checks } = matcher
   let pspec = prefixSpec(prefix, match)
-  return Object.assign({}, result, { prefix, match: pspec.match.bind(pspec, checks) })
+  return Object.assign({}, matcher, { prefix, match: pspec.match.bind(pspec, checks) })
 }
 
 function prematch(matchCheck, msg) {
@@ -74,7 +74,7 @@ export function match(specs, checks = {}, matchCheck) {
 
 export function prefixMatch(prefix, matcher, matchCheck) {
   let prefixed = matchPrefix(prefix, matcher)
-  if(matchCheck) {
+  if (matchCheck) {
     let { match } = prefixed
     prefixed.match = pipe(prematch.bind(null, matchCheck), match)
   }
