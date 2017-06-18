@@ -119,15 +119,15 @@ class PrefixSpec extends PathSpec {
     let { path } = msg, result = Object.assign({}, msg)
     let matches = super.match(checks, path)
     if (matches) {
-      let prefix = matches[this.prefixKey].match
-      result = super.resolve(Object.assign(result, { prefix }), null, true)
+      let { match: prefix, values: prefixValues } = matches[this.prefixKey]
+      result = super.resolve(Object.assign(result, { prefix, prefixValues }), null, true)
     } else result.success = false
     return result
   }
 }
 
-export function prefixSpec(prefix, next) {
-  return new PrefixSpec(prefix, next)
+export function prefixSpec(prefixKey, next) {
+  return new PrefixSpec(prefixKey, next)
 }
 
 function rxFn(rxs) {

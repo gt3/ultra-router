@@ -47,10 +47,10 @@ function reject(specs, msg) {
   specs.forEach(s => s !== spec && s.reject(result))
 }
 
-function matchPrefix(prefix, matcher) {
+function matchPrefix(prefixKey, matcher) {
   let { match, checks } = matcher
-  let pspec = prefixSpec(prefix, match)
-  return Object.assign({}, matcher, { prefix, match: pspec.match.bind(pspec, checks) })
+  let pspec = prefixSpec(prefixKey, match)
+  return Object.assign({}, matcher, { prefixKey, match: pspec.match.bind(pspec, checks) })
 }
 
 function prematch(matchCheck, msg) {
@@ -72,8 +72,8 @@ export function match(specs, checks = {}, matchCheck) {
   return { match, resolve, specs, checks, reject: reject.bind(null, specs) }
 }
 
-export function prefixMatch(prefix, matcher, matchCheck) {
-  let prefixed = matchPrefix(prefix, matcher)
+export function prefixMatch(prefixKey, matcher, matchCheck) {
+  let prefixed = matchPrefix(prefixKey, matcher)
   if (matchCheck) {
     let { match } = prefixed
     prefixed.match = pipe(prematch.bind(null, matchCheck), match)
