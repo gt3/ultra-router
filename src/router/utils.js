@@ -1,6 +1,8 @@
 function noop() {}
 
-function id(x) { return x }
+function id(x) {
+  return x
+}
 
 function isFn(t) {
   return typeof t === 'function' ? t : void 0
