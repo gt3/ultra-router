@@ -84,7 +84,7 @@ function parseHref(loc) {
   return makeLocation(...extractQSHash(loc))
 }
 
-function parseQS(qs, ids, { delim = ',', defaults = [], decodeValues }) {
+function parseQS(qs, ids, { delim = ',', defaults = [], decodeValues } = {}) {
   if (qs[0] !== '?') qs = '?' + qs
   let values = ids.map((id, i) => {
     let rx = new RegExp('[?&;]+' + escapeRx(id) + '=([^&;#]+)', 'i')
