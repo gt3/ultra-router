@@ -1,5 +1,5 @@
 export { spec, miss, check, assignValues } from './router/spec'
 export { match, prefixMatch, toggle, toggleSelected } from './router/match'
-export { parseQS } from './router/utils-path'
+export { parseQS, prependPath, appendPath } from './router/utils-path'
 export { container } from './container'
 export { Anchor } from './anchor'

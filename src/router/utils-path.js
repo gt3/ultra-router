@@ -84,17 +84,28 @@ function parseHref(loc) {
   return makeLocation(...extractQSHash(loc))
 }
 
-function parseQS(qs, ids, path = '', delim = ',') {
+function parseQS(qs, ids, { delim = ',', defaults = [], decodeValues }) {
   if (qs[0] !== '?') qs = '?' + qs
-  let values = ids.map(id => {
+  let values = ids.map((id, i) => {
     let rx = new RegExp('[?&;]+' + escapeRx(id) + '=([^&;#]+)', 'i')
-    return qs.split(rx).slice(1).filter(s => /^[^&;#]/.test(s)).join(delim)
+    let res = qs.split(rx).slice(1).filter(s => /^[^&;#]/.test(s))
+    res = (decodeValues ? res.map(decode) : res).join(delim)
+    return res || defaults[i] || ''
   })
-  let slashes = new Array(ids.length).fill('/', path.slice(-1) === '/' ? 1 : 0)
+  return values
+}
+
+function prependPath(values, path) {
+  let slashes = new Array(values.length).fill('/', path.slice(-1) === '/' ? 1 : 0)
   return substitute([path, ...values], slashes)
 }
 
-export { parseHref, parseQS }
+function appendPath(values, path) {
+  let slashes = new Array(values.length).fill('/', 0, path.slice(0, 1) === '/' ? -1 : void 0)
+  return substitute([...values, path], slashes)
+}
+
+export { parseHref, parseQS, prependPath, appendPath }
 
 let env = {
   get window() {
