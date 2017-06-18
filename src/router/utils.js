@@ -1,5 +1,7 @@
 function noop() {}
 
+function id(x) { return x }
+
 function isFn(t) {
   return typeof t === 'function' ? t : void 0
 }
@@ -13,7 +15,7 @@ function empty(t) {
   return !t || (!t.length && !Object.keys(t).length)
 }
 
-export { isFn, isStr, empty }
+export { id, isFn, isStr, empty }
 
 function makeArray(arr) {
   return Array.isArray(arr) ? arr : empty(arr) ? [] : [arr]
@@ -23,7 +25,7 @@ function pipe(...fns) {
   function invoke(v) {
     return fns.reduce((acc, fn) => (fn ? fn.call(this, acc) : acc), v)
   }
-  return invoke
+  return fns.length > 0 ? invoke : id
 }
 
 const flattenToObj = (arr, base = {}) => Object.assign(base, ...arr)
