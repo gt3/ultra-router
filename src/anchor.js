@@ -10,16 +10,14 @@ function verifyClick(e) {
 }
 
 export function makeClickHandler({ href, state, docTitle, retain }, action) {
-  function clickHandler(e) {
+  let loc = Object.assign(parseHref(href), { state, docTitle })
+  let clickHandler = e => {
     if (verifyClick(e) && verifyOrigin(href)) {
-      let loc = clickHandler.loc
-      if (retain) Object.assign(loc, retainQSHash(retain, loc))
       e.preventDefault()
-      action(loc)
+      action(retain ? Object.assign({}, loc, retainQSHash(retain, loc)) : loc)
     }
   }
-  clickHandler.loc = Object.assign(parseHref(href), { state, docTitle })
-  return clickHandler
+  return Object.assign(clickHandler, { loc })
 }
 
 function retainQS(retain, currQS) {
