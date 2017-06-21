@@ -205,6 +205,14 @@ describe('PathSpec', function() {
     instance = spec()(next)
     eq(instance.resolve(result, null, false), 'next')
   })
+  it('reject should call failure callback with result', function() {
+    let next = mock('next'), err = mock('err'), fail = mock('fail')
+    let instance = spec()(next, err, fail)
+    let result = { '/x': {} }
+    eq(instance.reject(result), 'fail')
+    eq(fail.mock.calls.length, 1)
+    eq(fail.mock.calls[0][0], result)
+  })
 })
 
 describe('PrefixSpec', function() {
