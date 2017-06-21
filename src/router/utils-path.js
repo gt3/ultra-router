@@ -41,7 +41,7 @@ function decode(path) {
   return result
 }
 
-export { encodePath, decode }
+export { encodePath, encodeData, decode }
 
 function verifyHashEncoding(h) {
   return !h || encodeData(h) === h
