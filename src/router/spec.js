@@ -34,7 +34,7 @@ class Path {
   }
   findInvalid(checks, values) {
     let ids = this.identifiers, hasCheck = Object.prototype.hasOwnProperty.bind(checks)
-    let callCheck = (id, val) => hasCheck(id) && !checks[id](val, ids, values)
+    let callCheck = (id, val) => hasCheck(id) && !checks[id](val, values, ids)
     return empty(checks) ? -1 : values.findIndex((val, i) => callCheck(ids[i], val))
   }
   validate(checks, values) {
@@ -119,8 +119,8 @@ class PrefixSpec extends PathSpec {
     let { path } = msg, result = Object.assign({}, msg)
     let matches = super.match(checks, path)
     if (matches) {
-      let { match: prefix, values: prefixValues } = matches[this.prefixKey]
-      result = super.resolve(Object.assign(result, { prefix, prefixValues }), null, true)
+      let { match: prefix, values: pValues, ids: pIds } = matches[this.prefixKey]
+      result = super.resolve(Object.assign(result, { prefix, pIds, pValues }), null, true)
     } else result.success = false
     return result
   }
