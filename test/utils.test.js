@@ -3,6 +3,11 @@ import { eq, neq, oeq, oneq, mock } from './helpers'
 import * as u from '../src/router/utils'
 
 describe('utils', function() {
+  it('id', function() {
+    eq(u.id(5), 5)
+    eq(u.id(null), null)
+    eq(u.id(undefined), undefined)
+  })
   it('pipe', function() {
     let inc = i => i + 1, sq = i => i * i
     eq(u.pipe(null, inc, sq)(1), 4)
@@ -68,5 +73,25 @@ describe('utils', function() {
     let escaped = u.escapeRx(escapeAll)
     eq(escaped, '\\'.concat(escapeAll.split('').join('\\')))
     assert.doesNotThrow(() => new RegExp(escaped))
+  })
+})
+describe('utils Timer', function() {
+  it('schedules timeout on instantiation', function(done) {
+    let t = new u.Timer(done)
+    assert(u.Timer.isTimer(t))
+    assert(!u.Timer.isTimer({}))
+    assert(t.active)
+  })
+  it('schedules timeout on demand', function(done) {
+    let t = new u.Timer(done, 0, false)
+    assert(!t.active)
+    t.run()
+    assert(t.active)
+  })
+  it('stop clears timeout', function(done) {
+    let t = new u.Timer(() => asssert.fail('timer was stopped!'))
+    t.stop()
+    assert(!t.active)
+    setTimeout(done, 5)
   })
 })
