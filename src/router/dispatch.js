@@ -1,4 +1,4 @@
-import { pipe, $devWarnOn } from './utils'
+import { pipe, isTimer, $devWarnOn } from './utils'
 
 function dispatch(actions, msg) {
   let result, resolved = actions.some(fn => !!(result = fn(msg)))
@@ -8,7 +8,7 @@ function dispatch(actions, msg) {
 
 function settle(matchers, mismatchers, msg) {
   let { timer, result } = msg
-  if (result && !(timer && timer.active)) {
+  if (result && !(isTimer(timer) && timer.active)) {
     if (timer) timer.run()
     matchers.forEach(matcher => matcher.reject(result))
     mismatchers.forEach(mm => mm.match(result))

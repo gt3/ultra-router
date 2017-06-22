@@ -221,9 +221,9 @@ describe('PathSpec', function() {
     let next = mock('next'), err = mock('err')
     let instance = spec()(next, err)
     let result = { '/x': {}, '/xy': {} }
-    eq(instance.resolve(result, null, true), 'next')
+    eq(instance.resolve(result, true), 'next')
     instance = spec()(next)
-    eq(instance.resolve(result, null, false), 'next')
+    eq(instance.resolve(result, false), 'next')
   })
   it('reject should call failure callback with result', function() {
     let next = mock('next'), err = mock('err'), fail = mock('fail')

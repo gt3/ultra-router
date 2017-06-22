@@ -1,4 +1,4 @@
-import { pipe, Timer } from './utils'
+import { pipe, isTimer } from './utils'
 import { normalizeHref, parseQS } from './utils-path'
 import { prefixSpec } from './spec'
 
@@ -28,7 +28,7 @@ function matcher(specs, checks, msg) {
 }
 
 function resolveSpec({ result, success, spec }) {
-  let timer = Timer.isTimer(spec.resolve(result, success))
+  let timer = isTimer(spec.resolve(result, success))
   return timer ? { result, timer } : { result }
 }
 

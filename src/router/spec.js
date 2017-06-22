@@ -1,7 +1,6 @@
-import { isStr, flattenToObj, empty, substitute, escapeRx, exclude, Timer, $devWarnOn } from './utils'
+import { isStr, flattenToObj, empty, substitute, escapeRx, exclude, $devWarnOn } from './utils'
 import { removeTrailingSlash, decode } from './utils-path'
 
-const scheduleTask = (fn, wait, ms) => new Timer(fn, !wait, ms)
 const literalp = `([^\\s/]*)`
 const allx = /(?:)/
 const identifierx = /(:[A-Za-z0-9_:]+)/
@@ -98,7 +97,7 @@ class PathSpec {
   }
   resolve(result, success = this.success(result)) {
     $devWarnOn(!success, `Resolve location with a partial match: ${result && result.href}`)
-    return !this.err || success ? this.next(result, scheduleTask) : this.err(result, scheduleTask)
+    return !this.err || success ? this.next(result) : this.err(result)
   }
   reject(result) {
     return this.fail && this.fail(result)

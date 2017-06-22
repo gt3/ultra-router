@@ -59,10 +59,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 export { makeArray, pipe, flattenToObj, exclude, substitute, escapeRx, $devWarnOn }
 
-export class Timer {
-  static isTimer(timer) {
-    return timer && timer instanceof Timer ? timer : false
-  }
+class Timer {
   constructor(cb, autoRun = true, ms = 0) {
     this.run = this.run.bind(this, cb, ms)
     if (autoRun) this.run()
@@ -79,3 +76,8 @@ export class Timer {
     return cb && cb()
   }
 }
+
+let isTimer = timer => timer && timer instanceof Timer ? timer : false
+let scheduleTask = (fn, wait, ms) => new Timer(fn, !wait, ms)
+
+export { isTimer, scheduleTask }
