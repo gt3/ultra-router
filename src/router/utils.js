@@ -60,6 +60,9 @@ if (process.env.NODE_ENV !== 'production') {
 export { makeArray, pipe, flattenToObj, exclude, substitute, escapeRx, $devWarnOn }
 
 export class Timer {
+  static create(fn, ms, wait) {
+    return new Timer(fn, ms, !wait)
+  }
   static isTimer(timer) {
     return timer && timer instanceof Timer ? timer : false
   }

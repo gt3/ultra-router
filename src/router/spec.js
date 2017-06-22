@@ -1,6 +1,7 @@
-import { isStr, flattenToObj, empty, substitute, escapeRx, exclude, $devWarnOn } from './utils'
+import { isStr, flattenToObj, empty, substitute, escapeRx, exclude, Timer, $devWarnOn } from './utils'
 import { removeTrailingSlash, decode } from './utils-path'
 
+const scheduleTask = Timer.create
 const literalp = `([^\\s/]*)`
 const allx = /(?:)/
 const identifierx = /(:[A-Za-z0-9_:]+)/
@@ -95,9 +96,9 @@ class PathSpec {
   success(result) {
     return result && Object.keys(result).some(k => result[k].exact)
   }
-  resolve(result, redirect, success = this.success(result)) {
+  resolve(result, success = this.success(result)) {
     $devWarnOn(!success, `Resolve location with a partial match: ${result && result.href}`)
-    return !this.err || success ? this.next(result, redirect) : this.err(result, redirect)
+    return !this.err || success ? this.next(result, scheduleTask) : this.err(result, scheduleTask)
   }
   reject(result) {
     return this.fail && this.fail(result)
@@ -117,7 +118,7 @@ class PrefixSpec extends PathSpec {
     let matches = super.match(checks, path)
     if (matches) {
       let { match: prefix, values: pValues, ids: pIds } = matches[this.prefixKey]
-      result = super.resolve(Object.assign(result, { prefix, pIds, pValues }), null, true)
+      result = super.resolve(Object.assign(result, { prefix, pIds, pValues }), true)
     } else result.success = false
     return result
   }
@@ -148,7 +149,7 @@ class MissSpec extends PathSpec {
     let hasCheck = Object.prototype.hasOwnProperty.bind(result)
     let miss = this.paths.filter(({ key }) => !hasCheck(key)).map(({ key }) => key)
     let matched = miss.length === this.paths.length
-    return matched && super.resolve(Object.assign({}, result, { miss }), null, true)
+    return matched && super.resolve(Object.assign({}, result, { miss }), true)
   }
 }
 

@@ -1,4 +1,4 @@
-import { pipe, exclude, Timer } from './utils'
+import { pipe, Timer } from './utils'
 import { normalizeHref, parseQS } from './utils-path'
 import { prefixSpec } from './spec'
 
@@ -27,14 +27,8 @@ function matcher(specs, checks, msg) {
   return { result, success, spec }
 }
 
-function makeRedirect(ultra) {
-  return (loc, wait) => new Timer(() => ultra.replace(loc), 0, !wait)
-}
-
 function resolveSpec({ result, success, spec }) {
-  let { ultra } = result, redirect = makeRedirect(ultra)
-  result = exclude(result, 'ultra')
-  let timer = Timer.isTimer(spec.resolve(result, redirect, success))
+  let timer = Timer.isTimer(spec.resolve(result, success))
   return timer ? { result, timer } : { result }
 }
 
