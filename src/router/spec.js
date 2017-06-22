@@ -1,7 +1,7 @@
 import { isStr, flattenToObj, empty, substitute, escapeRx, exclude, Timer, $devWarnOn } from './utils'
 import { removeTrailingSlash, decode } from './utils-path'
 
-const scheduleTask = Timer.create
+const scheduleTask = (fn, wait, ms) => new Timer(fn, !wait, ms)
 const literalp = `([^\\s/]*)`
 const allx = /(?:)/
 const identifierx = /(:[A-Za-z0-9_:]+)/
