@@ -7,8 +7,10 @@ const getMatchX = SpecRewired.__GetDependency__('getMatchX')
 const litp = SpecRewired.__GetDependency__('literalp')
 const allx = SpecRewired.__GetDependency__('allx')
 const parsePathKey = SpecRewired.__GetDependency__('parsePathKey')
+const trimIdsValues = SpecRewired.__GetDependency__('trimIdsValues')
 const Path = SpecRewired.__GetDependency__('Path')
 const PathSpec = SpecRewired.__GetDependency__('PathSpec')
+//const MissSpec = SpecRewired.__GetDependency__('MissSpec')
 
 function escape(path, ...ids) {
   path = ids.reduce((acc, id) => acc.replace(id, litp), path)
@@ -50,6 +52,24 @@ describe('spec', function() {
       oeq(identifiers, [])
       oeq(literals, [''])
     })
+  })
+  it('trimIdsValues', function() {
+    let trim = trimIdsValues, ids, vals;
+    ([ids,vals] = trim(['x'], ['x','y'], [42,43]))
+    oeq(['y'], ids)
+    oeq([43], vals);
+    ([ids,vals] = trim(['x','y'], ['x','y'], [42,43]))
+    oeq([], ids)
+    oeq([], vals);
+    ([ids,vals] = trim(['y'], ['x','y'], [42,43]))
+    oeq(['x','y'], ids)
+    oeq([42, 43], vals);
+    ([ids,vals] = trim([], ['x','y'], [42,43]))
+    oeq(['x','y'], ids)
+    oeq([42, 43], vals);
+    ([ids,vals] = trim(['x'], [], []))
+    oeq([], ids)
+    oeq([], vals);
   })
   it('assignValues', function() {
     let expected = { ':x': 42, ':y': 43 }
