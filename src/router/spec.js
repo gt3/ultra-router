@@ -50,9 +50,6 @@ class Path {
     let exact = match.length === path.length, ids = this.identifiers
     return Object.assign({ ids, match, exact }, this.validate(checks, values))
   }
-  /*makeLink(values) {
-    return substitute(this.literals, values)
-  }*/
 }
 
 function trimIdsValues(sourceIds, targetIds, targetValues) {

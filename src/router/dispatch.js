@@ -9,9 +9,9 @@ function dispatch(actions, msg) {
 function settle(matchers, mismatchers, msg) {
   let { timer, result } = msg
   if (result && !(timer && timer.active)) {
+    if (timer) timer.run()
     matchers.forEach(matcher => matcher.reject(result))
     mismatchers.forEach(mm => mm.match(result))
-    if (timer) timer.run()
   }
 }
 
