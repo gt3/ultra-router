@@ -1,7 +1,7 @@
 import assert from 'assert'
 import { eq, neq, oeq, oneq, mock } from './helpers'
 import SpecRewired from '../src/router/spec'
-import { prefixSpec, spec, check, assignValues } from '../src/router/spec'
+import { prefixSpec, spec, check, assignValues, miss } from '../src/router/spec'
 
 const getMatchX = SpecRewired.__GetDependency__('getMatchX')
 const litp = SpecRewired.__GetDependency__('literalp')
@@ -255,5 +255,17 @@ describe('PrefixSpec', function() {
   it('should return success false if prefix does not match', function() {
     let instance = prefixSpec('/x', mock(null))
     assert(!instance.match(null, { path: '/000' }).success)
+  })
+})
+
+describe('MissSpec', function() {
+  it('should resolve if all given pathKeys failed to match', function() {
+    let next = mock()
+    let instance = miss(next, '/x', '/y')
+    instance.match({})
+    eq(next.mock.calls.length, 1)
+    oeq(next.mock.calls[0][0].miss, ['/x','/y'])
+    assert(!instance.match({'/y': {}}))
+    eq(next.mock.calls.length, 1)
   })
 })
