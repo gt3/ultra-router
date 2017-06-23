@@ -77,7 +77,7 @@ class Timer {
   }
 }
 
-let isTimer = timer => timer && timer instanceof Timer ? timer : false
+let isTimer = timer => (timer && timer instanceof Timer ? timer : false)
 let scheduleTask = (...args) => new Timer(...args)
 
 export { isTimer, scheduleTask }

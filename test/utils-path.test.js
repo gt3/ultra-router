@@ -51,20 +51,20 @@ describe('path utils', function() {
   it('prependPath', function() {
     let pre = u.prependPath
     eq(pre(['abc'], '/'), '/abc')
-    eq(pre(['abc','def'], ''), '/abc/def')
-    eq(pre(['abc','def'], '/xyz'), '/xyz/abc/def')
+    eq(pre(['abc', 'def'], ''), '/abc/def')
+    eq(pre(['abc', 'def'], '/xyz'), '/xyz/abc/def')
     eq(pre(['abc'], 'xyz'), 'xyz/abc')
     eq(pre([], '/'), '/')
-    eq(pre([], ''),'')
+    eq(pre([], ''), '')
   })
   it('appendPath', function() {
     let app = u.appendPath
-    eq(app(['abc','def'], ''), 'abc/def/')
-    eq(app(['abc','def'], '/'), 'abc/def/')
-    eq(app(['abc','def'], '/xyz'), 'abc/def/xyz')
-    eq(app(['abc','def'], 'xyz'), 'abc/def/xyz')
+    eq(app(['abc', 'def'], ''), 'abc/def/')
+    eq(app(['abc', 'def'], '/'), 'abc/def/')
+    eq(app(['abc', 'def'], '/xyz'), 'abc/def/xyz')
+    eq(app(['abc', 'def'], 'xyz'), 'abc/def/xyz')
     eq(app([], '/'), '/')
-    eq(app([], ''),'')
+    eq(app([], ''), '')
   })
   it('parseQS', function() {
     let parse = u.parseQS
@@ -72,16 +72,16 @@ describe('path utils', function() {
     oeq(parse('x=42', ['x']), ['42'])
     oeq(parse('?&&;x=42', ['x']), ['42'])
     oeq(parse('x=42', ['y']), [''])
-    oeq(parse('x=42', ['x','y'], {defaults: [,'43']}), ['42', '43'])
+    oeq(parse('x=42', ['x', 'y'], { defaults: [, '43'] }), ['42', '43'])
 
     oeq(parse('?x=42&x=42', ['x']), ['42,42'])
-    oeq(parse('?x=43&y=007&x=42', ['x', 'y']), ['43,42','007'])
-    oeq(parse('?x=43&y=007&x=42', ['x', 'y'], {delim: '&'}), ['43&42','007'])
-    oeq(parse('?x=42;y=43', ['x', 'y']), ['42','43'])
-    oeq(parse('?blahblahblah', ['x', 'y', 'z']), ['','',''])
+    oeq(parse('?x=43&y=007&x=42', ['x', 'y']), ['43,42', '007'])
+    oeq(parse('?x=43&y=007&x=42', ['x', 'y'], { delim: '&' }), ['43&42', '007'])
+    oeq(parse('?x=42;y=43', ['x', 'y']), ['42', '43'])
+    oeq(parse('?blahblahblah', ['x', 'y', 'z']), ['', '', ''])
 
-    oeq(parse('?x=%24&&&x=%20', ['x', 'y']), ['%24,%20',''])
-    oeq(parse('?x=%24&&&x=%20', ['x', 'y'], {decodeValues: true}), ['$, ',''])
+    oeq(parse('?x=%24&&&x=%20', ['x', 'y']), ['%24,%20', ''])
+    oeq(parse('?x=%24&&&x=%20', ['x', 'y'], { decodeValues: true }), ['$, ', ''])
   })
   it('parseHref', function() {
     let parse = u.parseHref

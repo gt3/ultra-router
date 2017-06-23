@@ -54,22 +54,22 @@ describe('spec', function() {
     })
   })
   it('trimIdsValues', function() {
-    let trim = trimIdsValues, ids, vals;
-    ([ids,vals] = trim(['x'], ['x','y'], [42,43]))
+    let trim = trimIdsValues, ids, vals
+    ;[ids, vals] = trim(['x'], ['x', 'y'], [42, 43])
     oeq(['y'], ids)
-    oeq([43], vals);
-    ([ids,vals] = trim(['x','y'], ['x','y'], [42,43]))
+    oeq([43], vals)
+    ;[ids, vals] = trim(['x', 'y'], ['x', 'y'], [42, 43])
     oeq([], ids)
-    oeq([], vals);
-    ([ids,vals] = trim(['y'], ['x','y'], [42,43]))
-    oeq(['x','y'], ids)
-    oeq([42, 43], vals);
-    ([ids,vals] = trim([], ['x','y'], [42,43]))
-    oeq(['x','y'], ids)
-    oeq([42, 43], vals);
-    ([ids,vals] = trim(['x'], [], []))
+    oeq([], vals)
+    ;[ids, vals] = trim(['y'], ['x', 'y'], [42, 43])
+    oeq(['x', 'y'], ids)
+    oeq([42, 43], vals)
+    ;[ids, vals] = trim([], ['x', 'y'], [42, 43])
+    oeq(['x', 'y'], ids)
+    oeq([42, 43], vals)
+    ;[ids, vals] = trim(['x'], [], [])
     oeq([], ids)
-    oeq([], vals);
+    oeq([], vals)
   })
   it('assignValues', function() {
     let expected = { ':x': 42, ':y': 43 }
@@ -248,17 +248,17 @@ describe('PrefixSpec', function() {
     let next = mock(), prefix, pIds, pValues
     let instance = prefixSpec('/:x/000/:y', next)
     instance.match(null, { path: '/xxx/000/yyy/zzz' })
-    eq(next.mock.calls.length, 1);
-    ({prefix, pIds, pValues} = next.mock.calls[0][0]);
+    eq(next.mock.calls.length, 1)
+    ;({ prefix, pIds, pValues } = next.mock.calls[0][0])
     eq(prefix, '/xxx/000/yyy')
-    oeq(pIds, [':x',':y'])
-    oeq(pValues, ['xxx','yyy'])
+    oeq(pIds, [':x', ':y'])
+    oeq(pValues, ['xxx', 'yyy'])
     instance.match(null, { path: '/xxx/000//zzz' })
-    eq(next.mock.calls.length, 2);
-    ({prefix, pIds, pValues} = next.mock.calls[1][0]);
+    eq(next.mock.calls.length, 2)
+    ;({ prefix, pIds, pValues } = next.mock.calls[1][0])
     eq(prefix, '/xxx/000/')
-    oeq(pIds, [':x',':y'])
-    oeq(pValues, ['xxx',''])
+    oeq(pIds, [':x', ':y'])
+    oeq(pValues, ['xxx', ''])
   })
   it('should run checks on values to determine match', function() {
     let next = mock(), valid = mock(true), invalid = mock(false)
@@ -267,10 +267,10 @@ describe('PrefixSpec', function() {
     eq(next.mock.calls.length, 0)
     instance.match({ ':x': valid, ':y': valid }, { path: '/xxx/yyy/zzz' })
     eq(next.mock.calls.length, 1)
-    let {prefix, pIds, pValues} = next.mock.calls[0][0]
+    let { prefix, pIds, pValues } = next.mock.calls[0][0]
     eq(prefix, '/xxx/yyy')
-    oeq(pIds, [':x',':y'])
-    oeq(pValues, ['xxx','yyy'])
+    oeq(pIds, [':x', ':y'])
+    oeq(pValues, ['xxx', 'yyy'])
   })
   it('should return success false if prefix does not match', function() {
     let instance = prefixSpec('/x', mock(null))
@@ -284,8 +284,8 @@ describe('MissSpec', function() {
     let instance = miss(next, '/x', '/y')
     instance.match({})
     eq(next.mock.calls.length, 1)
-    oeq(next.mock.calls[0][0].miss, ['/x','/y'])
-    assert(!instance.match({'/y': {}}))
+    oeq(next.mock.calls[0][0].miss, ['/x', '/y'])
+    assert(!instance.match({ '/y': {} }))
     eq(next.mock.calls.length, 1)
   })
 })

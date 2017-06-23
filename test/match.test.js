@@ -155,7 +155,7 @@ describe('prefixMatch', function() {
   })
   it('specs + matchCheck', function() {
     let s = spec('/c')(next, err, fail)
-    let matchCheck = ({path}) => prependPath(['c'], path)
+    let matchCheck = ({ path }) => prependPath(['c'], path)
     let aorbCheck = check(':aorb')(/^[a,b]$/)
     let matcher = prefixMatch('/:aorb', match(s, aorbCheck), matchCheck)
     let res, run = u.pipe(matcher.match, matcher.resolve)
