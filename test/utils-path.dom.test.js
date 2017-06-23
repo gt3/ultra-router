@@ -4,33 +4,11 @@
 import assert from 'assert'
 import { eq, neq, oeq, oneq, mock } from './helpers'
 import * as u from '../src/router/utils-path'
-
-function setOrigin(protocol, hostname, port) {
-  return Object.defineProperties(window.location, {
-    protocol: { writable: true, value: protocol },
-    hostname: { writable: true, value: hostname },
-    port: { writable: true, value: port || '' }
-  })
-}
-
-function setLocation(loc) {
-  let { href, path: pathname, qs: search = '', hash = '' } = u.parseHref(loc)
-  href = u.addLeadingSlash(href)
-  pathname = u.addLeadingSlash(pathname)
-  Object.defineProperties(window.location, {
-    href: { writable: true, value: href },
-    pathname: { writable: true, value: pathname },
-    hash: { writable: true, value: hash && hash[0] !== '#' ? '#' + hash : hash },
-    search: { writable: true, value: search && search[0] !== '?' ? '?' + search : search }
-  })
-  return { href, pathname, search, hash }
-}
+import { setOrigin, setLocation } from './helpers-jsdom'
 
 let testEnv = (loc = window.location) => {
   if (loc !== window.location) loc = setLocation(loc)
   let { href, path, qs = '', hash = '' } = u.env
-  //console.log([href,path,qs,hash])
-  //console.log([loc.href,loc.pathname,loc.search,loc.hash])
   return oeq([href, path, qs, hash], [loc.href, loc.pathname, loc.search, loc.hash])
 }
 
