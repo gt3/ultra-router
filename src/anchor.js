@@ -1,6 +1,22 @@
 import { parseHref, env } from './router/utils-path'
 import { exclude, substitute } from './router/utils'
 
+function retainQS(retain, currQS) {
+  let qs = retain && /\bqs\b/.test(retain) ? env.qs : ''
+  return currQS ? substitute([currQS, qs], ['&'], true) : qs
+}
+
+function retainHash(retain, currHash) {
+  return retain && /\bhash\b/.test(retain) ? env.hash : currHash
+}
+
+function retainQSHash(retain, loc) {
+  let qs = retainQS(retain, loc.qs)
+  let hash = retainHash(retain, loc.hash)
+  let href = substitute([loc.path, qs, hash], ['?', '#'], true)
+  return { href, qs, hash }
+}
+
 function verifyOrigin(href) {
   return href.indexOf(env.location.protocol) !== 0 || href.indexOf(env.origin) === 0
 }
@@ -18,22 +34,6 @@ export function makeClickHandler({ href, state, docTitle, retain }, action) {
     }
   }
   return Object.assign(clickHandler, { loc })
-}
-
-function retainQS(retain, currQS) {
-  let qs = retain && /\bqs\b/.test(retain) ? env.qs : ''
-  return currQS ? substitute([currQS, qs], ['&'], true) : qs
-}
-
-function retainHash(retain, currHash) {
-  return retain && /\bhash\b/.test(retain) ? env.hash : currHash
-}
-
-function retainQSHash(retain, loc) {
-  let qs = retainQS(retain, loc.qs)
-  let hash = retainHash(retain, loc.hash)
-  let href = substitute([loc.path, qs, hash], ['?', '#'], true)
-  return { href, qs, hash }
 }
 
 function getNavAction(retain) {

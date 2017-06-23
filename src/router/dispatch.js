@@ -10,7 +10,7 @@ function settle(matchers, mismatchers, msg) {
   let { timer, result } = msg
   if (result && !(isTimer(timer) && timer.active)) {
     if (timer) timer.run()
-    matchers.forEach(matcher => matcher.reject(result))
+    matchers.forEach(matcher => matcher.reject(msg))
     mismatchers.forEach(mm => mm.match(result))
   }
 }

@@ -1,4 +1,4 @@
-import { pipe, exclude, isTimer } from './utils'
+import { pipe, isTimer } from './utils'
 import { normalizePath } from './utils-path'
 import { prefixSpec } from './spec'
 
@@ -33,8 +33,7 @@ function resolveSpec({ result, success, spec }) {
 }
 
 function resolve(msg) {
-  let res = exclude(msg, 'spec')
-  return msg.spec ? Object.assign({}, res, resolveSpec(msg)) : false
+  return msg.spec ? Object.assign({}, msg, resolveSpec(msg)) : false
 }
 
 function reject(specs, msg) {
