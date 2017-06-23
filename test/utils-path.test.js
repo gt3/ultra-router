@@ -8,8 +8,8 @@ let verifyMatch = (xhref, xpath, xqs, xhash) => actual => {
 }
 
 describe('path utils', function() {
-  it('normalizeHref', function() {
-    let norm = u.normalizeHref
+  it('normalizePath', function() {
+    let norm = u.normalizePath
     eq(norm()('abc/def/'), '/abc/def')
     eq(norm('')('/abc/def/'), '/abc/def')
     eq(norm('/')('/abc/def/'), '/abc/def')

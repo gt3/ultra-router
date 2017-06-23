@@ -15,7 +15,7 @@ function settle(matchers, mismatchers, msg) {
   }
 }
 
-export function makeDispatcher(matchers, mismatchers) {
+function makeDispatcher(matchers, mismatchers) {
   let actions = matchers.map(matcher => pipe(matcher.match, matcher.resolve))
   let dispatcher = pipe(dispatch.bind(null, actions), settle.bind(null, matchers, mismatchers))
   return dispatcher

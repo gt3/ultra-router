@@ -1,8 +1,9 @@
 import assert from 'assert'
 import { eq, neq, oeq, oneq, mock } from './helpers'
 import * as u from '../src/router/utils'
+import { parseQS, prependPath } from '../src/router/utils-path'
 import { prefixSpec, spec, check, assignValues } from '../src/router/spec'
-import { toggle, toggleSelected, match } from '../src/router/match'
+import { toggle, toggleSelected, match, prefixMatch } from '../src/router/match'
 
 function testToggle(id, match) {
   let testOn = t => {
@@ -56,14 +57,14 @@ describe('match', function() {
   it('specs', function() {
     let matcher = match(spec('/a')(next, err))
     let run = u.pipe(matcher.match, matcher.resolve)
-    run({ href: '/a' })
+    run({ path: '/a' })
     eq(next.mock.calls.length, 1)
     let res = next.mock.calls[0][0]['/a']
     assert(res.exact)
-    run({ href: '/a/b' })
+    run({ path: '/a/b' })
     eq(err.mock.calls.length, 1)
     res = err.mock.calls[0][0]['/a']
-    assert(res.passed)
+    assert(res)
     assert(!res.exact)
     eq(res.match, '/a')
   })
@@ -72,66 +73,50 @@ describe('match', function() {
     let checks = check(':x', ':y')(/^4/, /[2,3]$/)
     let matcher = match(specs, checks)
     let res, run = u.pipe(matcher.match, matcher.resolve)
-    run({ href: '/abc/42' })
+    run({ path: '/abc/42' })
     eq(next.mock.calls.length, 1)
     res = next.mock.calls[0][0]['/abc/:x']
     assert(res.exact)
     eq(res.values[0], '42')
-    run({ href: '/xyz/42/43' })
+    run({ path: '/xyz/42/43' })
     eq(next.mock.calls.length, 2)
     res = next.mock.calls[1][0]['/xyz/:x/:y']
     assert(res.exact)
     oeq(res.values, ['42', '43'])
-    run({ href: '/xyz/42/44' })
+    run({ path: '/xyz/42/44' })
     eq(err.mock.calls.length, 1)
     assert(!err.mock.calls[0][0]['/xyz/:x/:y'])
     res = err.mock.calls[0][0]['/xyz']
-    assert(res.passed)
+    assert(res)
   })
-  it('specs + prefix', function() {
+  it('spec + matchCheck', function() {
     let s = spec('/c')(next, err)
-    let a = match(s, null, '/a')
-    let b = match(s, null, '/b')
-    let res, run = u.pipe(a.match, a.resolve)
-    run({ path: '/a/c', href: '/a/c' })
-    eq(next.mock.calls.length, 1)
-    res = next.mock.calls[0][0]['/c']
-    assert(res.exact)
-    run = u.pipe(b.match, b.resolve)
-    run({ path: '/b/c', href: '/b/c' })
-    eq(next.mock.calls.length, 2)
-    res = next.mock.calls[1][0]['/c']
-    assert(res.exact)
-  })
-  it('spec + specCheck', function() {
-    let s = spec('/c')(next, err)
-    let specCheck = mock('/c')
-    let matcher = match(s, null, null, specCheck)
+    let matchCheck = mock('/c')
+    let matcher = match(s, null, matchCheck)
     let res, run = u.pipe(matcher.match, matcher.resolve)
     run({ path: '/xxx', href: '/xxx', qs: '', hash: '', prefix: '' })
     eq(next.mock.calls.length, 1)
     res = next.mock.calls[0][0]['/c']
     assert(res.exact)
-    eq(specCheck.mock.calls.length, 1)
-    res = specCheck.mock.calls[0][0]
+    eq(matchCheck.mock.calls.length, 1)
+    res = matchCheck.mock.calls[0][0]
     eq(res.path, '/xxx')
     eq(res.href, '/xxx')
     eq(res.qs, '')
     eq(res.hash, '')
     eq(res.prefix, '')
   })
-  it('spec + specCheck + QS', function() {
+  it('spec + matchCheck + QS', function() {
     let s = spec('/c/:d')(next, err)
-    let checks = check(':aorb')(/^[a,b]$/)
-    let specCheck = ({ path }, parseQS) => parseQS(['q'], path)
-    let aorb = match(s, checks, '/:aorb', specCheck)
-    let res, run = u.pipe(aorb.match, aorb.resolve)
-    run({ path: '/a/c', href: '/a/c?q=42&q=43', qs: '?q=42&q=43' })
+    let matchCheck = ({ qs, path }) => prependPath(parseQS(qs, ['q']), path)
+    let m = match(s, null, matchCheck)
+    let res, run = u.pipe(m.match, m.resolve)
+    run({ path: '/c', qs: '?q=42&q=43' })
     eq(next.mock.calls.length, 1)
     res = next.mock.calls[0][0]['/c/:d']
     assert(res.exact)
     assert(res.values[0], '42,43')
-    run({ path: '/b/c', href: '/b/c?q=42', qs: '?q=42' })
+    run({ path: '/c', qs: '?q=42' })
     eq(next.mock.calls.length, 2)
     res = next.mock.calls[1][0]['/c/:d']
     assert(res.exact)
@@ -140,8 +125,31 @@ describe('match', function() {
   it('does not match any routes', function() {
     let matcher = match(spec('/a')(next, err))
     let run = u.pipe(matcher.match, matcher.resolve)
-    run({ href: '/' })
+    run({ path: '/' })
     eq(next.mock.calls.length, 0)
     eq(err.mock.calls.length, 0)
+  })
+})
+
+describe('prefixMatch', function() {
+  let next, err
+  beforeEach(function() {
+    next = mock()
+    err = mock()
+  })
+  it('specs + prefix', function() {
+    let s = spec('/c')(next, err)
+    let a = prefixMatch('/a', match(s))
+    let b = prefixMatch('/b', match(s))
+    let res, run = u.pipe(a.match, a.resolve)
+    run({ path: '/a/c' })
+    eq(next.mock.calls.length, 1)
+    res = next.mock.calls[0][0]['/c']
+    assert(res.exact)
+    run = u.pipe(b.match, b.resolve)
+    run({ path: '/b/c' })
+    eq(next.mock.calls.length, 2)
+    res = next.mock.calls[1][0]['/c']
+    assert(res.exact)
   })
 })

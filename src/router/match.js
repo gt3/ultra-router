@@ -1,5 +1,5 @@
 import { pipe, isTimer } from './utils'
-import { normalizeHref, parseQS } from './utils-path'
+import { normalizePath } from './utils-path'
 import { prefixSpec } from './spec'
 
 let falsy = () => false
@@ -49,15 +49,9 @@ function matchPrefix(prefixKey, matcher) {
 
 function prematch(matchCheck, msg) {
   let { prefix, href, path, qs = '', hash = '' } = msg
-  if (prefix) {
-    href = normalizeHref(prefix)(href)
-    path = normalizeHref(prefix)(path)
-  }
-  if (matchCheck) {
-    let checkMsg = { prefix, href, path, qs, hash }
-    path = matchCheck(checkMsg, parseQS.bind(null, qs))
-  }
-  return path === msg.path ? msg : Object.assign({}, msg, { href, path })
+  if (prefix) path = normalizePath(prefix)(path)
+  if (matchCheck) path = matchCheck({ prefix, href, path, qs, hash })
+  return path === msg.path ? msg : Object.assign({}, msg, { path })
 }
 
 export function match(specs, checks = {}, matchCheck) {
@@ -66,11 +60,11 @@ export function match(specs, checks = {}, matchCheck) {
   return { match, resolve, specs, checks, reject: reject.bind(null, specs) }
 }
 
-export function prefixMatch(prefixKey, matcher, matchCheck) {
+export function prefixMatch(prefixKey, matcher, prematchCheck) {
   let prefixed = matchPrefix(prefixKey, matcher)
-  if (matchCheck) {
+  if (prematchCheck) {
     let { match } = prefixed
-    prefixed.match = pipe(prematch.bind(null, matchCheck), match)
+    prefixed.match = pipe(prematch.bind(null, prematchCheck), match)
   }
   return prefixed
 }

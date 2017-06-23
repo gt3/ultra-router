@@ -14,11 +14,11 @@ function removeTrailingSlash(path) {
   return path === '/' ? path : path.replace(/\/$/, '')
 }
 
-function normalizeHref(prefix) {
+function normalizePath(prefix) {
   return pipe(stripPrefix.bind(null, prefix), addLeadingSlash, removeTrailingSlash)
 }
 
-export { addLeadingSlash, removeTrailingSlash, normalizeHref }
+export { addLeadingSlash, removeTrailingSlash, normalizePath }
 
 function encodePath(path, decoded) {
   if (!decoded) path = decode(path)

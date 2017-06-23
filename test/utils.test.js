@@ -77,19 +77,19 @@ describe('utils', function() {
 })
 describe('utils Timer', function() {
   it('schedules timeout on instantiation', function(done) {
-    let t = new u.Timer(done)
-    assert(u.Timer.isTimer(t))
-    assert(!u.Timer.isTimer({}))
+    let t = u.scheduleTask(done)
+    assert(u.isTimer(t))
+    assert(!u.isTimer({}))
     assert(t.active)
   })
   it('schedules timeout on demand', function(done) {
-    let t = new u.Timer(done, 0, false)
+    let t = u.scheduleTask(done, true)
     assert(!t.active)
     t.run()
     assert(t.active)
   })
   it('stop clears timeout', function(done) {
-    let t = new u.Timer(() => asssert.fail('timer was stopped!'))
+    let t = u.scheduleTask(() => asssert.fail('timer was stopped!'))
     t.stop()
     assert(!t.active)
     setTimeout(done, 5)
