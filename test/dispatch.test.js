@@ -7,20 +7,18 @@ import { toggle, toggleSelected, match, prefixMatch } from '../src/router/match'
 import { dispatcher } from '../src/router/dispatch'
 
 describe('dispatch + settle', function() {
-  let next, fail, missed, task, nextTask
+  let next, fail, missed, task
   let clearMocks = () => {
     next.mockClear()
     fail.mockClear()
     missed.mockClear()
     task.mockClear()
-    nextTask.mockClear()
   }
   beforeEach(function() {
     next = mock()
     fail = mock()
     missed = mock()
     task = mock()
-    nextTask = mock(u.scheduleTask(task, true))
   })
   it('should resolve, fail, and reject upon path match', function() {
     let d = dispatcher(
@@ -42,12 +40,24 @@ describe('dispatch + settle', function() {
     eq(fail.mock.calls.length, 0)
     eq(missed.mock.calls.length, 0)
   })
-  it('should run scheduled task (timer)', function(done) {
+  it('should schedule task (timer)', function(done) {
+    let nextTask = mock(u.scheduleTask(task, true))
     let d = dispatcher([match(spec('/a')(nextTask))], [miss(missed, '/c')])
     d({ path: '/a' })
     eq(nextTask.mock.calls.length, 1)
     eq(task.mock.calls.length, 0)
     eq(missed.mock.calls.length, 1)
+    setTimeout(() => {
+      eq(task.mock.calls.length, 1)
+      done()
+    })
+  })
+  it('should not run settle if task is already scheduled', function(done) {
+    let nextTask = () => u.scheduleTask(task, false)
+    let d = dispatcher([match(spec('/a')(nextTask))], [miss(missed, '/c')])
+    d({ path: '/a' })
+    eq(task.mock.calls.length, 0)
+    eq(missed.mock.calls.length, 0)
     setTimeout(() => {
       eq(task.mock.calls.length, 1)
       done()
