@@ -1,5 +1,3 @@
-function noop() {}
-
 function id(x) {
   return x
 }
@@ -17,7 +15,7 @@ function empty(t) {
   return !t || (!t.length && !Object.keys(t).length)
 }
 
-export { id, isFn, isStr, empty }
+export { isFn, isStr, empty }
 
 function makeArray(arr) {
   return Array.isArray(arr) ? arr : empty(arr) ? [] : [arr]
@@ -52,7 +50,7 @@ function escapeRx(string) {
 function warnOn(truthy, msg) {
   return truthy && console.error(msg)
 }
-let $devWarnOn = noop
+let $devWarnOn = function () {}
 if (process.env.NODE_ENV !== 'production') {
   $devWarnOn = warnOn
 }

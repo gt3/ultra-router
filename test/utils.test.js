@@ -3,11 +3,6 @@ import { eq, neq, oeq, oneq, mock } from './helpers'
 import * as u from '../src/router/utils'
 
 describe('utils', function() {
-  it('id', function() {
-    eq(u.id(5), 5)
-    eq(u.id(null), null)
-    eq(u.id(undefined), undefined)
-  })
   it('makeArray', function() {
     oeq(u.makeArray('xxx'), ['xxx'])
     oeq(u.makeArray(42), [])
