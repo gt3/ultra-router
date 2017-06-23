@@ -8,11 +8,19 @@ describe('utils', function() {
     eq(u.id(null), null)
     eq(u.id(undefined), undefined)
   })
+  it('makeArray', function() {
+    oeq(u.makeArray('xxx'), ['xxx'])
+    oeq(u.makeArray(42), [])
+    oeq(u.makeArray([42]), [42])
+    oeq(u.makeArray(''), [])
+    oeq(u.makeArray({}), [])
+  })
   it('pipe', function() {
     let inc = i => i + 1, sq = i => i * i
     eq(u.pipe(null, inc, sq)(1), 4)
     eq(u.pipe(sq, null, inc)(1), 2)
     eq(u.pipe(null)(1), 1)
+    eq(u.pipe()(1), 1)
   })
   it('flattenToObj', function() {
     let a = [], a2 = [{ x: 1 }, { y: 2 }], a3 = [{ x: { y: 1 } }]

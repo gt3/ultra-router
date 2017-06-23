@@ -136,6 +136,7 @@ describe('prefixMatch', function() {
   beforeEach(function() {
     next = mock()
     err = mock()
+    fail = mock()
   })
   it('specs + prefix', function() {
     let s = spec('/c')(next, err)
@@ -151,5 +152,44 @@ describe('prefixMatch', function() {
     eq(next.mock.calls.length, 2)
     res = next.mock.calls[1][0]['/c']
     assert(res.exact)
+  })
+  it('specs + matchCheck', function() {
+    let s = spec('/c')(next, err, fail)
+    let matchCheck = ({path}) => prependPath(['c'], path)
+    let aorbCheck = check(':aorb')(/^[a,b]$/)
+    let matcher = prefixMatch('/:aorb', match(s, aorbCheck), matchCheck)
+    let res, run = u.pipe(matcher.match, matcher.resolve)
+    run({ path: '/a' })
+    eq(next.mock.calls.length, 1)
+    res = next.mock.calls[0][0]['/c']
+    assert(res.exact)
+    run({ path: '/b' })
+    eq(next.mock.calls.length, 2)
+    res = next.mock.calls[1][0]['/c']
+    assert(res.exact)
+    run = u.pipe(matcher.match, matcher.resolve, matcher.reject)
+    run({ path: '/d' })
+    eq(next.mock.calls.length, 2)
+    eq(fail.mock.calls.length, 1)
+  })
+})
+
+describe('match: resolve returns timer', function() {
+  let next, task
+  beforeEach(function() {
+    task = mock()
+    next = mock(u.scheduleTask(task))
+  })
+  it('specs + matchCheck', function(done) {
+    let matcher = match(spec('/a')(next))
+    let run = u.pipe(matcher.match, matcher.resolve)
+    let res = run({ path: '/a' })
+    eq(next.mock.calls.length, 1)
+    eq(task.mock.calls.length, 0)
+    assert(u.isTimer(res.timer))
+    setTimeout(() => {
+      eq(task.mock.calls.length, 1)
+      done()
+    })
   })
 })
