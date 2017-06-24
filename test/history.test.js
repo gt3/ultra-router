@@ -15,7 +15,6 @@ describe('history', function() {
     path = '/' + path.slice(0, 3)
   })
   it('push', function() {
-    eq(u.env.href, '/')
     push(null, { href: path, path, state })
     eq(u.env.history.length - hlen, 1)
     eq(u.env.href, path)
@@ -44,5 +43,14 @@ describe('history', function() {
     eq(u.env.history.length - hlen, 0)
     eq(cb.mock.calls.length, 2)
     eq(u.env.history.state, state)
+  })
+})
+
+describe('history pushstate mocked', function() {
+  let loc = window.location, state = { x: 42 }, hlen = 0, path
+  beforeEach(function() {
+    hlen = u.env.history.length;
+    ([, path = '0'] = Math.random().toString().split('.'))
+    path = '/' + path.slice(0, 3)
   })
 })
