@@ -35,7 +35,7 @@ function mockPushState(env) {
     replaceState: mock(),
     go: mock()
   })
-  return overrideHistoryMethods.bind(null, env, {pushState,replaceState,go})
+  return overrideHistoryMethods.bind(null, env, { pushState, replaceState, go })
 }
 
 function makeRandomPath() {

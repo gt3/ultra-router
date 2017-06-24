@@ -47,7 +47,7 @@ describe('history pushstate simulated', function() {
 
 describe('history pushstate mocked', function() {
   let loc = window.location, state = { x: 42 }, hlen = 0, path
-  let psmock, rsmock, gomock, resetPushState
+  let psmock, rsmock, gomock, restorePushState
   beforeEach(function() {
     hlen = u.env.history.length
     path = makeRandomPath()
@@ -56,11 +56,11 @@ describe('history pushstate mocked', function() {
     gomock.mockClear()
   })
   beforeAll(function() {
-    resetPushState = mockPushState(u.env);
-    ({pushState: psmock, replaceState: rsmock, go: gomock} = u.env.history)
+    restorePushState = mockPushState(u.env)
+    ;({ pushState: psmock, replaceState: rsmock, go: gomock } = u.env.history)
   })
   afterAll(function() {
-    resetPushState()
+    restorePushState()
   })
   it('push', function() {
     push(null, { href: path, path, state, docTitle: 'zoom' })
@@ -81,5 +81,33 @@ describe('history pushstate mocked', function() {
     eq(gomock.mock.calls.length, 0)
     go(-1)
     eq(gomock.mock.calls.length, 1)
+  })
+})
+
+function firePopstate(state) {
+  let { window } = u.env
+  let event = Object.assign(new window.Event('popstate'), { state })
+  window.dispatchEvent(event)
+  return event
+}
+
+let testLoc = loc => {
+  let { href, path, qs = '', hash = '' } = u.env
+  return oeq([href, path, qs, hash], [loc.href, loc.path, loc.qs, loc.hash])
+}
+
+describe('createPopstate', function() {
+  let state = { x: 42 }
+  it('should fire registered handlers on popstate event', function() {
+    let h1 = mock(), h2 = mock(), popstate = createPopstate()
+    popstate.add(h1)
+    popstate.add(h2)
+    let event = firePopstate(state)
+    eq(h1.mock.calls.length, 1)
+    let { href, path, qs, hash, state: s, event: e } = h1.mock.calls[0][0]
+    eq(state, h1.mock.calls[0][0].state)
+    eq(event, h1.mock.calls[0][0].event)
+    testLoc(h1.mock.calls[0][0])
+    eq(h2.mock.calls.length, 1)
   })
 })
