@@ -42,5 +42,7 @@ export default class Listener extends Set {
   values() {
     return Array.from(this)
   }
-  get size() { return this.values().length }
+  get size() {
+    return this.values().length
+  }
 }

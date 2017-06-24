@@ -50,7 +50,7 @@ function escapeRx(string) {
 function warnOn(truthy, msg) {
   return truthy && console.error(msg)
 }
-let $devWarnOn = function () {}
+let $devWarnOn = function() {}
 if (process.env.NODE_ENV !== 'production') {
   $devWarnOn = warnOn
 }

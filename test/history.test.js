@@ -10,8 +10,8 @@ import * as u from '../src/router/utils-path'
 describe('history', function() {
   let loc = window.location, state = { x: 42 }, hlen = 0, path
   beforeEach(function() {
-    hlen = u.env.history.length;
-    ([, path = '0'] = Math.random().toString().split('.'))
+    hlen = u.env.history.length
+    ;[, path = '0'] = Math.random().toString().split('.')
     path = '/' + path.slice(0, 3)
   })
   it('push', function() {
@@ -48,9 +48,47 @@ describe('history', function() {
 
 describe('history pushstate mocked', function() {
   let loc = window.location, state = { x: 42 }, hlen = 0, path
+  let _pushState, _replaceState, psmock, rsmock, gomock
   beforeEach(function() {
-    hlen = u.env.history.length;
-    ([, path = '0'] = Math.random().toString().split('.'))
+    hlen = u.env.history.length
+    ;[, path = '0'] = Math.random().toString().split('.')
     path = '/' + path.slice(0, 3)
+    psmock.mockClear()
+    rsmock.mockClear()
+    gomock.mockClear()
+  })
+  beforeAll(function() {
+    psmock = mock()
+    rsmock = mock()
+    gomock = mock()
+    _pushState = u.env.history.pushState
+    _replaceState = u.env.history.replaceState
+    u.env.history.pushState = psmock
+    u.env.history.replaceState = rsmock
+    u.env.history.go = gomock
+  })
+  afterAll(function() {
+    u.env.history.pushState = _pushState
+    u.env.history.replaceState = _replaceState
+  })
+  it('push', function() {
+    push(null, { href: path, path, state, docTitle: 'zoom' })
+    eq(psmock.mock.calls.length, 1)
+    eq(psmock.mock.calls[0][0], state)
+    eq(psmock.mock.calls[0][1], 'zoom')
+    eq(psmock.mock.calls[0][2], path)
+  })
+  it('replace', function() {
+    replace(null, { href: path, path, state, docTitle: 'zoom' })
+    eq(rsmock.mock.calls.length, 1)
+    eq(rsmock.mock.calls[0][0], state)
+    eq(rsmock.mock.calls[0][1], 'zoom')
+    eq(rsmock.mock.calls[0][2], path)
+  })
+  it('go', function() {
+    go(0)
+    eq(gomock.mock.calls.length, 0)
+    go(-1)
+    eq(gomock.mock.calls.length, 1)
   })
 })
