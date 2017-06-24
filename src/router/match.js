@@ -2,21 +2,18 @@ import { pipe, isTimer } from './utils'
 import { normalizePath } from './utils-path'
 import { prefixSpec } from './spec'
 
-let falsy = () => false
+const off = () => false
+const turnOff = o => Object.assign(o, { match: off, resolve: off, reject: off })
 
-export function toggle(newKey, match) {
-  let { off, key = newKey } = match, on = off
-  if (!off) {
-    on = { off: match, match: falsy, resolve: falsy, reject: falsy }
-  }
-  if (key) on.key = key
+export function toggle(match, newKey, newMatch) {
+  let { off, key } = match
+  let on = off ? (newMatch || off) : turnOff({ off: (newMatch || match) })
+  on.key = newKey || key
   return on
 }
 
-export function toggleSelected(matchers, ...selectKeys) {
-  return matchers.map(
-    m => (m.key !== undefined && selectKeys.indexOf(m.key) !== -1 ? toggle(m.key, m) : m)
-  )
+export function toggleSelected(matchers, key, replaceWith) {
+  return matchers.map(m => key !== undefined && m.key === key ? toggle(m, key, replaceWith) : m)
 }
 
 function matcher(specs, checks, msg) {
@@ -67,4 +64,11 @@ export function prefixMatch(prefixKey, matcher, prematchCheck) {
     prefixed.match = pipe(prematch.bind(null, prematchCheck), match)
   }
   return prefixed
+}
+
+export function futureMatch(key, promise) {
+  let _match = toggle(key, {})
+  return promise.then((match, matchers) => {
+    return matchers ? toggleSelected(matchers, key, match) : toggle(_match, key, match)
+  })
 }

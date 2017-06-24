@@ -26,16 +26,16 @@ describe('match: toggle', function() {
   it('toggle', function() {
     let match = { match: mock(true), resolve: mock(true) }
     let test = testToggle('x', match)
-    let t = toggle('x', match)
+    let t = toggle(match, 'x')
     test.off(t)
-    t = toggle('y', t)
+    t = toggle(t)
     test.on(t)
-    t = toggle(undefined, t)
+    t = toggle(t)
     test.off(t)
   })
   it('toggle absent key', function() {
     let match = { match: mock(true), resolve: mock(true) }
-    testToggle(undefined, match).off(toggle(undefined, match))
+    testToggle(undefined, match).off(toggle(match))
   })
   it('toggleSelected', function() {
     let m1 = { key: '', match: mock(true), resolve: mock() }
