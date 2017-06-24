@@ -38,12 +38,13 @@
     "uglify-es": "^3.0.13"
   },
   "jest": {
-    "testRegex": "(/test/history.*\\.test\\.js$)",
+    "testRegex": "(/test/.*\\.test\\.js$)",
     "coveragePathIgnorePatterns": [
       "/test/",
       "/node_modules/"
     ],
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testURL": "http://localhost:8080"
   },
   "files": [
     "dist",

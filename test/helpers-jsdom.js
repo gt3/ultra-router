@@ -6,6 +6,7 @@ function setOrigin(protocol, hostname, port) {
   return Object.defineProperties(window.location, {
     protocol: { writable: true, value: protocol },
     hostname: { writable: true, value: hostname },
+    host: { writable: true, value: hostname + (port || '') },
     port: { writable: true, value: port || '' }
   })
 }
