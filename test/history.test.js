@@ -4,15 +4,14 @@
 import assert from 'assert'
 import { eq, neq, oeq, oneq, mock } from './helpers'
 import { push, replace, go, createPopstate } from '../src/history'
-import { setOrigin, setLocation } from './helpers-jsdom'
+import { mockPushState, makeRandomPath } from './helpers-jsdom'
 import * as u from '../src/router/utils-path'
 
-describe('history', function() {
+describe('history pushstate simulated', function() {
   let loc = window.location, state = { x: 42 }, hlen = 0, path
   beforeEach(function() {
     hlen = u.env.history.length
-    ;[, path = '0'] = Math.random().toString().split('.')
-    path = '/' + path.slice(0, 3)
+    path = makeRandomPath()
   })
   it('push', function() {
     push(null, { href: path, path, state })
@@ -48,28 +47,20 @@ describe('history', function() {
 
 describe('history pushstate mocked', function() {
   let loc = window.location, state = { x: 42 }, hlen = 0, path
-  let _pushState, _replaceState, psmock, rsmock, gomock
+  let psmock, rsmock, gomock, resetPushState
   beforeEach(function() {
     hlen = u.env.history.length
-    ;[, path = '0'] = Math.random().toString().split('.')
-    path = '/' + path.slice(0, 3)
+    path = makeRandomPath()
     psmock.mockClear()
     rsmock.mockClear()
     gomock.mockClear()
   })
   beforeAll(function() {
-    psmock = mock()
-    rsmock = mock()
-    gomock = mock()
-    _pushState = u.env.history.pushState
-    _replaceState = u.env.history.replaceState
-    u.env.history.pushState = psmock
-    u.env.history.replaceState = rsmock
-    u.env.history.go = gomock
+    resetPushState = mockPushState(u.env);
+    ({pushState: psmock, replaceState: rsmock, go: gomock} = u.env.history)
   })
   afterAll(function() {
-    u.env.history.pushState = _pushState
-    u.env.history.replaceState = _replaceState
+    resetPushState()
   })
   it('push', function() {
     push(null, { href: path, path, state, docTitle: 'zoom' })

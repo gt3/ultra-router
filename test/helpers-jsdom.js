@@ -24,4 +24,24 @@ function setLocation(loc) {
   return { href, pathname, search, hash }
 }
 
-export { setOrigin, setLocation }
+function overrideHistoryMethods(env, overrides) {
+  return Object.assign(env.history, overrides)
+}
+
+function mockPushState(env) {
+  let { pushState, replaceState, go } = env.history
+  overrideHistoryMethods(env, {
+    pushState: mock(),
+    replaceState: mock(),
+    go: mock()
+  })
+  return overrideHistoryMethods.bind(null, env, {pushState,replaceState,go})
+}
+
+function makeRandomPath() {
+  let [, path = '0'] = Math.random().toString().split('.')
+  path = '/' + path.slice(0, 3)
+  return path
+}
+
+export { setOrigin, setLocation, mockPushState, makeRandomPath }
