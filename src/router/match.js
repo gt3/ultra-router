@@ -1,4 +1,4 @@
-import { pipe, isTimer, $devWarnOn } from './utils'
+import { pipe, isTimer, replaceAt, $devWarnOn } from './utils'
 import { normalizePath } from './utils-path'
 import { prefixSpec } from './spec'
 
@@ -15,7 +15,8 @@ export function toggle(match, newKey, newMatch) {
 }
 
 export function toggleSelected(matchers, key, replaceWith) {
-  return matchers.map(m => (key !== undefined && m.key === key ? toggle(m, key, replaceWith) : m))
+  let i = matchers.findIndex(m => m.key === key)
+  return i === -1 ? matchers : replaceAt(matchers, i, toggle(matchers[i], key, replaceWith))
 }
 
 function matcher(specs, checks, msg) {

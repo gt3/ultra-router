@@ -34,6 +34,10 @@ function exclude(t, ...keys) {
   return flattenToObj(Object.keys(t).filter(k => keys.indexOf(k) === -1).map(k => ({ [k]: t[k] })))
 }
 
+function replaceAt(arr, i, val) {
+  return [...arr.slice(0, i < 0 ? 0 : i), val, ...arr.slice(-(arr.length - i - 1) || arr.length)]
+}
+
 function substitute(literals, values, removeEmpty) {
   let vals = Array.from(values, v => v || '')
   let lits = Array.from(literals, v => v || '')
@@ -55,7 +59,7 @@ if (process.env.NODE_ENV !== 'production') {
   $devWarnOn = warnOn
 }
 
-export { makeArray, pipe, flattenToObj, exclude, substitute, escapeRx, $devWarnOn }
+export { makeArray, pipe, flattenToObj, exclude, replaceAt, substitute, escapeRx, $devWarnOn }
 
 class Timer {
   constructor(cb, wait, ms = 0) {
