@@ -17,7 +17,10 @@ function createPopstate() {
 let push = (success, msg) => {
   let { href, path, state, docTitle } = msg
   if (href !== env.href) {
-    $devWarnOn(encodePath(path) !== path, `Incorrect encoding. Use encodeURI on path: ${path}`)
+    $devWarnOn(
+      () => encodePath(path) !== path,
+      `Incorrect encoding. Use encodeURI on path: ${path}`
+    )
     env.history.pushState(state, docTitle, href)
     if (success) return success(msg)
   } else $devWarnOn(true, `Attempt to push location identical to current one: ${href}`)
@@ -26,7 +29,10 @@ let push = (success, msg) => {
 let replace = (success, msg) => {
   let { href, path, state, docTitle } = msg
   if (!(href === env.href && state === env.state)) {
-    $devWarnOn(encodePath(path) !== path, `Incorrect encoding. Use encodeURI on path: ${path}`)
+    $devWarnOn(
+      () => encodePath(path) !== path,
+      `Incorrect encoding. Use encodeURI on path: ${path}`
+    )
     env.history.replaceState(state, docTitle, href)
     if (success) return success(msg)
   } else $devWarnOn(true, `Attempt to replace current location with the same one: ${href}`)

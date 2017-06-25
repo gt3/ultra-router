@@ -51,8 +51,8 @@ function escapeRx(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-function warnOn(truthy, msg) {
-  return truthy && console.error(msg)
+function warnOn(warnCheck, msg) {
+  return (isFn(warnCheck) ? /*@__PURE__*/ warnCheck() : warnCheck) && console.error(msg)
 }
 let $devWarnOn = function() {}
 if (process.env.NODE_ENV !== 'production') {
