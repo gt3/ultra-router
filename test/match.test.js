@@ -35,14 +35,26 @@ describe('match: toggle', function() {
     let match = { match: mock(true), resolve: mock(), reject: mock() }
     testToggle(undefined, match).off(toggle(match))
   })
+  it('toggle new value', function() {
+    let matchx = { match: mock(true), resolve: mock(), reject: mock() }
+    let matchy = { match: mock(true), resolve: mock(), reject: mock() }
+    let t = toggle(matchx, 'x')
+    testToggle('x', matchx).off(t)
+    t = toggle(t, 'y', matchy)
+    testToggle('y', matchy).on(t)
+  })
   it('toggleSelected', function() {
-    let m1 = { key: '', match: mock(true), resolve: mock(), reject: mock() }
-    let m2 = { key: 'y', match: mock(true), resolve: mock(), reject: mock() }
-    let m3 = { key: 'x', match: mock(true), resolve: mock(), reject: mock() }
-    let matchers = toggleSelected([m1, m2, m3], 'x')
+    let m1 = { key: 'y', match: mock(true), resolve: mock(), reject: mock() }
+    let m2 = { key: 'x', match: mock(true), resolve: mock(), reject: mock() }
+    let matchers = toggleSelected([m1, m2], 'x')
     eq(matchers[0], m1)
-    eq(matchers[1], m2)
-    testToggle('x', m3).off(matchers[2])
+    testToggle('x', m2).off(matchers[1])
+    let newm2 = { key: 'x', match: mock(true), resolve: mock(), reject: mock() }
+    matchers = toggleSelected(matchers, 'x', newm2)
+    eq(matchers[0], m1)
+    testToggle('x', newm2).on(matchers[1])
+    let untouched = toggleSelected(matchers, 'zzz')
+    eq(untouched, matchers)
   })
 })
 
