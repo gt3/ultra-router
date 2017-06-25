@@ -10,7 +10,8 @@ export function toggle(match, newKey, newMatch) {
   let on = off ? newMatch || off : turnOff({ off: newMatch || match })
   on.key = newKey || key
   let has = Object.prototype.hasOwnProperty.bind(on)
-  $devWarnOn(!has('match') || !has('resolve') || !has('reject'), `Match not well formed: ${on}`)
+  let hasAll = (...props) => props.every(Object.prototype.hasOwnProperty.bind(on))
+  $devWarnOn(!hasAll('match', 'resolve', 'reject'), `Match not well formed: ${on.key}`)
   return on
 }
 

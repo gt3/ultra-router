@@ -8,14 +8,12 @@ import { toggle, toggleSelected, match, prefixMatch } from '../src/router/match'
 function testToggle(id, match) {
   let testOn = t => {
     assert(t.match())
-    assert(t.resolve())
     eq(t, match)
     eq(t.key, id)
   }
 
   let testOff = t => {
     assert(!t.match())
-    assert(!t.resolve())
     eq(t.off, match)
     eq(t.key, id)
   }
@@ -24,7 +22,7 @@ function testToggle(id, match) {
 
 describe('match: toggle', function() {
   it('toggle', function() {
-    let match = { match: mock(true), resolve: mock(true) }
+    let match = { match: mock(true), resolve: mock(), reject: mock() }
     let test = testToggle('x', match)
     let t = toggle(match, 'x')
     test.off(t)
@@ -34,13 +32,13 @@ describe('match: toggle', function() {
     test.off(t)
   })
   it('toggle absent key', function() {
-    let match = { match: mock(true), resolve: mock(true) }
+    let match = { match: mock(true), resolve: mock(), reject: mock() }
     testToggle(undefined, match).off(toggle(match))
   })
   it('toggleSelected', function() {
-    let m1 = { key: '', match: mock(true), resolve: mock() }
-    let m2 = { key: 'y', match: mock(true), resolve: mock() }
-    let m3 = { key: 'x', match: mock(true), resolve: mock() }
+    let m1 = { key: '', match: mock(true), resolve: mock(), reject: mock() }
+    let m2 = { key: 'y', match: mock(true), resolve: mock(), reject: mock() }
+    let m3 = { key: 'x', match: mock(true), resolve: mock(), reject: mock() }
     let matchers = toggleSelected([m1, m2, m3], 'x')
     eq(matchers[0], m1)
     eq(matchers[1], m2)
