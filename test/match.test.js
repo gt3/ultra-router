@@ -53,8 +53,8 @@ describe('match: toggle', function() {
     matchers = toggleSelected(matchers, 'x', newm2)
     eq(matchers[0], m1)
     testToggle('x', newm2).on(matchers[1])
-    //let untouched = toggleSelected(matchers, 'zzz')
-    //eq(untouched, matchers)
+    let untouched = toggleSelected(matchers)
+    eq(untouched, matchers)
   })
 })
 
