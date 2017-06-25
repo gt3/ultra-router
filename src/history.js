@@ -23,7 +23,7 @@ let push = (success, msg) => {
     )
     env.history.pushState(state, docTitle, href)
     if (success) return success(msg)
-  } else $devWarnOn(true, `Attempt to push location identical to current one: ${href}`)
+  } else $devWarnOn(() => true, `Attempt to push location identical to current one: ${href}`)
 }
 
 let replace = (success, msg) => {
@@ -35,7 +35,7 @@ let replace = (success, msg) => {
     )
     env.history.replaceState(state, docTitle, href)
     if (success) return success(msg)
-  } else $devWarnOn(true, `Attempt to replace current location with the same one: ${href}`)
+  } else $devWarnOn(() => true, `Attempt to replace current location with the same one: ${href}`)
 }
 
 let go = val => val && env.history.go(val)

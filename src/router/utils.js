@@ -34,10 +34,6 @@ function exclude(t, ...keys) {
   return flattenToObj(Object.keys(t).filter(k => keys.indexOf(k) === -1).map(k => ({ [k]: t[k] })))
 }
 
-function replaceAt(arr, i, val) {
-  return [...arr.slice(0, i < 0 ? 0 : i), val, ...arr.slice(-(arr.length - i - 1) || arr.length)]
-}
-
 function substitute(literals, values, removeEmpty) {
   let vals = Array.from(values, v => v || '')
   let lits = Array.from(literals, v => v || '')
@@ -52,14 +48,14 @@ function escapeRx(string) {
 }
 
 function warnOn(warnCheck, msg) {
-  return (isFn(warnCheck) ? /*@__PURE__*/ warnCheck() : warnCheck) && console.error(msg)
+  return /*@__PURE__*/warnCheck() && console.error(msg)
 }
 let $devWarnOn = function() {}
 if (process.env.NODE_ENV !== 'production') {
   $devWarnOn = warnOn
 }
 
-export { makeArray, pipe, flattenToObj, exclude, replaceAt, substitute, escapeRx, $devWarnOn }
+export { makeArray, pipe, flattenToObj, exclude, substitute, escapeRx, $devWarnOn }
 
 class Timer {
   constructor(cb, wait, ms = 0) {

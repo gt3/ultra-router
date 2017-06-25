@@ -112,7 +112,7 @@ export { parseHref, parseQS, prependPath, appendPath }
 
 let env = {
   get window() {
-    $devWarnOn(typeof window === 'undefined', 'missing window object in environment')
+    $devWarnOn(() => typeof window === 'undefined', 'missing window object in environment')
     return window
   },
   get location() {

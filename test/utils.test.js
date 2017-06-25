@@ -60,14 +60,6 @@ describe('utils', function() {
     oeq(u.exclude(o, ''), o)
     neq(u.exclude(o, ''), o)
   })
-  it('replaceAt', function() {
-    let r = u.replaceAt
-    oeq(r([42,43,44,45,46],2,99), [42,43,99,45,46])
-    oeq(r([42,43,44,45,46],0,99), [99,43,44,45,46])
-    oeq(r([42,43,44,45,46],4,99), [42,43,44,45,99])
-    oeq(r([],0,99), [99])
-    oeq(r([1,2],-1,99), [99,1,2])
-  })
   it('substitute', function() {
     eq(u.substitute([42, 42], [42]), '424242')
     eq(u.substitute([42], [42]), '42')

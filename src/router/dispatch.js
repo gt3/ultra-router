@@ -2,7 +2,7 @@ import { pipe, isTimer, $devWarnOn } from './utils'
 
 function dispatch(actions, msg) {
   let result, resolved = actions.some(fn => !!(result = fn(msg)))
-  $devWarnOn(!resolved, `Could not resolve location: ${msg.href}`)
+  $devWarnOn(() => !resolved, `Could not resolve location: ${msg.href}`)
   return result
 }
 

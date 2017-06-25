@@ -96,7 +96,7 @@ class PathSpec {
     return result && Object.keys(result).some(k => result[k].exact)
   }
   resolve(result, success = this.success(result)) {
-    $devWarnOn(!success, `Resolve location with a partial match: ${result && result.href}`)
+    $devWarnOn(() => !success, `Resolve location with a partial match: ${result && result.href}`)
     return !this.err || success ? this.next(result) : this.err(result)
   }
   reject(result) {
