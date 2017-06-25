@@ -7,8 +7,6 @@ const babelPlugin = babel({exclude: 'node_modules/**', plugins: ["external-helpe
 
 const lib = {
   entry: './src/index.js',
-  external: [ 'warning' ],
-  globals: { warning: 'warning' },
   plugins: [
     babelPlugin,
     replace({
