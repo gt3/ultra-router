@@ -1,4 +1,4 @@
-import { pipe, isTimer } from './utils'
+import { pipe, isTimer, $devWarnOn } from './utils'
 import { normalizePath } from './utils-path'
 import { prefixSpec } from './spec'
 
@@ -7,13 +7,15 @@ const turnOff = o => Object.assign(o, { match: off, resolve: off, reject: off })
 
 export function toggle(match, newKey, newMatch) {
   let { off, key } = match
-  let on = off ? (newMatch || off) : turnOff({ off: (newMatch || match) })
+  let on = off ? newMatch || off : turnOff({ off: newMatch || match })
   on.key = newKey || key
+  let has = Object.prototype.hasOwnProperty.bind(on)
+  $devWarnOn(!has('match') || !has('resolve') || !has('reject'), `Match not well formed: ${on}`)
   return on
 }
 
 export function toggleSelected(matchers, key, replaceWith) {
-  return matchers.map(m => key !== undefined && m.key === key ? toggle(m, key, replaceWith) : m)
+  return matchers.map(m => (key !== undefined && m.key === key ? toggle(m, key, replaceWith) : m))
 }
 
 function matcher(specs, checks, msg) {
@@ -64,11 +66,4 @@ export function prefixMatch(prefixKey, matcher, prematchCheck) {
     prefixed.match = pipe(prematch.bind(null, prematchCheck), match)
   }
   return prefixed
-}
-
-export function futureMatch(key, promise) {
-  let _match = toggle(key, {})
-  return promise.then((match, matchers) => {
-    return matchers ? toggleSelected(matchers, key, match) : toggle(_match, key, match)
-  })
 }
