@@ -10,6 +10,7 @@ import { mockPushState, makeRandomPath } from './helpers-jsdom'
 import VisitRewired from '../src/visit'
 
 const guardDispatch = ContainerRewired.__GetDependency__('guardDispatch')
+const recordVisit = ContainerRewired.__GetDependency__('recordVisit')
 const makeId = VisitRewired.__GetDependency__('makeId')
 
 let len = () => u.env.history.length
@@ -83,5 +84,39 @@ describe('container #guardDispatch', function() {
     guardDispatch(ultra, dispatch, { href: ultra.pauseRecord[1] })
     eq(dispatch.mock.calls.length, 0)
     eq(confirm.mock.calls.length, 0)
+  })
+})
+
+describe('container #recordVisit', function() {
+  let dispatch = mock(), restorePushState, replaceState
+  beforeAll(function() {
+    restorePushState = mockPushState(u.env)
+    replaceState = u.env.history.replaceState
+  })
+  afterAll(function() {
+    restorePushState()
+  })
+  beforeEach(function() {
+    dispatch = mock()
+    replaceState.mockClear()
+  })
+  it('should record visit and invoke replace with computed state', function() {
+    let ultra = {}, state, msg = { ultra, state, href: u.env.href, path: u.env.path }
+    recordVisit(dispatch, msg)
+    assert(dispatch.mock.calls.length, 1)
+    assert(ultra.visited)
+    assert(replaceState.mock.calls.length, 1)
+    let [newState, , href] = replaceState.mock.calls[0]
+    eq(newState.$id, ...ultra.visited.slice(-1))
+    eq(href, msg.href)
+  })
+  it('should not record visit if state is already updated', function() {
+    let visited = [len(), makeId(len(), 0)]
+    let ultra = { visited }, state = { $id: makeId(len(), 0) }
+    let msg = { ultra, state, href: u.env.href, path: u.env.path }
+    recordVisit(dispatch, msg)
+    eq(ultra.visited, visited)
+    eq(replaceState.mock.calls.length, 0)
+    eq(dispatch.mock.calls.length, 1)
   })
 })
