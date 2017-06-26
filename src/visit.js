@@ -2,7 +2,7 @@ import { env } from './router/utils-path'
 const idk = '$id'
 
 function place(n) {
-  return [10, 100].find(x => n % x === n)
+  return [10, 100].find(x => n % x === n) || 100
 }
 
 function makeId(m, n = 0) {
