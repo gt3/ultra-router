@@ -4,7 +4,7 @@ import { dispatcher } from './router/dispatch'
 import { createPopstate, push, replace, go } from './history'
 import { makeVisit, recalibrate } from './visit'
 
-export function recordVisit(dispatch, msg) {
+function recordVisit(dispatch, msg) {
   let { ultra, state } = msg
   let { visited, newState } = makeVisit(ultra, state)
   ultra.visited = visited
