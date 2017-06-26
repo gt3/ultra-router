@@ -15,9 +15,12 @@ export function toggle(match, newKey, newMatch) {
 }
 
 export function toggleSelected(matchers, key, replaceWith) {
-  if(key === undefined) return matchers
-  $devWarnOn(() => matchers.filter(m => m.key === key).length !== 1, `0 or >1 match for toggle key: ${key}`)
-  return matchers.map(m => m.key === key ? toggle(m, key, replaceWith) : m)
+  if (key === undefined) return matchers
+  $devWarnOn(
+    () => matchers.filter(m => m.key === key).length !== 1,
+    `0 or >1 match for toggle key: ${key}`
+  )
+  return matchers.map(m => (m.key === key ? toggle(m, key, replaceWith) : m))
 }
 
 function matcher(specs, checks, msg) {

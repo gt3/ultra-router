@@ -48,7 +48,7 @@ function escapeRx(string) {
 }
 
 function warnOn(warnCheck, msg) {
-  return /*@__PURE__*/warnCheck() && console.error(msg)
+  return /*@__PURE__*/ warnCheck() && console.error(msg)
 }
 let $devWarnOn = function() {}
 if (process.env.NODE_ENV !== 'production') {
