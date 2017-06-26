@@ -5,9 +5,11 @@ import assert from 'assert'
 import { eq, neq, oeq, oneq, mock } from './helpers'
 import * as u from '../src/router/utils-path'
 import ContainerRewired from '../src/container'
+import VisitRewired from '../src/visit'
 import { container } from '../src/container'
 import { mockPushState, makeRandomPath } from './helpers-jsdom'
-import VisitRewired from '../src/visit'
+import { prefixSpec, spec, check, assignValues } from '../src/router/spec'
+import { toggle, toggleSelected, match, prefixMatch } from '../src/router/match'
 
 const guardDispatch = ContainerRewired.__GetDependency__('guardDispatch')
 const recordVisit = ContainerRewired.__GetDependency__('recordVisit')
@@ -88,7 +90,7 @@ describe('container #guardDispatch', function() {
 })
 
 describe('container #recordVisit', function() {
-  let dispatch = mock(), restorePushState, replaceState
+  let dispatch, restorePushState, replaceState
   beforeAll(function() {
     restorePushState = mockPushState(u.env)
     replaceState = u.env.history.replaceState
@@ -118,5 +120,75 @@ describe('container #recordVisit', function() {
     eq(ultra.visited, visited)
     eq(replaceState.mock.calls.length, 0)
     eq(dispatch.mock.calls.length, 1)
+  })
+})
+
+describe('container', function() {
+  let next, restorePS, replaceState, path
+  let mockPS = () => {
+    restorePS = mockPushState(u.env);
+    ({replaceState} = u.env.history)
+  }
+  beforeAll(function() {
+    next = mock()
+    mockPS()
+  })
+  afterAll(function() {
+    restorePS()
+  })
+  beforeEach(function() {
+    next.mockClear()
+    replaceState.mockClear()
+    path = makeRandomPath()
+  })
+  it('should dispatch current loc on instatiation', function() {
+    restorePS()
+    let prev = len()
+    window.history.pushState(null, null, path)
+    eq(len(), prev+1)
+    mockPS()
+    let ultra = container(match(spec(path)(next)))
+    assert(ultra.visited)
+    assert(next.mock.calls.length, 1)
+  })
+  it('should not dispatch current loc if runDispatch is false', function() {
+    let ultra = container(match(spec(path)(next)), null, null, false)
+    assert(!ultra.visited)
+  })
+  it('should not dispatch current loc when cloning a container that has dispatched', function() {
+    restorePS()
+    let prev = len()
+    window.history.pushState(null, null, path)
+    eq(len(), prev+1)
+    mockPS()
+    let ultra = container(match(spec(path)(next)))
+    assert(ultra.visited)
+    assert(next.mock.calls.length, 1)
+    let visited = ultra.visited
+
+    restorePS()
+    prev = len()
+    window.history.pushState(null, null, '/a')
+    eq(len(), prev+1)
+    mockPS()
+
+    ultra = container([...ultra.matchers, match(spec('/a')(next))], null, ultra)
+    eq(ultra.visited, visited)
+    eq(next.mock.calls.length, 1)
+  })
+  it('should dispatch current loc when cloning a container that has not dispatched', function() {
+    restorePS()
+    let prev = len()
+    window.history.pushState(null, null, path)
+    eq(len(), prev+1)
+    mockPS()
+
+    let ultra = container(match(spec(path)(next)), null, null, false)
+    assert(!ultra.visited)
+    eq(next.mock.calls.length, 0)
+
+    ultra = container([...ultra.matchers], null, ultra)
+    assert(ultra.visited)
+    eq(next.mock.calls.length, 1)
   })
 })
