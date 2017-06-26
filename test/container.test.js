@@ -71,12 +71,17 @@ describe('container #guardDispatch', function() {
     guardDispatch({ pauseRecord: [], resume }, dispatch, loc)
     eq(dispatch.mock.calls.length, 1)
   })
-  it('should dispatch if pauseRecord set but outdated', function() {
+  it('should dispatch if pauseRecord is stale', function() {
     let prev = len()
     window.history.pushState(null, null, u.env.path + '?test')
     eq(prev + 1, len())
     guardDispatch(ultra, dispatch, loc)
     eq(dispatch.mock.calls.length, 1)
     eq(resume.mock.calls.length, 1)
+  })
+  it('should neither dispatch nor confirm when returning back to the original url', function() {
+    guardDispatch(ultra, dispatch, { href: ultra.pauseRecord[1] })
+    eq(dispatch.mock.calls.length, 0)
+    eq(confirm.mock.calls.length, 0)
   })
 })
