@@ -8,7 +8,7 @@ import ContainerRewired from '../src/container'
 import VisitRewired from '../src/visit'
 import { container } from '../src/container'
 import { mockPushState, makeRandomPath } from './helpers-jsdom'
-import { prefixSpec, spec, check, assignValues } from '../src/router/spec'
+import { prefixSpec, spec, check, assignValues, miss } from '../src/router/spec'
 import { toggle, toggleSelected, match, prefixMatch } from '../src/router/match'
 
 const guardDispatch = ContainerRewired.__GetDependency__('guardDispatch')
@@ -147,9 +147,9 @@ describe('container', function() {
     window.history.pushState(null, null, path)
     eq(len(), prev+1)
     mockPS()
-    let ultra = container(match(spec(path)(next)))
+    let ultra = container(match(spec(path)(next)), miss(next, 'xxx'))
     assert(ultra.visited)
-    assert(next.mock.calls.length, 1)
+    assert(next.mock.calls.length, 2)
   })
   it('should not dispatch current loc if runDispatch is false', function() {
     let ultra = container(match(spec(path)(next)), null, null, false)
@@ -183,12 +183,13 @@ describe('container', function() {
     eq(len(), prev+1)
     mockPS()
 
-    let ultra = container(match(spec(path)(next)), null, null, false)
+    let ultra = container(match(spec(path)(next)), miss(next, 'xxx'), null, false)
     assert(!ultra.visited)
     eq(next.mock.calls.length, 0)
 
-    ultra = container([...ultra.matchers], null, ultra)
+    ultra = container(ultra.matchers, ultra.mismatchers, ultra)
     assert(ultra.visited)
-    eq(next.mock.calls.length, 1)
+    eq(next.mock.calls.length, 2)
   })
+
 })
