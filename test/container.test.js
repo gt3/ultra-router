@@ -18,7 +18,7 @@ const makeId = VisitRewired.__GetDependency__('makeId')
 let len = () => u.env.history.length
 
 describe('container #guardDispatch', function() {
-  let confirm, pauseRecord, resume, dispatch, path
+  let confirm, inhibitRecord, restore, dispatch, path
   let state, visited, ultra, loc
   beforeEach(function() {
     path = makeRandomPath()
@@ -27,11 +27,11 @@ describe('container #guardDispatch', function() {
     loc = { href: path, path, state }
     dispatch = mock()
     confirm = mock()
-    resume = mock()
-    pauseRecord = [len(), u.env.href, confirm]
-    ultra = { pauseRecord, resume, visited }
+    restore = mock()
+    inhibitRecord = [len(), u.env.href, confirm]
+    ultra = { inhibitRecord, restore, visited }
   })
-  it('should confirm and allow resume in paused state', function() {
+  it('should confirm and allow navigation in inhibited state', function() {
     guardDispatch(ultra, dispatch, loc)
     eq(dispatch.mock.calls.length, 0)
     eq(confirm.mock.calls.length, 1)
@@ -41,11 +41,11 @@ describe('container #guardDispatch', function() {
     assert(ok)
     assert(cancel)
     ok()
-    eq(resume.mock.calls.length, 1)
+    eq(restore.mock.calls.length, 1)
     eq(dispatch.mock.calls.length, 1)
     eq(dispatch.mock.calls[0][0], msg)
   })
-  it('should confirm and allow cancel in paused state', function(done) {
+  it('should confirm and forfeit navigation in inhibited state', function(done) {
     guardDispatch(ultra, dispatch, loc)
     eq(dispatch.mock.calls.length, 0)
     eq(confirm.mock.calls.length, 1)
@@ -64,26 +64,26 @@ describe('container #guardDispatch', function() {
       restorePushState()
       done()
     })
-    eq(resume.mock.calls.length, 0)
+    eq(restore.mock.calls.length, 0)
     eq(dispatch.mock.calls.length, 0)
 
     eq(go.mock.calls.length, 1)
     eq(go.mock.calls[0][0], -1)
   })
-  it('should dispatch if pauseRecord is not set', function() {
-    guardDispatch({ pauseRecord: [], resume }, dispatch, loc)
+  it('should dispatch if inhibitRecord is not set', function() {
+    guardDispatch({ inhibitRecord: [], restore }, dispatch, loc)
     eq(dispatch.mock.calls.length, 1)
   })
-  it('should dispatch if pauseRecord is stale', function() {
+  it('should dispatch if inhibitRecord is stale', function() {
     let prev = len()
     window.history.pushState(null, null, u.env.path + '?test')
     eq(prev + 1, len())
     guardDispatch(ultra, dispatch, loc)
     eq(dispatch.mock.calls.length, 1)
-    eq(resume.mock.calls.length, 1)
+    eq(restore.mock.calls.length, 1)
   })
   it('should neither dispatch nor confirm when returning back to the original url', function() {
-    guardDispatch(ultra, dispatch, { href: ultra.pauseRecord[1] })
+    guardDispatch(ultra, dispatch, { href: ultra.inhibitRecord[1] })
     eq(dispatch.mock.calls.length, 0)
     eq(confirm.mock.calls.length, 0)
   })
@@ -124,21 +124,22 @@ describe('container #recordVisit', function() {
 })
 
 describe('container', function() {
-  let next, restorePS, replaceState, path
+  let next, restorePS, pushState, pMock, rMock, path
   let mockPS = () => {
     restorePS = mockPushState(u.env);
-    ({replaceState} = u.env.history)
+    ({pushState: pMock, replaceState: rMock} = u.env.history)
   }
   beforeAll(function() {
     next = mock()
     mockPS()
   })
   afterAll(function() {
-    restorePS()
+    restorePS && restorePS()
   })
   beforeEach(function() {
     next.mockClear()
-    replaceState.mockClear()
+    pMock.mockClear()
+    rMock.mockClear()
     path = makeRandomPath()
   })
   it('should dispatch current loc on instatiation', function() {
@@ -191,5 +192,25 @@ describe('container', function() {
     assert(ultra.visited)
     eq(next.mock.calls.length, 2)
   })
+  it('should allow inhibit/restore control on navigation', function() {
+    let confirm = mock()
+    let ultra = container(match(spec(path)(next)), null, null, false)
+    assert(!ultra.visited)
+    eq(next.mock.calls.length, 0)
+    ultra.inhibit(confirm)
+    ultra.push({ href: path, path })
+    eq(confirm.mock.calls.length, 1)
+    eq(next.mock.calls.length, 0)
+    assert(!ultra.visited)
+    ultra.restore()
+    ultra.push({ href: path + '?test', path })
+    eq(next.mock.calls.length, 1)
+    assert(ultra.visited)
+  })
+  it('push', function() {
 
+  })
+  it('replace', function() {
+
+  })
 })
