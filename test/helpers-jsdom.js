@@ -44,4 +44,11 @@ function makeRandomPath() {
   return path
 }
 
-export { setOrigin, setLocation, mockPushState, makeRandomPath }
+function firePopstate(state) {
+  let { window } = u.env
+  let event = Object.assign(new window.Event('popstate'), { state })
+  window.dispatchEvent(event)
+  return event
+}
+
+export { setOrigin, setLocation, mockPushState, makeRandomPath, firePopstate }

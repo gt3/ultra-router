@@ -4,7 +4,7 @@
 import assert from 'assert'
 import { eq, neq, oeq, oneq, mock } from './helpers'
 import { push, replace, go, createPopstate } from '../src/history'
-import { mockPushState, makeRandomPath } from './helpers-jsdom'
+import { mockPushState, makeRandomPath, firePopstate } from './helpers-jsdom'
 import * as u from '../src/router/utils-path'
 
 describe('history pushstate simulated', function() {
@@ -83,13 +83,6 @@ describe('history pushstate mocked', function() {
     eq(gomock.mock.calls.length, 1)
   })
 })
-
-function firePopstate(state) {
-  let { window } = u.env
-  let event = Object.assign(new window.Event('popstate'), { state })
-  window.dispatchEvent(event)
-  return event
-}
 
 let testLoc = loc => {
   let { href, path, qs = '', hash = '' } = u.env

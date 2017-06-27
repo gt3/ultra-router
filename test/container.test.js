@@ -7,7 +7,7 @@ import * as u from '../src/router/utils-path'
 import ContainerRewired from '../src/container'
 import VisitRewired from '../src/visit'
 import { container } from '../src/container'
-import { mockPushState, makeRandomPath } from './helpers-jsdom'
+import { mockPushState, makeRandomPath, firePopstate } from './helpers-jsdom'
 import { prefixSpec, spec, check, assignValues, miss } from '../src/router/spec'
 import { toggle, toggleSelected, match, prefixMatch } from '../src/router/match'
 
@@ -207,10 +207,29 @@ describe('container', function() {
     eq(next.mock.calls.length, 1)
     assert(ultra.visited)
   })
-  it('push', function() {
-
+  it('push/replace', function() {
+    let ultra = container(match(spec(path)(next)), null, null, false)
+    eq(next.mock.calls.length, 0)
+    ultra.push({ href: path, path })
+    eq(pMock.mock.calls.length, 1)
+    eq(rMock.mock.calls.length, 1)
+    eq(next.mock.calls.length, 1)
+    ultra.replace({ href: path + '?test', path })
+    eq(rMock.mock.calls.length, 3)
+    eq(next.mock.calls.length, 2)
   })
-  it('replace', function() {
-
+  it('stop popstate listener', function() {
+    let state = { x: 42 }
+    let ultra = container(match(spec(path)(next)), null, null, false)
+    restorePS()
+    let prev = len()
+    window.history.pushState(null, null, path)
+    eq(len(), prev+1)
+    firePopstate(state)
+    eq(next.mock.calls.length, 1)
+    ultra.stop()
+    firePopstate(state)
+    eq(next.mock.calls.length, 1)
   })
 })
+
