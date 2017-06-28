@@ -14,6 +14,8 @@ import { toggle, toggleSelected, match, prefixMatch } from '../src/router/match'
 
 const retainQSHash = AnchorRewired.__GetDependency__('retainQSHash')
 const getNavAction = AnchorRewired.__GetDependency__('getNavAction')
+const originx = AnchorRewired.__GetDependency__('originx')
+const verifyClick = AnchorRewired.__GetDependency__('verifyClick')
 let len = () => u.env.history.length
 
 describe('retain', function() {
@@ -102,18 +104,35 @@ describe('Anchor', function() {
     onClick(clickEvent)
     eq(preventDefault.mock.calls.length, 0)
   })
-  it('should check if preventDefault was already issued on event', function(done) {
+  it('should check if preventDefault was already issued on event', function() {
     let event = Object.assign(new Event('click', { bubbles: true, cancelable: true }), {button: 0})
-    window.addEventListener('click', e => e.preventDefault() )
-    document.dispatchEvent(event)
-    setTimeout(() => {
-      assert(event.defaultPrevented)
-      event.preventDefault = preventDefault
-      Anchor({ createElement, href: path })
-      let { onClick } = createElement.mock.calls[0][1]
-      onClick(event)
-      eq(preventDefault.mock.calls.length, 0)
-      done()
-    })
+    event.preventDefault()
+    assert(event.defaultPrevented)
+    event.preventDefault = preventDefault
+    Anchor({ createElement, href: path })
+    let { onClick } = createElement.mock.calls[0][1]
+    onClick(event)
+    eq(preventDefault.mock.calls.length, 0)
+  })
+})
+
+it('originx', function() {
+  assert(originx.test('/abc'))
+  assert(originx.test('http://localhost:8080/abc'))
+  assert(!originx.test('https://localhost:8080/abc'))
+  assert(!originx.test('http://localhost:8081/abc'))
+  assert(!originx.test('http://xyz:8080/abc'))
+  assert(originx.test('https/xyz'))
+})
+
+it('verifyClick', function() {
+  let createClick = o => Object.assign(new Event('click', { bubbles: true, cancelable: true }, o))
+  let event = createClick({button: 0})
+  event.preventDefault()
+  assert(event.defaultPrevented)
+  assert(!verifyClick(event));
+  [{},{metaKey: true},{altKey: true},{ctrlKey: true},{shiftKey: true}].forEach(o => {
+    event = createClick(o)
+    assert(!verifyClick(event))
   })
 })

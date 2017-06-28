@@ -1,5 +1,7 @@
 import { parseHref, env } from './router/utils-path'
-import { exclude, substitute } from './router/utils'
+import { escapeRx, exclude, substitute } from './router/utils'
+
+const originx = new RegExp(`^${escapeRx(env.origin)}|^(?!https?:\/\/)`)
 
 function retainQS(retain, currQS) {
   let qs = retain && /\bqs\b/.test(retain) ? env.qs : ''
@@ -17,10 +19,6 @@ function retainQSHash(retain, loc) {
   return { href, qs, hash }
 }
 
-function verifyOrigin(href) {
-  return href.indexOf(env.location.protocol) !== 0 || href.indexOf(env.origin) === 0
-}
-
 function verifyClick(e) {
   return !(e.defaultPrevented || e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
 }
@@ -28,7 +26,7 @@ function verifyClick(e) {
 export function makeClickHandler({ href, state, docTitle, retain }, action) {
   const loc = Object.assign(parseHref(href), { state, docTitle })
   let clickHandler = e => {
-    if (verifyClick(e) && verifyOrigin(href)) {
+    if (verifyClick(e) && originx.test(href)) {
       e.preventDefault()
       action(retain ? Object.assign({}, loc, retainQSHash(retain, loc)) : loc)
     }
