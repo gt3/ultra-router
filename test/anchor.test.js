@@ -6,7 +6,7 @@ import { eq, neq, oeq, oneq, mock } from './helpers'
 import * as u from '../src/router/utils-path'
 import { setOrigin, setLocation } from './helpers-jsdom'
 import AnchorRewired from '../src/anchor'
-import { Anchor } from '../src/anchor'
+import { Anchor, defaultStyle } from '../src/anchor'
 import { container } from '../src/container'
 import { mockPushState, makeRandomPath, firePopstate } from './helpers-jsdom'
 import { prefixSpec, spec, check, assignValues, miss } from '../src/router/spec'
@@ -54,21 +54,51 @@ describe('retain', function() {
 })
 
 describe.only('Anchor', function() {
-  let createElement, next, path
+  let createElement, next, path, clickEvent, preventDefault
   beforeAll(function() {
+    preventDefault = mock()
+    clickEvent = Object.assign(new window.Event('click'),{button: 0, preventDefault})
     createElement = mock()
     next = mock()
   })
   beforeEach(function () {
+    next.mockClear()
+    createElement.mockClear()
+    preventDefault.mockClear()
     path = makeRandomPath()
     setLocation('/xyz?q=42#skipto')
   })
-  it('should call createElement with clickHandler', function() {
-    let ultra = container(match(spec(path)(next)))
+  it('end-to-end with retain hash', function() {
+    let ultra = container(match(spec(path)(next)), null, null, false)
     let getUltra = () => ultra, retain = 'hash'
     Anchor({ createElement, getUltra, retain, href: path })
     eq(createElement.mock.calls.length, 1)
     eq(createElement.mock.calls[0][0], 'a')
     assert(createElement.mock.calls[0][1])
+    let { onClick } = createElement.mock.calls[0][1]
+    onClick(clickEvent)
+    eq(preventDefault.mock.calls.length, 1)
+    eq(next.mock.calls.length, 1)
+    let { href } = next.mock.calls[0][0]
+    eq(href, path + '#' + u.env.hash)
+  })
+  it('apply default style', function() {
+    Anchor({ createElement, href: path })
+    eq(createElement.mock.calls.length, 1)
+    let { style } = createElement.mock.calls[0][1]
+    oeq(style, defaultStyle)
+  })
+  it('override default style', function() {
+    let override = { touchAction: 'something', msTouchAction: 'something', color: 'green' }
+    Anchor({ createElement, href: path, style: override })
+    eq(createElement.mock.calls.length, 1)
+    let { style } = createElement.mock.calls[0][1]
+    oeq(style, override)
+  })
+  it('should enfore same origin', function() {
+    
+  })
+  it('should enfore same origin', function() {
+    
   })
 })

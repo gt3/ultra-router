@@ -28,7 +28,7 @@ function verifyClick(e) {
 export function makeClickHandler({ href, state, docTitle, retain }, action) {
   let loc = Object.assign(parseHref(href), { state, docTitle })
   let clickHandler = e => {
-    if (verifyClick(e) && verifyOrigin(href)) {
+    if (verifyClick(e) && verifyOrigin(loc.href)) {
       e.preventDefault()
       action(retain ? Object.assign({}, loc, retainQSHash(retain, loc)) : loc)
     }
@@ -40,7 +40,7 @@ function getNavAction(retain) {
   return retain && /\bhistory\b/.test(retain) ? 'replace' : 'push'
 }
 
-const defaultStyle = { touchAction: 'manipulation', msTouchAction: 'manipulation' }
+export const defaultStyle = { touchAction: 'manipulation', msTouchAction: 'manipulation' }
 const ownKeys = ['createElement', 'getUltra', 'style', 'state', 'docTitle', 'retain', 'onClick']
 
 export function Anchor(props) {
