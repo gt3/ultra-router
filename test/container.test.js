@@ -130,8 +130,11 @@ describe('container', function() {
     ;({ pushState: pMock, replaceState: rMock } = u.env.history)
   }
   afterEach(function() {
-    if(restorePS) { restorePS(); restorePS = null }
-    if(ultra) ultra.stop()
+    if (restorePS) {
+      restorePS()
+      restorePS = null
+    }
+    if (ultra) ultra.stop()
   })
   beforeEach(function() {
     next = mock()
