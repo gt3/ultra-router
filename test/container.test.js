@@ -124,45 +124,38 @@ describe('container #recordVisit', function() {
 })
 
 describe('container', function() {
-  let next, restorePS, pushState, pMock, rMock, path
+  let next, restorePS, pushState, pMock, rMock, path, ultra
   let mockPS = () => {
     restorePS = mockPushState(u.env)
     ;({ pushState: pMock, replaceState: rMock } = u.env.history)
   }
-  beforeAll(function() {
-    next = mock()
-    mockPS()
-  })
-  afterAll(function() {
-    restorePS && restorePS()
+  afterEach(function() {
+    if(restorePS) { restorePS(); restorePS = null }
+    if(ultra) ultra.stop()
   })
   beforeEach(function() {
-    next.mockClear()
-    pMock.mockClear()
-    rMock.mockClear()
+    next = mock()
     path = makeRandomPath()
   })
   it('should dispatch current loc on instatiation', function() {
-    restorePS()
     let prev = len()
     window.history.pushState(null, null, path)
     eq(len(), prev + 1)
     mockPS()
-    let ultra = container(match(spec(path)(next)), miss(next, 'xxx'))
+    ultra = container(match(spec(path)(next)), miss(next, 'xxx'))
     assert(ultra.visited)
     assert(next.mock.calls.length, 2)
   })
   it('should not dispatch current loc if runDispatch is false', function() {
-    let ultra = container(match(spec(path)(next)), null, null, false)
+    ultra = container(match(spec(path)(next)), null, null, false)
     assert(!ultra.visited)
   })
   it('should not dispatch current loc when cloning a container that has dispatched', function() {
-    restorePS()
     let prev = len()
     window.history.pushState(null, null, path)
     eq(len(), prev + 1)
     mockPS()
-    let ultra = container(match(spec(path)(next)))
+    ultra = container(match(spec(path)(next)))
     assert(ultra.visited)
     assert(next.mock.calls.length, 1)
     let visited = ultra.visited
@@ -178,13 +171,12 @@ describe('container', function() {
     eq(next.mock.calls.length, 1)
   })
   it('should dispatch current loc when cloning a container that has not dispatched', function() {
-    restorePS()
     let prev = len()
     window.history.pushState(null, null, path)
     eq(len(), prev + 1)
     mockPS()
 
-    let ultra = container(match(spec(path)(next)), miss(next, 'xxx'), null, false)
+    ultra = container(match(spec(path)(next)), miss(next, 'xxx'), null, false)
     assert(!ultra.visited)
     eq(next.mock.calls.length, 0)
 
@@ -194,7 +186,7 @@ describe('container', function() {
   })
   it('should allow inhibit/restore control on navigation', function() {
     let confirm = mock()
-    let ultra = container(match(spec(path)(next)), null, null, false)
+    ultra = container(match(spec(path)(next)), null, null, false)
     assert(!ultra.visited)
     eq(next.mock.calls.length, 0)
     ultra.inhibit(confirm)
@@ -208,7 +200,8 @@ describe('container', function() {
     assert(ultra.visited)
   })
   it('push/replace', function() {
-    let ultra = container(match(spec(path)(next)), null, null, false)
+    mockPS()
+    ultra = container(match(spec(path)(next)), null, null, false)
     eq(next.mock.calls.length, 0)
     ultra.push({ href: path, path })
     eq(pMock.mock.calls.length, 1)
@@ -217,11 +210,11 @@ describe('container', function() {
     ultra.replace({ href: path + '?test', path })
     eq(rMock.mock.calls.length, 3)
     eq(next.mock.calls.length, 2)
+    ultra.stop()
   })
   it('stop popstate listener', function() {
     let state = { x: 42 }
-    let ultra = container(match(spec(path)(next)), null, null, false)
-    restorePS()
+    ultra = container(match(spec(path)(next)), null, null, false)
     let prev = len()
     window.history.pushState(null, null, path)
     eq(len(), prev + 1)
