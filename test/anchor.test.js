@@ -6,6 +6,11 @@ import { eq, neq, oeq, oneq, mock } from './helpers'
 import * as u from '../src/router/utils-path'
 import { setOrigin, setLocation } from './helpers-jsdom'
 import AnchorRewired from '../src/anchor'
+import { Anchor } from '../src/anchor'
+import { container } from '../src/container'
+import { mockPushState, makeRandomPath, firePopstate } from './helpers-jsdom'
+import { prefixSpec, spec, check, assignValues, miss } from '../src/router/spec'
+import { toggle, toggleSelected, match, prefixMatch } from '../src/router/match'
 
 const retainQSHash = AnchorRewired.__GetDependency__('retainQSHash')
 const getNavAction = AnchorRewired.__GetDependency__('getNavAction')
@@ -48,3 +53,22 @@ describe('retain', function() {
   })
 })
 
+describe.only('Anchor', function() {
+  let createElement, next, path
+  beforeAll(function() {
+    createElement = mock()
+    next = mock()
+  })
+  beforeEach(function () {
+    path = makeRandomPath()
+    setLocation('/xyz?q=42#skipto')
+  })
+  it('should call createElement with clickHandler', function() {
+    let ultra = container(match(spec(path)(next)))
+    let getUltra = () => ultra, retain = 'hash'
+    Anchor({ createElement, getUltra, retain, href: path })
+    eq(createElement.mock.calls.length, 1)
+    eq(createElement.mock.calls[0][0], 'a')
+    assert(createElement.mock.calls[0][1])
+  })
+})
