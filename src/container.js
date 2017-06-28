@@ -69,6 +69,6 @@ export function container(matchers, mismatchers, instance, runDispatch = true) {
   let ultra = run(makeArray(matchers), makeArray(mismatchers), popstate)
   if (stop) stop.call(instance)
   if (Array.isArray(visited)) ultra.visited = visited
-  else runDispatch && ultra.nav((cb, msg) => cb(msg), env.href)
+  else if (runDispatch) ultra.nav((cb, msg) => cb(msg), env.href)
   return ultra
 }

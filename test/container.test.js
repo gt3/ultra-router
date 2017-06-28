@@ -126,8 +126,8 @@ describe('container #recordVisit', function() {
 describe('container', function() {
   let next, restorePS, pushState, pMock, rMock, path
   let mockPS = () => {
-    restorePS = mockPushState(u.env);
-    ({pushState: pMock, replaceState: rMock} = u.env.history)
+    restorePS = mockPushState(u.env)
+    ;({ pushState: pMock, replaceState: rMock } = u.env.history)
   }
   beforeAll(function() {
     next = mock()
@@ -146,7 +146,7 @@ describe('container', function() {
     restorePS()
     let prev = len()
     window.history.pushState(null, null, path)
-    eq(len(), prev+1)
+    eq(len(), prev + 1)
     mockPS()
     let ultra = container(match(spec(path)(next)), miss(next, 'xxx'))
     assert(ultra.visited)
@@ -160,7 +160,7 @@ describe('container', function() {
     restorePS()
     let prev = len()
     window.history.pushState(null, null, path)
-    eq(len(), prev+1)
+    eq(len(), prev + 1)
     mockPS()
     let ultra = container(match(spec(path)(next)))
     assert(ultra.visited)
@@ -170,7 +170,7 @@ describe('container', function() {
     restorePS()
     prev = len()
     window.history.pushState(null, null, '/a')
-    eq(len(), prev+1)
+    eq(len(), prev + 1)
     mockPS()
 
     ultra = container([...ultra.matchers, match(spec('/a')(next))], null, ultra)
@@ -181,7 +181,7 @@ describe('container', function() {
     restorePS()
     let prev = len()
     window.history.pushState(null, null, path)
-    eq(len(), prev+1)
+    eq(len(), prev + 1)
     mockPS()
 
     let ultra = container(match(spec(path)(next)), miss(next, 'xxx'), null, false)
@@ -224,7 +224,7 @@ describe('container', function() {
     restorePS()
     let prev = len()
     window.history.pushState(null, null, path)
-    eq(len(), prev+1)
+    eq(len(), prev + 1)
     firePopstate(state)
     eq(next.mock.calls.length, 1)
     ultra.stop()
@@ -232,4 +232,3 @@ describe('container', function() {
     eq(next.mock.calls.length, 1)
   })
 })
-
