@@ -53,7 +53,7 @@ describe('retain', function() {
   })
 })
 
-describe.only('Anchor', function() {
+describe('Anchor', function() {
   let createElement, next, path, clickEvent, preventDefault
   beforeAll(function() {
     preventDefault = mock()
@@ -95,10 +95,25 @@ describe.only('Anchor', function() {
     let { style } = createElement.mock.calls[0][1]
     oeq(style, override)
   })
-  it('should enfore same origin', function() {
-    
+  it('should enforce same origin', function() {
+    Anchor({ createElement, href: 'http://foo.com' + path })
+    eq(createElement.mock.calls.length, 1)
+    let { onClick } = createElement.mock.calls[0][1]
+    onClick(clickEvent)
+    eq(preventDefault.mock.calls.length, 0)
   })
-  it('should enfore same origin', function() {
-    
+  it('should check if preventDefault was already issued on event', function(done) {
+    let event = Object.assign(new Event('click', { bubbles: true, cancelable: true }), {button: 0})
+    window.addEventListener('click', e => e.preventDefault() )
+    document.dispatchEvent(event)
+    setTimeout(() => {
+      assert(event.defaultPrevented)
+      event.preventDefault = preventDefault
+      Anchor({ createElement, href: path })
+      let { onClick } = createElement.mock.calls[0][1]
+      onClick(event)
+      eq(preventDefault.mock.calls.length, 0)
+      done()
+    })
   })
 })

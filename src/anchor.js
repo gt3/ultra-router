@@ -26,14 +26,14 @@ function verifyClick(e) {
 }
 
 export function makeClickHandler({ href, state, docTitle, retain }, action) {
-  let loc = Object.assign(parseHref(href), { state, docTitle })
+  const loc = Object.assign(parseHref(href), { state, docTitle })
   let clickHandler = e => {
-    if (verifyClick(e) && verifyOrigin(loc.href)) {
+    if (verifyClick(e) && verifyOrigin(href)) {
       e.preventDefault()
       action(retain ? Object.assign({}, loc, retainQSHash(retain, loc)) : loc)
     }
   }
-  return Object.assign(clickHandler, { loc })
+  return Object.assign(clickHandler, loc)
 }
 
 function getNavAction(retain) {
