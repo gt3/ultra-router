@@ -1,19 +1,23 @@
-# ultra
+# ` npm i --S ultra `
 
-## Setup
 
-```Javascript
-npm install --save ultra
 
-import * as Ultra from 'ultra'
-```
-A minimal routing library that is:
-- Framework independent
-- Built for component-based architectures
-- Favors convention over configuration
+
+
+
+Router for component-based UIs. Pair with React, or `<BYO web framework />`.
+
+
+USP
+- Framework agnostic
+  - Independent of rendering or view layer
+- Compliments component-based architecture
+  - Use convention over configuration
 - Extensible and Compact
+  - Clear seperation between configuration and runtime
+  - Does not render component or fetch data for you (it's a good thing)
+  - For modern browsers with ES6 support
+  - Functional routing API to target different environments
 
-Minimal because it does *not* undertake these responsibilites:
-- Render components
-- Fetch data
+
 
