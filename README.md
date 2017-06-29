@@ -2,7 +2,6 @@
 
 - Setup centralized routing (matching and resolution) for your favorite news website
 ```JavaScript
-
 import { spec, match, prefixMatch, container } from 'ultra'
 
 let matchers = [
@@ -12,25 +11,29 @@ let matchers = [
 ]
 ```
 
-- Integrate with browser's PushState API to enable routing
+- Integrate with browser's PushState API to kickoff routing
 
 ```JavaScript
 let ultra = container(matchers)
+
+//navigation
 ultra.push('/news') //resolve: b.next
 ultra.push('/news/sports') //resolve: b.next
-ultra.push('/news/sports') //resolve: b.err
+ultra.push('/news/foo') //resolve: b.err
 ```
-- Map query string, hash fragments to path
+- Treat query string and hash fragments integral to routing
 
 ```JavaScript
 import { check, parseQS, prependPath } from 'ultra'
 
-let addZip = ({qs, path}) => prependPath(parseQS(qs, ['loc']), path)
+let weatherSpec = spec('/weather/:zip')(next, err)
 let zipCheck = check(':zip')(/^$|^[0-9]$/)
-match(spec('/weather/:zip', zipCheck, addZip)(next)), //a - replace a above
+let addZip = ({qs, path}) => prependPath(parseQS(qs, ['loc']), path)
+match(weatherSpec, zipCheck, addZip)), //a* replace a above 
 
-ultra.push('/weather') //resolve: a.next
-ultra.push('/weather?loc=90210') //resolve: a.next with :zip = 90210
+ultra.push('/weather') //resolve: a*.next
+ultra.push('/weather?loc=90210') //resolve: a*.next with :zip = 90210
+ultra.push('/weather?loc=abc') //resolve: a*.err
 
 ```
 
