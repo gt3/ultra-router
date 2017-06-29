@@ -14,10 +14,8 @@ USP
 - Compliments component-based architecture
   - Use convention over configuration
 - Extensible and Compact
-  - Clear seperation between configuration and runtime
-  - Does not render component or fetch data for you (it's a good thing)
-  - For modern browsers with ES6 support
+  - Clear separation between route configuration and runtime
   - Functional routing API to target different environments
-
-
-
+  - Does not render component or fetch data
+  - For modern browsers with pushstate support
+  
