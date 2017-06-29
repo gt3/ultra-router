@@ -1,3 +1,7 @@
+function id(x) {
+  return x
+}
+
 function isFn(t) {
   return typeof t === 'function' ? t : void 0
 }
@@ -13,11 +17,15 @@ function empty(t) {
 
 export { isFn, isStr, empty }
 
+function makeArray(arr) {
+  return Array.isArray(arr) ? arr : empty(arr) ? [] : [arr]
+}
+
 function pipe(...fns) {
   function invoke(v) {
     return fns.reduce((acc, fn) => (fn ? fn.call(this, acc) : acc), v)
   }
-  return invoke
+  return fns.length > 0 ? invoke : id
 }
 
 const flattenToObj = (arr, base = {}) => Object.assign(base, ...arr)
@@ -27,9 +35,8 @@ function exclude(t, ...keys) {
 }
 
 function substitute(literals, values, removeEmpty) {
-  let falsyToEmpty = v => v || ''
-  let vals = Array.from(values, falsyToEmpty)
-  let lits = Array.from(literals, falsyToEmpty)
+  let vals = Array.from(values, v => v || '')
+  let lits = Array.from(literals, v => v || '')
   if (removeEmpty && lits.length > vals.length) {
     lits = [lits[0], ...lits.slice(1).map((l, i) => l || (vals[i] = ''))]
   }
@@ -40,4 +47,35 @@ function escapeRx(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-export { pipe, flattenToObj, exclude, substitute, escapeRx }
+function warnOn(warnCheck, msg) {
+  return /*@__PURE__*/ warnCheck() && console.error(msg)
+}
+let $devWarnOn = function() {}
+if (process.env.NODE_ENV !== 'production') {
+  $devWarnOn = warnOn
+}
+
+export { makeArray, pipe, flattenToObj, exclude, substitute, escapeRx, $devWarnOn }
+
+class Timer {
+  constructor(cb, wait, ms = 0) {
+    this.run = this.run.bind(this, cb, ms)
+    if (!wait) this.run()
+  }
+  get active() {
+    return !!this.ref
+  }
+  run(cb, ms) {
+    return (this.ref = setTimeout(this.stop.bind(this, cb), ms))
+  }
+  stop(cb) {
+    clearTimeout(this.ref)
+    this.ref = undefined
+    return cb && cb()
+  }
+}
+
+let isTimer = timer => (timer && timer instanceof Timer ? timer : false)
+let scheduleTask = (...args) => new Timer(...args)
+
+export { isTimer, scheduleTask }

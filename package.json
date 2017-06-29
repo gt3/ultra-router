@@ -1,6 +1,6 @@
 {
   "name": "ultra",
-  "version": "0.3.3",
+  "version": "0.4.1",
   "description": "Generic pushstate router for React and other component-based frameworks.",
   "main": "./lib/ultra.js",
   "module": "./lib/ultra.es.js",
@@ -20,9 +20,11 @@
   "license": "MIT",
   "devDependencies": {
     "babel-jest": "^20.0.3",
-    "babel-plugin-dev-expression": "^0.2.1",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-rewire": "^1.1.0",
+    "babel-plugin-transform-es2015-destructuring": "^6.23.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
+    "babel-plugin-transform-es2015-template-literals": "^6.22.0",
     "babel-preset-es2016": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "cross-env": "^4.0.0",
@@ -31,8 +33,9 @@
     "prettier": "^1.1.0",
     "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-re": "=1.0.2",
     "rollup-plugin-uglify": "^2.0.1",
-    "uglify-es": "^3.0.13"
+    "uglify-es": "^3.0.20"
   },
   "jest": {
     "testRegex": "(/test/.*\\.test\\.js$)",
@@ -40,11 +43,9 @@
       "/test/",
       "/node_modules/"
     ],
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testURL": "http://localhost:8080"
   },
-  "bundleDependencies": [
-    "warning"
-  ],
   "files": [
     "dist",
     "lib"

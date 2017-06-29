@@ -3,11 +3,19 @@ import { eq, neq, oeq, oneq, mock } from './helpers'
 import * as u from '../src/router/utils'
 
 describe('utils', function() {
+  it('makeArray', function() {
+    oeq(u.makeArray('xxx'), ['xxx'])
+    oeq(u.makeArray(42), [])
+    oeq(u.makeArray([42]), [42])
+    oeq(u.makeArray(''), [])
+    oeq(u.makeArray({}), [])
+  })
   it('pipe', function() {
     let inc = i => i + 1, sq = i => i * i
     eq(u.pipe(null, inc, sq)(1), 4)
     eq(u.pipe(sq, null, inc)(1), 2)
     eq(u.pipe(null)(1), 1)
+    eq(u.pipe()(1), 1)
   })
   it('flattenToObj', function() {
     let a = [], a2 = [{ x: 1 }, { y: 2 }], a3 = [{ x: { y: 1 } }]
@@ -68,5 +76,25 @@ describe('utils', function() {
     let escaped = u.escapeRx(escapeAll)
     eq(escaped, '\\'.concat(escapeAll.split('').join('\\')))
     assert.doesNotThrow(() => new RegExp(escaped))
+  })
+})
+describe('utils Timer', function() {
+  it('schedules timeout on instantiation', function(done) {
+    let t = u.scheduleTask(done)
+    assert(u.isTimer(t))
+    assert(!u.isTimer({}))
+    assert(t.active)
+  })
+  it('schedules timeout on demand', function(done) {
+    let t = u.scheduleTask(done, true)
+    assert(!t.active)
+    t.run()
+    assert(t.active)
+  })
+  it('stop clears timeout', function(done) {
+    let t = u.scheduleTask(() => asssert.fail('timer was stopped!'))
+    t.stop()
+    assert(!t.active)
+    setTimeout(done, 5)
   })
 })

@@ -1,6 +1,6 @@
 {
   "name": "ultra-router",
-  "version": "0.3.3",
+  "version": "0.4.1",
   "description": "Routing rules API for Ultra",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,12 +9,10 @@
   "keywords": [],
   "author": "Ankit Patel <gt3.someday@gmail.com>",
   "license": "MIT",
-  "dependencies": {
-    "warning": "^3.0.0"
-  },
   "files": [
     "spec.js",
     "match.js",
+    "dispatch.js",
     "utils.js",
     "utils-path.js"
   ]

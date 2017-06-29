@@ -1,15 +1,19 @@
 import babel from 'rollup-plugin-babel'
 import { minify } from 'uglify-es'
 import uglify from 'rollup-plugin-uglify'
-
+import replace from 'rollup-plugin-re'
 const compress = process.env.DIST === 'true'
+const babelPlugin = babel({exclude: 'node_modules/**', plugins: ["external-helpers"]})
 
 const lib = {
   entry: './src/index.js',
-  external: [ 'warning' ],
-  globals: { warning: 'warning' },
   plugins: [
-    babel({exclude: 'node_modules/**'})
+    babelPlugin,
+    replace({
+      patterns: [
+        { test: /\$devWarnOn\s*\(/g, replace: m => '/*@__PURE__*/' + m }
+      ]
+    })
   ],
   targets: [
     { format: 'es', dest: './lib/ultra.es.js' },
@@ -19,7 +23,13 @@ const lib = {
 
 const dist = Object.assign({}, lib, {
   plugins: [
-    babel({exclude: 'node_modules/**'}),
+    babelPlugin,
+    replace({
+      patterns: [
+        { test: /\$devWarnOn\s*\(/g, replace: m => '/*@__PURE__*/' + m },
+        { test: 'process.env.NODE_ENV', replace: "'production'" }
+      ]
+    }),
     uglify({}, minify)
   ],
   targets: [

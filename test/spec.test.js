@@ -1,14 +1,16 @@
 import assert from 'assert'
 import { eq, neq, oeq, oneq, mock } from './helpers'
 import SpecRewired from '../src/router/spec'
-import { prefixSpec, spec, check, assignValues } from '../src/router/spec'
+import { prefixSpec, spec, check, assignValues, miss } from '../src/router/spec'
 
 const getMatchX = SpecRewired.__GetDependency__('getMatchX')
 const litp = SpecRewired.__GetDependency__('literalp')
 const allx = SpecRewired.__GetDependency__('allx')
 const parsePathKey = SpecRewired.__GetDependency__('parsePathKey')
+const trimIdsValues = SpecRewired.__GetDependency__('trimIdsValues')
 const Path = SpecRewired.__GetDependency__('Path')
 const PathSpec = SpecRewired.__GetDependency__('PathSpec')
+//const MissSpec = SpecRewired.__GetDependency__('MissSpec')
 
 function escape(path, ...ids) {
   path = ids.reduce((acc, id) => acc.replace(id, litp), path)
@@ -51,6 +53,24 @@ describe('spec', function() {
       oeq(literals, [''])
     })
   })
+  it('trimIdsValues', function() {
+    let trim = trimIdsValues, ids, vals
+    ;[ids, vals] = trim(['x'], ['x', 'y'], [42, 43])
+    oeq(['y'], ids)
+    oeq([43], vals)
+    ;[ids, vals] = trim(['x', 'y'], ['x', 'y'], [42, 43])
+    oeq([], ids)
+    oeq([], vals)
+    ;[ids, vals] = trim(['y'], ['x', 'y'], [42, 43])
+    oeq(['x', 'y'], ids)
+    oeq([42, 43], vals)
+    ;[ids, vals] = trim([], ['x', 'y'], [42, 43])
+    oeq(['x', 'y'], ids)
+    oeq([42, 43], vals)
+    ;[ids, vals] = trim(['x'], [], [])
+    oeq([], ids)
+    oeq([], vals)
+  })
   it('assignValues', function() {
     let expected = { ':x': 42, ':y': 43 }
     oeq(assignValues('/:x', [42]), { ':x': 42 })
@@ -78,11 +98,15 @@ describe('Path: match', function() {
   it('should return empty object on no matches', function() {
     oeq(new Path('/a').match('/b'), {})
   })
-  it('exact should not be true for partial matches', function() {
+  it('exact should be true for exact matches', function() {
+    assert(new Path('/a').match(null, '/a').exact)
     assert(!new Path('/a').match(null, '/').exact)
     assert(!new Path('/').match(null, '/a').exact)
     assert(!new Path('').match(null, '/a').exact)
-    assert(new Path('/a').match(null, '/a').exact)
+    assert(!new Path('/a').match(null, '/').exact)
+    assert(new Path('/:id').match(null, '/a').exact)
+    assert(new Path('/:id/:id2').match(null, '/abc/').exact)
+    assert(!new Path('/:id/:id2').match(null, '/abc').exact)
   })
   it('passed should be true for all matches', function() {
     assert(new Path('/').match(null, '/a').passed)
@@ -94,9 +118,12 @@ describe('Path: match', function() {
     assert(new Path('/:x').match({ ':x': valid }, '/xxx').passed)
     eq(valid.mock.calls.length, 1)
     eq(valid.mock.calls[0][0], 'xxx')
-    oeq(valid.mock.calls[0][1], { ':x': 'xxx' })
+    oeq(valid.mock.calls[0][1], ['xxx'])
+    oeq(valid.mock.calls[0][2], [':x'])
     assert(!new Path('/:x').match({ ':x': invalid }, '/xxx').passed)
     eq(invalid.mock.calls.length, 1)
+    assert(new Path('/:id/:id2').match(check(':id2')(/^z/), '/abc/zzz').exact)
+    assert(!new Path('/:id/:id2').match(check(':id2')(/^z/), '/abc/xyz').exact)
   })
   it('should validate multiple values in a pathKey', function() {
     let valid = mock(true), invalid = mock(false)
@@ -108,7 +135,8 @@ describe('Path: match', function() {
     oeq(valid.mock.calls[0][0], 'xxx')
     oeq(valid.mock.calls[1][0], '')
     oeq(invalid.mock.calls[0][0], 'zzz')
-    oeq(valid.mock.calls[0][1], { ':x': 'xxx', ':y': '', ':z': 'zzz' })
+    oeq(valid.mock.calls[0][1], ['xxx', '', 'zzz'])
+    oeq(valid.mock.calls[0][2], [':x', ':y', ':z'])
   })
   it('should not invoke remaining checks once validation fails', function() {
     let valid = mock(true), invalid = mock(false)
@@ -152,23 +180,23 @@ describe('PathSpec', function() {
     it('should match primary and sub pathkeys', function() {
       let instance = spec('/', '/x', '/xy', '/xxx')()
       let { '/': a, '/x': b, '/xy': c, '/xxx': d } = instance.match(null, '/xxx')
-      assert(a.passed && !a.exact)
-      assert(b.passed && !b.exact)
-      assert(d.passed && d.exact)
+      assert(!a.exact)
+      assert(!b.exact)
+      assert(d.exact)
       assert(!c)
     })
     it('should stop matching if primary pathkey matched exactly', function() {
       let instance = spec('/xx', '/x')()
       let { '/xx': a, '/x': b } = instance.match(null, '/xx')
-      assert(a.passed && a.exact)
+      assert(a.exact)
       assert(!b)
     })
     it('should stop matching on first exact match', function() {
       let instance = spec('/', '/x', '/xy', '/xyy')()
       let { '/': a, '/x': b, '/xy': c, '/xyy': d } = instance.match(null, '/xy')
-      assert(a.passed && !a.exact)
-      assert(b.passed && !b.exact)
-      assert(c.passed && c.exact)
+      assert(!a.exact)
+      assert(!b.exact)
+      assert(c.exact)
       assert(!d)
     })
   })
@@ -197,6 +225,14 @@ describe('PathSpec', function() {
     instance = spec()(next)
     eq(instance.resolve(result, false), 'next')
   })
+  it('reject should call failure callback with result', function() {
+    let next = mock('next'), err = mock('err'), fail = mock('fail')
+    let instance = spec()(next, err, fail)
+    let result = { '/x': {} }
+    eq(instance.reject(result), 'fail')
+    eq(fail.mock.calls.length, 1)
+    eq(fail.mock.calls[0][0], result)
+  })
 })
 
 describe('PrefixSpec', function() {
@@ -209,14 +245,20 @@ describe('PrefixSpec', function() {
     eq(next.mock.calls[0][0].path, '/xyz')
   })
   it('should substitute identifier for values', function() {
-    let next = mock()
+    let next = mock(), prefix, pIds, pValues
     let instance = prefixSpec('/:x/000/:y', next)
     instance.match(null, { path: '/xxx/000/yyy/zzz' })
     eq(next.mock.calls.length, 1)
-    eq(next.mock.calls[0][0].prefix, '/xxx/000/yyy')
+    ;({ prefix, pIds, pValues } = next.mock.calls[0][0])
+    eq(prefix, '/xxx/000/yyy')
+    oeq(pIds, [':x', ':y'])
+    oeq(pValues, ['xxx', 'yyy'])
     instance.match(null, { path: '/xxx/000//zzz' })
     eq(next.mock.calls.length, 2)
-    eq(next.mock.calls[1][0].prefix, '/xxx/000/')
+    ;({ prefix, pIds, pValues } = next.mock.calls[1][0])
+    eq(prefix, '/xxx/000/')
+    oeq(pIds, [':x', ':y'])
+    oeq(pValues, ['xxx', ''])
   })
   it('should run checks on values to determine match', function() {
     let next = mock(), valid = mock(true), invalid = mock(false)
@@ -225,10 +267,25 @@ describe('PrefixSpec', function() {
     eq(next.mock.calls.length, 0)
     instance.match({ ':x': valid, ':y': valid }, { path: '/xxx/yyy/zzz' })
     eq(next.mock.calls.length, 1)
-    eq(next.mock.calls[0][0].prefix, '/xxx/yyy')
+    let { prefix, pIds, pValues } = next.mock.calls[0][0]
+    eq(prefix, '/xxx/yyy')
+    oeq(pIds, [':x', ':y'])
+    oeq(pValues, ['xxx', 'yyy'])
   })
   it('should return success false if prefix does not match', function() {
     let instance = prefixSpec('/x', mock(null))
     assert(!instance.match(null, { path: '/000' }).success)
+  })
+})
+
+describe('MissSpec', function() {
+  it('should resolve if all given pathKeys failed to match', function() {
+    let next = mock()
+    let instance = miss(next, '/x', '/y')
+    instance.match({})
+    eq(next.mock.calls.length, 1)
+    oeq(next.mock.calls[0][0].miss, ['/x', '/y'])
+    assert(!instance.match({ '/y': {} }))
+    eq(next.mock.calls.length, 1)
   })
 })

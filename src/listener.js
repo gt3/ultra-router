@@ -36,10 +36,13 @@ export default class Listener extends Set {
     ;[...super.values.call(this)]
       .filter(v => this.orphans.has(v))
       .map(v => super.delete.call(this, v))
-    if (this.size === 0) this.stopListen()
+    if (super.size === 0) this.stopListen()
     else yield* super.values.call(this)
   }
   values() {
     return Array.from(this)
+  }
+  get size() {
+    return this.values().length
   }
 }

@@ -1,32 +1,53 @@
 import { parseHref, env } from './router/utils-path'
-import { exclude } from './router/utils'
+import { escapeRx, exclude, substitute } from './router/utils'
 
-function verifyOrigin(href) {
-  return href.indexOf(env.location.protocol) !== 0 || href.indexOf(env.origin) === 0
+const originx = new RegExp(`^${escapeRx(env.origin)}|^(?!https?:\/\/)`)
+
+function retainQS(retain, currQS) {
+  let qs = retain && /\bqs\b/.test(retain) ? env.qs : ''
+  return currQS ? substitute([currQS, qs], ['&'], true) : qs
+}
+
+function retainHash(retain, currHash) {
+  return retain && /\bhash\b/.test(retain) ? env.hash : currHash
+}
+
+function retainQSHash(retain, loc) {
+  let qs = retainQS(retain, loc.qs)
+  let hash = retainHash(retain, loc.hash)
+  let href = substitute([loc.path, qs, hash], ['?', '#'], true)
+  return { href, qs, hash }
 }
 
 function verifyClick(e) {
   return !(e.defaultPrevented || e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
 }
 
-export function makeClickHandler({ href, state, docTitle }, action) {
-  function clickHandler(e) {
-    if (verifyClick(e) && verifyOrigin(href)) {
+export function makeClickHandler({ href, state, docTitle, retain }, action) {
+  const loc = Object.assign(parseHref(href), { state, docTitle })
+  let clickHandler = e => {
+    if (verifyClick(e) && originx.test(href)) {
       e.preventDefault()
-      action(clickHandler.loc)
+      action(retain ? Object.assign({}, loc, retainQSHash(retain, loc)) : loc)
     }
   }
-  clickHandler.loc = Object.assign(parseHref(href), { state, docTitle })
-  return clickHandler
+  return Object.assign(clickHandler, loc)
 }
 
-const defaultStyle = { touchAction: 'manipulation', msTouchAction: 'manipulation' }
-const ownKeys = ['createElement', 'getUltra', 'style', 'state', 'docTitle', 'navAction', 'onClick']
+function getNavAction(retain) {
+  return retain && /\bhistory\b/.test(retain) ? 'replace' : 'push'
+}
+
+export const defaultStyle = { touchAction: 'manipulation', msTouchAction: 'manipulation' }
+const ownKeys = ['createElement', 'getUltra', 'style', 'state', 'docTitle', 'retain', 'onClick']
 
 export function Anchor(props) {
-  let { href, createElement, getUltra, style, state, docTitle, navAction = 'push' } = props
+  let { href, createElement, getUltra, style, state, docTitle, retain } = props
   props = exclude(props, ...ownKeys)
-  props.onClick = makeClickHandler({ href, state, docTitle }, loc => getUltra()[navAction](loc))
+  let navAction = getNavAction(retain)
+  props.onClick = makeClickHandler({ href, state, docTitle, retain }, loc =>
+    getUltra()[navAction](loc)
+  )
   props.style = Object.assign({}, defaultStyle, style)
   return createElement('a', props)
 }

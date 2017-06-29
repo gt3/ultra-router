@@ -1,5 +1,5 @@
-import { isStr, flattenToObj, empty, substitute, escapeRx } from './utils'
-import { removeTrailingSlash, decodePath } from './utils-path'
+import { isStr, flattenToObj, empty, substitute, escapeRx, exclude, $devWarnOn } from './utils'
+import { removeTrailingSlash, decode } from './utils-path'
 
 const literalp = `([^\\s/]*)`
 const allx = /(?:)/
@@ -34,45 +34,58 @@ class Path {
   }
   findInvalid(checks, values) {
     let ids = this.identifiers, hasCheck = Object.prototype.hasOwnProperty.bind(checks)
-    let mapped = assignValues(this.key, values)
-    let callCheck = id => hasCheck(id) && !checks[id](mapped[id], mapped)
-    return empty(checks) ? -1 : values.findIndex((v, i) => callCheck(ids[i]))
+    let callCheck = (id, val) => hasCheck(id) && !checks[id](val, values, ids)
+    return empty(checks) ? -1 : values.findIndex((val, i) => callCheck(ids[i], val))
   }
   validate(checks, values) {
     let invalid = this.findInvalid(checks, values)
-    return invalid === -1 ? { values, passed: true } : { values: values.slice(0, invalid) }
+    return invalid === -1
+      ? { values, passed: true }
+      : { values: values.slice(0, invalid), exact: false }
   }
-  match(checks, href) {
-    let matches = this.matchx.exec(href)
+  match(checks, path) {
+    let matches = this.matchx.exec(path)
     if (!matches) return {}
-    let match = matches[0], values = matches.slice(1).map(decodePath)
-    let exact = match.length === href.length
-    return Object.assign(this.validate(checks, values), { match, exact })
+    let match = matches[0], values = matches.slice(1).map(decode)
+    let exact = match.length === path.length, ids = this.identifiers
+    return Object.assign({ ids, match, exact }, this.validate(checks, values))
   }
-  /*makeLink(values) {
-    return substitute(this.literals, values)
-  }*/
+}
+
+function trimIdsValues(sourceIds, targetIds, targetValues) {
+  let stopReplaceIndex = sourceIds.findIndex((sid, i) => targetIds[i] !== sid)
+  if (stopReplaceIndex === -1) stopReplaceIndex = sourceIds.length
+  return [targetIds.slice(stopReplaceIndex), targetValues.slice(stopReplaceIndex)]
 }
 
 class PathSpec {
-  constructor(pathKeys, next, err) {
+  constructor(pathKeys, next, err, fail) {
     if (!Array.isArray(pathKeys) || !pathKeys.length) pathKeys = [isStr(pathKeys) ? pathKeys : '']
     let paths = pathKeys.map(k => new Path(k))
-    Object.assign(this, { pathKeys, paths, next, err })
+    Object.assign(this, { pathKeys, paths, next, err, fail })
   }
   find(pathKey) {
     let idx = this.pathKeys.indexOf(pathKey)
     return idx > -1 && this.paths[idx]
   }
-  match(checks, href) {
+  match(checks, path) {
     let [primary, ...subs] = this.paths
-    let result, matches = primary.match(checks, href)
+    let result, matches = primary.match(checks, path)
     if (matches.passed) {
-      result = { [primary.key]: matches }
+      result = {
+        ids: matches.ids,
+        values: matches.values,
+        [primary.key]: exclude(matches, 'passed')
+      }
       if (!matches.exact) {
         subs.some(sub => {
-          let submatches = sub.match(checks, href)
-          if (submatches.passed) result[sub.key] = submatches
+          let submatches = sub.match(checks, path)
+          if (submatches.passed) {
+            let [ids, vals] = trimIdsValues(result.ids, submatches.ids, submatches.values)
+            result.ids = result.ids.concat(ids)
+            result.values = result.values.concat(vals)
+            result[sub.key] = exclude(submatches, 'passed')
+          }
           return submatches.exact
         })
       }
@@ -83,12 +96,16 @@ class PathSpec {
     return result && Object.keys(result).some(k => result[k].exact)
   }
   resolve(result, success = this.success(result)) {
+    $devWarnOn(() => !success, `Resolve location with a partial match: ${result && result.href}`)
     return !this.err || success ? this.next(result) : this.err(result)
+  }
+  reject(result) {
+    return this.fail && this.fail(result)
   }
 }
 
 export function spec(...pathKeys) {
-  return (next, err) => new PathSpec(pathKeys, next, err)
+  return (next, err, fail) => new PathSpec(pathKeys, next, err, fail)
 }
 
 class PrefixSpec extends PathSpec {
@@ -99,15 +116,15 @@ class PrefixSpec extends PathSpec {
     let { path } = msg, result = Object.assign({}, msg)
     let matches = super.match(checks, path)
     if (matches) {
-      let prefix = matches[this.prefixKey].match
-      result = super.resolve(Object.assign(result, { prefix }), true)
+      let { match: prefix, values: pValues, ids: pIds } = matches[this.prefixKey]
+      result = super.resolve(Object.assign(result, { prefix, pIds, pValues }), true)
     } else result.success = false
     return result
   }
 }
 
-export function prefixSpec(prefix, next) {
-  return new PrefixSpec(prefix, next)
+export function prefixSpec(prefixKey, next) {
+  return new PrefixSpec(prefixKey, next)
 }
 
 function rxFn(rxs) {
@@ -124,4 +141,17 @@ function rx(ids, ...rxs) {
 
 export function check(...ids) {
   return rx.bind(null, ids)
+}
+
+class MissSpec extends PathSpec {
+  match(result) {
+    let hasCheck = Object.prototype.hasOwnProperty.bind(result)
+    let miss = this.paths.filter(({ key }) => !hasCheck(key)).map(({ key }) => key)
+    let matched = miss.length === this.paths.length
+    return matched && super.resolve(Object.assign({}, result, { miss }), true)
+  }
+}
+
+export function miss(next, ...pathKeys) {
+  return new MissSpec(pathKeys, next)
 }
