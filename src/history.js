@@ -5,7 +5,7 @@ import { encodePath, env } from './router/utils-path'
 function invokeHandlers(handlers) {
   function invoke(event, fn) {
     let { href, path, qs, hash } = env, state = event.state
-    return fn({ href, path, qs, hash, state, event })
+    return fn({ href, path, qs, hash, state })
   }
   return event => handlers().forEach(invoke.bind(null, event))
 }
