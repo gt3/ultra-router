@@ -1,11 +1,11 @@
-# ` npm i --S ultra `
+# ` npm i --save ultra `
 
 
 
 
 
 
-Router for component-based UIs. Pair with React, or `<BYO web framework />`.
+Router for component-based JavaScript apps. Pair with React, or `<BYO web framework />`.
 
 
 USP
@@ -18,4 +18,5 @@ USP
   - Functional routing API to target different environments
   - Does not render component or fetch data
   - For modern browsers with pushstate support
+- Easier to test
   
