@@ -73,7 +73,7 @@ ultra.push('/weather?loc=abc') //resolve: a*.err
 - Compliments component-based architecture
   - Use conventions to map url string to component (sub)trees
 - Extensible and Compact
-  - Composable API provides clear separation between route configuration and runtime to target different environments  
+  - Composable API provides clear separation between route configuration and runtime to avail maximum reuse and target different environments  
   - Ideal for progressive web apps
     - No runtime dependencies
     - 5k > ultra (> preact)
