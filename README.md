@@ -1,4 +1,6 @@
-# ` npm i --save ultra `
+`npm i --save ultra`
+
+---
 
 - Setup centralized routing (matching and resolution) for your favorite news website
 ```JavaScript
@@ -31,15 +33,16 @@ let zipCheck = check(':zip')(/^$|^[0-9]$/) //allow nothing or digits
 let addZip = ({qs, path}) => prependPath(parseQS(qs, ['loc']), path)
 match(weatherSpec, zipCheck, addZip) //a*
 
-//replace a with a* above
+//replace a with a* in previous code block
+//assume query param loc is set externally
 
-//navigate
 ultra.push('/weather') //resolve: a*.next
 ultra.push('/weather?loc=90210') //resolve: a*.next with :zip = 90210
 ultra.push('/weather?loc=abc') //resolve: a*.err
 ```
 
-# _ultra_
+
+# ultra
 
 Router for component-based web apps. Pair with React, or `<BYOF />`.
 
@@ -52,17 +55,17 @@ Router for component-based web apps. Pair with React, or `<BYOF />`.
   - Use conventions to map url string to component (sub)trees
 - Extensible and Compact
   - Composable API marks a clear separation between route configuration and runtime to target different environments  
-  - For modern browsers with pushstate support
-  - Zero dependencies
-    - 5kB > ultra > Preact
+  - No runtime dependencies
+    - 5k > ultra (> preact)
 
 
 ## Trade-offs (YMMV)
+  - For modern browsers with pushstate support
   - Does not render component or fetch data
-  - Use of path keys (strings) to derive result
-    - might require more effort to make a change in app's url structure 
-    - minification of path keys (matters if you have various deeply nested routes e.g. Amazon)
-  - Switch (back) to centralized routing configuration for React folks
-
+  - Relies on use of path keys (strings) to derive result
+    - might require more effort to make a change in app's url structure
+    - Path keys (non-minified) may contribute to bloated bundles (matters if you have _various_ deeply nested routes e.g. Amazon)
+  - Return to centralized routing configuration for React folks
+  - Use in production - not just yet!
 
 
