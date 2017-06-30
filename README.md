@@ -1,8 +1,6 @@
-`npm i --save ultra`
+## Test-drive: `npm i --save ultra`
 
----
-
-- Setup centralized routing (matching and resolution) for your favorite news website
+- Setup centralized routing (matching and resolution) for a news portal
 ```JavaScript
 import { spec, match, prefixMatch, container } from 'ultra'
 
@@ -44,12 +42,7 @@ ultra.push('/weather') //resolve: a*.next
 ultra.push('/weather?loc=90210') //resolve: a*.next with :zip = 90210
 ultra.push('/weather?loc=abc') //resolve: a*.err
 ```
-
-
-# ultra
-
-Router for component-based web apps. Pair with React, or `<BYOF />`.
-
+---
 
 ## USP
 - Framework agnostic
@@ -59,19 +52,23 @@ Router for component-based web apps. Pair with React, or `<BYOF />`.
   - Use conventions to map url string to component (sub)trees
 - Extensible and Compact
   - Composable API provides clear separation between route configuration and runtime to target different environments  
-  - No runtime dependencies
+  - Ideal for progressive web apps
+    - No runtime dependencies
     - 5k > ultra (> preact)
+    - Code splitting friendly
 
 
-## Trade-offs (YMMV)
+## Trade-offs
   - For modern browsers with pushstate support
   - Does not render component or fetch data
   - Relies on use of path keys (strings) to derive result
     - might require more effort to make a change in app's url structure
     - Path keys (non-minified) may contribute to bloated bundles
       - especially true for apps with _multiple_ deeply nested routes, e.g. Amazon
-  - Return to centralized routing configuration for React folks
+  - Return to centralized routing configuration for React folks (_ymmv_)
   - Use in production - not just yet.
-  
 
+## License
+
+MIT
 
