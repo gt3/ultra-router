@@ -1,9 +1,13 @@
-# `npm i --save ultra`
+## `npm i --save ultra`
 
 ## Quick Intro
 - Setup centralized routing (matching and resolution) for a news portal
 ```JavaScript
 import { spec, match, prefixMatch, container } from 'ultra'
+
+let next = console.log.bind(console), err = console.warn.bind(console)
+
+//call next on exact match, err on partial match
 
 let matchers = [
   match(spec('/weather')(next)), //a
@@ -15,9 +19,9 @@ let matchers = [
 - Integrate with browser's PushState API to kickoff routing
 
 ```JavaScript
-let ultra = container(matchers)
+let ultra = container(matchers) //run
 
-// navigate
+// ultra points to the router instance, use it to navigate
 ultra.push('/news') //resolve: b.next
 ultra.push('/news/sports') //resolve: b.next
 ultra.push('/news/foo') //resolve: b.err
@@ -27,20 +31,23 @@ ultra.push('/news/foo') //resolve: b.err
 ```JavaScript
 import { check, parseQS, prependPath } from 'ultra'
 
+//add :zip identifier to our path key
 let weatherSpec = spec('/weather','/weather/:zip')(next, err)
+
+//validate value of identifier with check
 let zipCheck = check(':zip')(/^[0-9]{5}$/) //allow 5 digits
 
 //extract loc value from query string and append to path
 let addZip = ({qs, path}) => qs ? prependPath(parseQS(qs, ['loc']), path) : path
 
-//update matchers (a* replaces a in previous code block)
+//new matchers (a* replaces a in previous code block)
 matchers = [
   match(weatherSpec, zipCheck, addZip) //a*
   prefixMatch('/news', match(spec('/', '/politics', '/sports')(next, err))), //b
   match(spec('/')(next)) //c
 ]
 
-//make new container by passing new matchers and running instance
+//clone container by passing new matchers and current running instance
 ultra = container(matchers, null, ultra)
 
 //navigate
@@ -50,7 +57,12 @@ ultra.push('/weather') //resolve: a*.next
 ultra.push('/weather?loc=90210') //resolve: a*.next with :zip = 90210
 ultra.push('/weather?loc=abc') //resolve: a*.err
 ```
-[Run example on JSFiddle](https://jsfiddle.net/cheekyiscool/ktdmwx0o/)
+
+## [Test-drive](https://jsfiddle.net/cheekyiscool/ktdmwx0o/embedded/js,html,css,result/dark/)
+
+![Result](assets/ultra-news-example-result.png)
+---
+![JS](assets/ultra-news-example-js.png)
 ---
 
 ## USP
