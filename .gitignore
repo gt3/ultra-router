@@ -1,3 +1,4 @@
+Thumbs.db
 *.pem
 
 logs
@@ -8,3 +9,4 @@ dist
 node_modules
 .vscode
 coverage
+

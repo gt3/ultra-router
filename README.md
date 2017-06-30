@@ -59,7 +59,7 @@ ultra.push('/weather?loc=abc') //resolve: a*.err
 ```
 
 ## Test-drive
-- [Vanilla JS example](https://jsfiddle.net/cheekyiscool/ktdmwx0o/embedded/js,html,css,result/dark/)
+- [Vanilla JS example](https://jsfiddle.net/cheekyiscool/ktdmwx0o/embedded/js,html,css,result/dark/) (ctrl-click to open in new tab)
 
 ![Result](assets/ultra-news-example-result.png)
 
