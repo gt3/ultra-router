@@ -30,13 +30,17 @@ import { check, parseQS, prependPath } from 'ultra'
 
 let weatherSpec = spec('/weather/:zip')(next, err)
 let zipCheck = check(':zip')(/^$|^[0-9]$/) //allow nothing or digits
+
+//extract loc value from query string and append to path
 let addZip = ({qs, path}) => prependPath(parseQS(qs, ['loc']), path)
+
 match(weatherSpec, zipCheck, addZip) //a*
-
 //replace a with a* in previous code block
-//assume query param loc is set externally
 
+//navigate
 ultra.push('/weather') //resolve: a*.next
+
+//assume query param loc is set externally
 ultra.push('/weather?loc=90210') //resolve: a*.next with :zip = 90210
 ultra.push('/weather?loc=abc') //resolve: a*.err
 ```
@@ -54,7 +58,7 @@ Router for component-based web apps. Pair with React, or `<BYOF />`.
 - Compliments component-based architecture
   - Use conventions to map url string to component (sub)trees
 - Extensible and Compact
-  - Composable API marks a clear separation between route configuration and runtime to target different environments  
+  - Composable API provides clear separation between route configuration and runtime to target different environments  
   - No runtime dependencies
     - 5k > ultra (> preact)
 
@@ -64,8 +68,10 @@ Router for component-based web apps. Pair with React, or `<BYOF />`.
   - Does not render component or fetch data
   - Relies on use of path keys (strings) to derive result
     - might require more effort to make a change in app's url structure
-    - Path keys (non-minified) may contribute to bloated bundles (matters if you have _various_ deeply nested routes e.g. Amazon)
+    - Path keys (non-minified) may contribute to bloated bundles
+      - especially true for apps with _multiple_ deeply nested routes, e.g. Amazon
   - Return to centralized routing configuration for React folks
-  - Use in production - not just yet!
+  - Use in production - not just yet.
+  
 
 
