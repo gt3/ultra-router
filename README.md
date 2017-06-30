@@ -1,5 +1,6 @@
-## Test-drive: `npm i --save ultra`
+# `npm i --save ultra`
 
+## Quick Intro
 - Setup centralized routing (matching and resolution) for a news portal
 ```JavaScript
 import { spec, match, prefixMatch, container } from 'ultra'
@@ -27,7 +28,7 @@ ultra.push('/news/foo') //resolve: b.err
 import { check, parseQS, prependPath } from 'ultra'
 
 let weatherSpec = spec('/weather','/weather/:zip')(next, err)
-let zipCheck = check(':zip')(/^[0-9]{5}$/) //allow nothing or digits
+let zipCheck = check(':zip')(/^[0-9]{5}$/) //allow 5 digits
 
 //extract loc value from query string and append to path
 let addZip = ({qs, path}) => qs ? prependPath(parseQS(qs, ['loc']), path) : path
@@ -49,6 +50,7 @@ ultra.push('/weather') //resolve: a*.next
 ultra.push('/weather?loc=90210') //resolve: a*.next with :zip = 90210
 ultra.push('/weather?loc=abc') //resolve: a*.err
 ```
+[Run example on JSFiddle](https://jsfiddle.net/cheekyiscool/ktdmwx0o/)
 ---
 
 ## USP
