@@ -26,14 +26,21 @@ ultra.push('/news/foo') //resolve: b.err
 ```JavaScript
 import { check, parseQS, prependPath } from 'ultra'
 
-let weatherSpec = spec('/weather/:zip')(next, err)
-let zipCheck = check(':zip')(/^$|^[0-9]$/) //allow nothing or digits
+let weatherSpec = spec('/weather','/weather/:zip')(next, err)
+let zipCheck = check(':zip')(/^[0-9]{5}$/) //allow nothing or digits
 
 //extract loc value from query string and append to path
-let addZip = ({qs, path}) => prependPath(parseQS(qs, ['loc']), path)
+let addZip = ({qs, path}) => qs ? prependPath(parseQS(qs, ['loc']), path) : path
 
-match(weatherSpec, zipCheck, addZip) //a*
-//replace a with a* in previous code block
+//update matchers (a* replaces a in previous code block)
+matchers = [
+  match(weatherSpec, zipCheck, addZip) //a*
+  prefixMatch('/news', match(spec('/', '/politics', '/sports')(next, err))), //b
+  match(spec('/')(next)) //c
+]
+
+//make new container by passing new matchers and running instance
+ultra = container(matchers, null, ultra)
 
 //navigate
 ultra.push('/weather') //resolve: a*.next
