@@ -59,7 +59,12 @@ ultra.push('/weather?loc=abc') //resolve: a*.err
 ```
 
 ## Test-drive
-- [Vanilla JS example](https://jsfiddle.net/cheekyiscool/ktdmwx0o/embedded/js,html,css,result/dark/) (ctrl-click to open in new tab)
+- [Vanilla JS](https://jsfiddle.net/cheekyiscool/ktdmwx0o/embedded/js,html,css,result/dark/) (ctrl-click to open in JSFiddle)
+- [React](http://jsfiddle.net/cheekyiscool/4wpt096z/embedded/js,html,css,result/dark/)
+
+> In both examples, routing code is identical only the rendering logic changes. Harness the true power of component-based architecture!
+
+- Vue.js example coming soon...
 
 ![Result](assets/ultra-news-example-result.png)
 
