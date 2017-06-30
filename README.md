@@ -58,12 +58,13 @@ ultra.push('/weather?loc=90210') //resolve: a*.next with :zip = 90210
 ultra.push('/weather?loc=abc') //resolve: a*.err
 ```
 
-## [Test-drive](https://jsfiddle.net/cheekyiscool/ktdmwx0o/embedded/js,html,css,result/dark/)
+## Test-drive
+- [Vanilla JS example](https://jsfiddle.net/cheekyiscool/ktdmwx0o/embedded/js,html,css,result/dark/)
 
 ![Result](assets/ultra-news-example-result.png)
----
+
 ![JS](assets/ultra-news-example-js.png)
----
+
 
 ## USP
 - Framework agnostic
