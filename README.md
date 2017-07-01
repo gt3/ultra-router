@@ -2,7 +2,25 @@
 
 ### Quick Intro
 
-- Setup centralized routing (matching and resolution) for a news portal
+Imagine we're tasked to setup routes for a news portal startup. We'll use a rudimentary  navigation structure for the purpose of this exercise.
+
+```AsciiDoc
+                +----------+
+     +----------+   root   +---------+
+     |          +----------+         |
+     |                               |
+     |                               |
++----+-----+                   +-----+----+
+| weather  |                 +-+   news   +-+
++----------+                 | +----------+ |
+                             |              |
+                        +----+-----+  +-----+----+
+                        | politics |  |  sports  |
+                        +----------+  +----------+
+```
+
+
+- Code to setup centralized routing (matching and resolution) as shown below
 
 ```javascript
 
@@ -10,7 +28,8 @@ import { spec, match, prefixMatch, container } from 'ultra'
 
 let next = console.log.bind(console), err = console.warn.bind(console)
 
-// call next on exact match, err on partial match
+// when route resolves call next on exact match, err on partial match
+// log route result to the console (warn on partial match)
 
 let matchers = [
   match(spec('/weather')(next)), //a
@@ -45,15 +64,10 @@ let zipCheck = check(':zip')(/^[0-9]{5}$/) //allow 5 digits
 // extract loc value from query string and append to path
 let addZip = ({qs, path}) => qs ? prependPath(parseQS(qs, ['loc']), path) : path
 
-// new matchers (a* replaces a in previous code block)
-matchers = [
-  match(weatherSpec, zipCheck, addZip) //a*
-  prefixMatch('/news', match(spec('/', '/politics', '/sports')(next, err))), //b
-  match(spec('/')(next)) //c
-]
+let weatherMatch = match(weatherSpec, zipCheck, addZip) //a*
 
-// clone container by passing new matchers and current running instance
-ultra = container(matchers, null, ultra)
+// clone container: replace match (a -> a*), replace current instance
+ultra = container([weatherMatch, ...ultra.matchers.slice(1)], null, ultra)
 
 // navigate
 ultra.push('/weather') //resolve: a*.next
@@ -62,7 +76,7 @@ ultra.push('/weather') //resolve: a*.next
 ultra.push('/weather?loc=90210') //resolve: a*.next with :zip = 90210
 ultra.push('/weather?loc=abc') //resolve: a*.err
 ```
-News portal navigation log:
+- News portal navigation log
 
 ![Result](assets/ultra-news-example-result.png)
 
