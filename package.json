@@ -15,7 +15,7 @@
     "preversion": "cd ./src/router && cross-env npm version $npm_package_version && git add -A package.json && cd ../..",
     "postpublish": "cd ./src/router && npm publish"
   },
-  "repository": "gt3/ultra",
+  "repository": "gt3/ultra-router",
   "author": "Ankit Patel <gt3.someday@gmail.com>",
   "license": "MIT",
   "devDependencies": {
