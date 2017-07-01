@@ -95,10 +95,10 @@ Quote from one of my favorite React talks by Cheng Lou: [The Spectrum of Abstrac
   - For modern browsers with pushstate support
   - Does not render component or fetch data
   - Relies on use of path keys (strings) to derive result
-    - might require more effort to make a change in app's url structure
+    - More complex update process involves replacing path keys throughout the app
     - Path keys (non-minified) may contribute to bloated bundles
-      - especially true for apps with _multiple_ deeply nested routes, e.g. Amazon
-  - Overcome the notion of changing your routing code again this season, and actually do it. No pun intended.
+      - Concern for apps with _multiple_ deeply nested routes, e.g. Amazon
+  - For the Developer: Overcome the notion of changing your routing code again this season, and actually following through. No pun intended.
 
 ### License
 
