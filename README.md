@@ -79,12 +79,13 @@ This is true, in part because component-based design afforded us this level of  
 Quote from one of my favorite React talks by Cheng Lou: [The Spectrum of Abstraction](https://www.youtube.com/watch?v=mVVNJKv9esE) _#throwback_
 
 ### USP
-- Framework agnostic
-  - Independent of rendering or view layer
-- Compliments component-based architecture
+- Embrace component paradigm, stay framework agnostic
   - Use conventions to map url string to component (sub)trees
-- Extensible and Compact
+  - Independent of rendering or view layer
+    - Immune to complexity introduced by framework-level abstractions (context in React for e.g.)
+- Extensible
   - Composable API provides clear separation between route configuration and runtime to avail maximum reuse and target different environments
+- Compact
   - Ideal for mobile and progressive web apps
     - No runtime dependencies
     - 5k > ultra (> preact)
