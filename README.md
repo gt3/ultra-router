@@ -68,7 +68,7 @@ ultra.push('/weather?loc=abc') //resolve: a*.err
 ![JS](assets/ultra-news-example-js.png)
 
 ### Test-drive
-- [Vanilla JS](https://jsfiddle.net/cheekyiscool/ktdmwx0o/embedded/js,html,css,result/dark/) (ctrl-click to open in JSFiddle)
+- [JavaScript](https://jsfiddle.net/cheekyiscool/ktdmwx0o/embedded/js,html,css,result/dark/) (ctrl-click to open in JSFiddle)
 - [React](http://jsfiddle.net/cheekyiscool/4wpt096z/embedded/js,html,css,result/dark/)
 
 > ✅ Routing code is reused in these examples. Generally a good measure to suggest that the abstraction hit a sweet spot!
