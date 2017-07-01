@@ -1,4 +1,4 @@
-## `npm i --save ultra`
+## `npm i ultra`
 
 ### Quick Intro
 - Setup centralized routing (matching and resolution) for a news portal
