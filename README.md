@@ -58,6 +58,10 @@ ultra.push('/weather?loc=90210') //resolve: a*.next with :zip = 90210
 ultra.push('/weather?loc=abc') //resolve: a*.err
 ```
 
+![Result](assets/ultra-news-example-result.png)
+
+![JS](assets/ultra-news-example-js.png)
+
 ## Test-drive
 - [Vanilla JS](https://jsfiddle.net/cheekyiscool/ktdmwx0o/embedded/js,html,css,result/dark/) (ctrl-click to open in JSFiddle)
 - [React](http://jsfiddle.net/cheekyiscool/4wpt096z/embedded/js,html,css,result/dark/)
@@ -70,12 +74,6 @@ This is true, in part because component-based design afforded us this level of  
 > We're often not seeking for more power. We're seeking for more principled ways of using our existing power.
 
 Quote from one of my favorite React talks by Cheng Lou: [The Spectrum of Abstraction](https://www.youtube.com/watch?v=mVVNJKv9esE) _#throwback_
-
-
-
-![Result](assets/ultra-news-example-result.png)
-
-![JS](assets/ultra-news-example-js.png)
 
 
 ## USP
