@@ -1,6 +1,6 @@
 ## `npm i ultra`
 
-### Quick Intro
+### Quick 5-minute Intro
 
 Imagine we're tasked to setup routes for a news portal startup. We'll use a rudimentary  navigation structure for the purpose of this exercise.
 
@@ -11,14 +11,14 @@ Imagine we're tasked to setup routes for a news portal startup. We'll use a rudi
      |                               |
      |                               |
 +----+-----+                   +-----+----+
-| weather  |                 +-+   news   +-+
-+----------+                 | +----------+ |
-                             |              |
-                        +----+-----+  +-----+----+
-                        | politics |  |  sports  |
-                        +----------+  +----------+
-```
+| weather  |                +--+   news   +--+
++----------+                |  +----------+  |
+                            |                |
+                       +----+-----+    +-----+----+
+                       | politics |    |  sports  |
+                       +----------+    +----------+
 
+```
 
 - Code to setup centralized routing (matching and resolution) as shown below
 
@@ -39,18 +39,42 @@ let matchers = [
 
 ```
 
+Right away you'll notice that ordering matters (like we'd expect in other forms of pattern matching). For example, there's a valid reason why `c` cannot precede `a` or `b`, while `a` or `b` could switch places.
+
+The API usage so far consists of three functions: spec, match, and prefixMatch, that are used to build our routing logic.
+
+- _spec_ - accepts path keys + callback functions, returns spec object
+  - `fn(...pathKeys) => fn(...callbacks) => object`
+  - Order of path keys matters: in `b` for intance, `/` represents the primary path key, whereas `/politics` and `/sports` are secondary and could switch places
+  - Position of function arguments is fixed: `0:exact match, 1:partial match, 2:neither`
+- _match_ - accepts specs, checks, preMatch callback, returns match object
+  - `fn(spec or [...specs], check, preMatch) => object`
+  - Provide a spec object or an array of spec objects
+  - Latter 2 arguments: check and preMatch will be explored later
+- _prefixMatch_ -  accepts a prefix path key, match object, preMatch callback, returns prefix-wrapped match object
+  - `fn(prefix, match, preMatch) => object`
+  - `/news` path key is used as prefix for the containing match
+  - preMatch will be explored later
+
+> ✅ Composable API: prefixMatch composes over match, match composes over spec. 
+
+It's time to make our app browser-aware.
+
 - Integrate with browser's PushState API to kickoff routing
 
 ```javascript
 
-let ultra = container(matchers) // run
+let ultra = container(matchers) // run container in browser environment
 
 // use ultra to navigate
 ultra.push('/news') // resolve: b.next
 ultra.push('/news/sports') // resolve: b.next
 ultra.push('/news/foo') // resolve: b.err
 ```
-- Treat query string and hash fragments integral to routing
+
+That was easy! Although don't hit deploy just yet. The weather route could really use user's location to provide a better experience. The challenge is to figure out how to map query string `?loc=<zip>` to the weather route.
+
+- Treat query string and hash fragments integral to routing as shown below
 
 ```JavaScript
 import { check, parseQS, prependPath } from 'ultra'
@@ -66,7 +90,7 @@ let addZip = ({qs, path}) => qs ? prependPath(parseQS(qs, ['loc']), path) : path
 
 let weatherMatch = match(weatherSpec, zipCheck, addZip) //a*
 
-// clone container: replace match (a -> a*), replace current instance
+// clone container: replace match (a -> a*), replace ultra object
 ultra = container([weatherMatch, ...ultra.matchers.slice(1)], null, ultra)
 
 // navigate
@@ -76,6 +100,18 @@ ultra.push('/weather') //resolve: a*.next
 ultra.push('/weather?loc=90210') //resolve: a*.next with :zip = 90210
 ultra.push('/weather?loc=abc') //resolve: a*.err
 ```
+
+We were able to accomplish 3 critical tasks here:
+- Create a new match for `/weather` and `/weather/:zip`
+- Extract value of `:zip` from query string and validate
+- Update our container with the new matchers
+
+Notice the call to match: `match(weatherSpec, zipCheck, addZip) //a*`
+- addZip is our preMatch callback function that's invoked before the specs
+- zipCheck, a regexp literal, provides validation to determine match
+
+Finally a dry-run of our hard work will produce a similar result.
+
 - News portal navigation log
 
 ![Result](assets/ultra-news-example-result.png)
