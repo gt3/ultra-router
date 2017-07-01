@@ -1,7 +1,7 @@
 {
   "name": "ultra",
   "version": "0.4.1",
-  "description": "Generic pushstate router for React and other component-based frameworks.",
+  "description": "Router for component-based web apps. Pair with React, Preact, Vue.js, and others.",
   "main": "./lib/ultra.js",
   "module": "./lib/ultra.es.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "preversion": "cd ./src/router && cross-env npm version $npm_package_version && git add -A package.json && cd ../..",
     "postpublish": "cd ./src/router && npm publish"
   },
-  "repository": "react-circuit/ultra",
+  "repository": "gt3/ultra",
   "author": "Ankit Patel <gt3.someday@gmail.com>",
   "license": "MIT",
   "devDependencies": {

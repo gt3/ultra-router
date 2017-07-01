@@ -1,11 +1,11 @@
 {
   "name": "ultra-router",
   "version": "0.4.1",
-  "description": "Routing rules API for Ultra",
+  "description": "Core routing API of Ultra",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": "react-circuit/ultra",
+  "repository": "gt3/ultra",
   "keywords": [],
   "author": "Ankit Patel <gt3.someday@gmail.com>",
   "license": "MIT",
