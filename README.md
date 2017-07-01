@@ -1,6 +1,6 @@
 ## `npm i --save ultra`
 
-## Quick Intro
+### Quick Intro
 - Setup centralized routing (matching and resolution) for a news portal
 ```JavaScript
 import { spec, match, prefixMatch, container } from 'ultra'
@@ -62,7 +62,7 @@ ultra.push('/weather?loc=abc') //resolve: a*.err
 
 ![JS](assets/ultra-news-example-js.png)
 
-## Test-drive
+### Test-drive
 - [Vanilla JS](https://jsfiddle.net/cheekyiscool/ktdmwx0o/embedded/js,html,css,result/dark/) (ctrl-click to open in JSFiddle)
 - [React](http://jsfiddle.net/cheekyiscool/4wpt096z/embedded/js,html,css,result/dark/)
 - Vue.js example coming soon...
@@ -75,8 +75,7 @@ This is true, in part because component-based design afforded us this level of  
 
 Quote from one of my favorite React talks by Cheng Lou: [The Spectrum of Abstraction](https://www.youtube.com/watch?v=mVVNJKv9esE) _#throwback_
 
-
-## USP
+### USP
 - Framework agnostic
   - Independent of rendering or view layer
   - Built for React, Preact, et al., but adaptable for Vue.js, Polymer, Angular oob
@@ -89,18 +88,19 @@ Quote from one of my favorite React talks by Cheng Lou: [The Spectrum of Abstrac
     - 5k > ultra (> preact)
     - Code splitting friendly
 
-
-## Trade-offs
+### Trade-offs
   - For modern browsers with pushstate support
   - Does not render component or fetch data
   - Relies on use of path keys (strings) to derive result
     - might require more effort to make a change in app's url structure
     - Path keys (non-minified) may contribute to bloated bundles
       - especially true for apps with _multiple_ deeply nested routes, e.g. Amazon
-  - Return to centralized routing configuration for React folks (_ymmv_)
-  - Use in production - not just yet.
+  - Overcome the idea of changing your routing code again this season. No pun intended.
 
-## License
+### License
 
 MIT
 
+---
+
+> Handle a route or two without breaking a sweat. :crossed_swords: `ULTRA`
