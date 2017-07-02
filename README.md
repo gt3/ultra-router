@@ -4,7 +4,7 @@
 
 Imagine we're tasked to set up routes for a news portal startup. We'll use a rudimentary  navigation structure for the purpose of this exercise.
 
-```AsciiDoc
+```
                 +----------+
      +----------+   root   +---------+
      |          +----------+         |
@@ -147,7 +147,7 @@ Don't sweat it! We'll introduce more meaningful examples soon.
 - Extensible
   - Composable API provides clear separation between route configuration and runtime to avail maximum reuse and target different environments
 - Compact
-  - Ideal for mobile and progressive web apps
+  - Ideal for mobile/progressive web apps
     - No runtime dependencies
     - `4.6 kb > ultra (> preact)`
     - Code splitting friendly
