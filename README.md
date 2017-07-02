@@ -2,7 +2,7 @@
 
 ### Quick 5-minute Intro
 
-Imagine we're tasked to setup routes for a news portal startup. We'll use a rudimentary  navigation structure for the purpose of this exercise.
+Imagine we're tasked to set up routes for a news portal startup. We'll use a rudimentary  navigation structure for the purpose of this exercise.
 
 ```AsciiDoc
                 +----------+
@@ -155,7 +155,7 @@ Don't sweat it! We'll introduce more meaningful examples soon.
 ### Trade-offs
   - For modern browsers with pushstate support
   - Does not render component or fetch data
-    - `<eloborate>`
+    - `<elaborate>`
   - Relies on use of path keys (strings) to derive result
     - More complex update process involves replacing path keys throughout the app
     - Path keys (non-minified) may contribute to bloated bundles
