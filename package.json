@@ -8,7 +8,7 @@
     "test": "cross-env BABEL_ENV=test jest --useStderr",
     "cover": "cross-env BABEL_ENV=test jest --coverage",
     "format": "prettier --no-semi --single-quote --print-width 100 --write \"{src,test}/**/*.js\"",
-    "lint": "npm run format && eslint -c ./config/eslint/.eslintrc.json --ignore-path .gitignore src/**/*.js",
+    "lint": "npm run format && eslint --ignore-path .gitignore src/**/*.js",
     "build": "rollup -c && rollup -c --environment DIST",
     "prepublishOnly": "npm run lint && npm run build",
     "local": "npm run prepublishOnly && npm pack",
@@ -19,6 +19,7 @@
   "author": "Ankit Patel <gt3.someday@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@gt3/eslint-config": "gist:eb3f2c746d399500ec5d8937ecee59b3",
     "babel-jest": "^20.0.3",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-rewire": "^1.1.0",
@@ -45,6 +46,9 @@
     ],
     "testEnvironment": "node",
     "testURL": "http://localhost:8080"
+  },
+  "eslintConfig": {
+    "extends": "@gt3"
   },
   "files": [
     "dist",
