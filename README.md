@@ -131,7 +131,7 @@ This is true, in part because component-based design afforded us this level of  
 
 Quote from one of my favorite React talks by Cheng Lou: [The Spectrum of Abstraction](https://www.youtube.com/watch?v=mVVNJKv9esE) _#throwback_
 
-The [React example](#test-drive) might seem superficial as it does not really render a tree of components. However by keeping the rendering code concise, we're able to focus more on the routing part which was the goal of the exercise.
+The [React example](#test-drive) might seem superficial as it does not really render a tree of components. However by keeping the rendering code concise, we're able to focus on the routing, goal of the exercise.
 
 Don't sweat it! We'll introduce more meaningful examples soon.
 
