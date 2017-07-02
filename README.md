@@ -39,7 +39,9 @@ let matchers = [
 
 ```
 
-Right away you'll notice that ordering matters (like we'd expect in other forms of pattern matching). For example, there's a valid reason why `c` cannot precede `a` or `b`, while `a` or `b` could switch places.
+Right away you'll notice that ordering matters (like we'd expect in other forms of pattern matching). For example, there's a valid reason why `c` cannot precede `a` or `b`, while `a` or `b` could switch places based on the requirements given to us.
+
+> ✅ Equally important to note that no more than one match ever gets resolved.
 
 The API usage so far consists of three functions: spec, match, and prefixMatch, that are used to build our routing logic.
 
@@ -56,15 +58,16 @@ The API usage so far consists of three functions: spec, match, and prefixMatch, 
   - `/news` path key is used as prefix for the containing match
   - preMatch will be explored later
 
-> ✅ Composable API: prefixMatch composes over match, match composes over spec. 
+> ✅ Notice how the route configuration is composed out of small pieces. prefixMatch composes over match and match composes over spec.
 
-It's time to make our app browser-aware.
+Next we'll make a container compose over matches to enable navigation.
 
 - Integrate with browser's PushState API to kickoff routing
 
 ```javascript
 
-let ultra = container(matchers) // run container in browser environment
+// run container to begin interacting with the browser
+let ultra = container(matchers)
 
 // use ultra to navigate
 ultra.push('/news') // resolve: b.next
@@ -72,7 +75,7 @@ ultra.push('/news/sports') // resolve: b.next
 ultra.push('/news/foo') // resolve: b.err
 ```
 
-That was easy! Although don't hit deploy just yet. The weather route could really use user's location to provide a better experience. The challenge is to figure out how to map query string `?loc=<zip>` to the weather route.
+:shipit: That was easy! Although don't hit deploy just yet. The weather route could really use user's location to provide a better experience. The challenge is to figure out how to map query string `?loc=<zip>` to the weather route.
 
 - Treat query string and hash fragments integral to routing as shown below
 
@@ -110,7 +113,7 @@ Notice the call to match: `match(weatherSpec, zipCheck, addZip) //a*`
 - addZip is our preMatch callback function that's invoked before the specs
 - zipCheck, a regexp literal, provides validation to determine match
 
-Finally a dry-run of our hard work will produce a similar result.
+Finally a dry-run of our ~~hard~~ work should produce a similar result.
 
 - News portal navigation log
 
@@ -128,22 +131,31 @@ This is true, in part because component-based design afforded us this level of  
 
 Quote from one of my favorite React talks by Cheng Lou: [The Spectrum of Abstraction](https://www.youtube.com/watch?v=mVVNJKv9esE) _#throwback_
 
+The [React example](#test-drive) might seem superficial as it does not really render a tree of components. However by keeping the rendering code concise, we're able to focus more on the routing part which was the goal of the exercise.
+
+Don't sweat it! We'll introduce more meaningful examples soon.
+
+
 ### USP
 - Embrace component paradigm, stay framework agnostic
   - Use conventions to map url string to component (sub)trees
   - Independent of rendering or view layer
-    - Immune to complexity introduced by framework-level abstractions (context in React for e.g.)
+    - Routing should be immune to complexity introduced by framework-level abstractions (context in React for e.g.)
+- Co-locate routes to support scalability
+  - Routes are data. Similar types of information are best understood if they exist in the same space.
+  - On the other end, as relationships between components get more complex, it is best to leave route matching logic out of the mix.
 - Extensible
   - Composable API provides clear separation between route configuration and runtime to avail maximum reuse and target different environments
 - Compact
   - Ideal for mobile and progressive web apps
     - No runtime dependencies
-    - 5k > ultra (> preact)
+    - `4.6 kb > ultra (> preact)`
     - Code splitting friendly
 
 ### Trade-offs
   - For modern browsers with pushstate support
   - Does not render component or fetch data
+    - `<eloborate>`
   - Relies on use of path keys (strings) to derive result
     - More complex update process involves replacing path keys throughout the app
     - Path keys (non-minified) may contribute to bloated bundles
