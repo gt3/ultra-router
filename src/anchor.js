@@ -23,7 +23,7 @@ function verifyClick(e) {
   return !(e.defaultPrevented || e.button !== 0 || e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
 }
 
-export function makeClickHandler({ href, state, docTitle, retain }, action) {
+function makeClickHandler({ href, state, docTitle, retain }, action) {
   const loc = Object.assign(parseHref(href), { state, docTitle })
   let clickHandler = e => {
     if (verifyClick(e) && originx.test(href)) {
@@ -38,10 +38,10 @@ function getNavAction(retain) {
   return retain && /\bhistory\b/.test(retain) ? 'replace' : 'push'
 }
 
-export const defaultStyle = { touchAction: 'manipulation', msTouchAction: 'manipulation' }
+const defaultStyle = { touchAction: 'manipulation', msTouchAction: 'manipulation' }
 const ownKeys = ['createElement', 'getUltra', 'style', 'state', 'docTitle', 'retain', 'onClick']
 
-export function Anchor(props) {
+function anchor(props) {
   let { href, createElement, getUltra, style, state, docTitle, retain } = props
   props = exclude(props, ...ownKeys)
   let navAction = getNavAction(retain)
@@ -51,3 +51,5 @@ export function Anchor(props) {
   props.style = Object.assign({}, defaultStyle, style)
   return createElement('a', props)
 }
+
+export const a = { link: anchor }

@@ -6,12 +6,13 @@ import { eq, neq, oeq, oneq, mock } from './helpers'
 import * as u from '../src/router/utils-path'
 import { setOrigin, setLocation } from './helpers-jsdom'
 import AnchorRewired from '../src/anchor'
-import { Anchor, defaultStyle } from '../src/anchor'
+import { a } from '../src/anchor'
 import { container } from '../src/container'
 import { mockPushState, makeRandomPath, firePopstate } from './helpers-jsdom'
 import { prefixSpec, spec, check, assignValues, miss } from '../src/router/spec'
 import { toggle, toggleSelected, match, prefixMatch } from '../src/router/match'
 
+const defaultStyle = AnchorRewired.__GetDependency__('defaultStyle')
 const retainQSHash = AnchorRewired.__GetDependency__('retainQSHash')
 const getNavAction = AnchorRewired.__GetDependency__('getNavAction')
 const originx = AnchorRewired.__GetDependency__('originx')
@@ -60,7 +61,7 @@ describe('retain', function() {
   })
 })
 
-describe('Anchor', function() {
+describe('a.link', function() {
   let createElement, next, path, clickEvent, preventDefault
   beforeAll(function() {
     preventDefault = mock()
@@ -78,7 +79,7 @@ describe('Anchor', function() {
   it('end-to-end', function() {
     let ultra = container(match(spec(path)(next)), null, null, false)
     let getUltra = () => ultra
-    Anchor({ createElement, getUltra, href: path })
+    a.link({ createElement, getUltra, href: path })
     eq(createElement.mock.calls.length, 1)
     eq(createElement.mock.calls[0][0], 'a')
     assert(createElement.mock.calls[0][1])
@@ -92,7 +93,7 @@ describe('Anchor', function() {
   it('end-to-end with retain hash', function() {
     let ultra = container(match(spec(path)(next)), null, null, false)
     let getUltra = () => ultra, retain = 'hash'
-    Anchor({ createElement, getUltra, retain, href: path })
+    a.link({ createElement, getUltra, retain, href: path })
     let { onClick } = createElement.mock.calls[0][1]
     onClick(clickEvent)
     eq(next.mock.calls.length, 1)
@@ -100,20 +101,20 @@ describe('Anchor', function() {
     eq(href, path + '#' + u.env.hash)
   })
   it('apply default style', function() {
-    Anchor({ createElement, href: path })
+    a.link({ createElement, href: path })
     eq(createElement.mock.calls.length, 1)
     let { style } = createElement.mock.calls[0][1]
     oeq(style, defaultStyle)
   })
   it('override default style', function() {
     let override = { touchAction: 'something', msTouchAction: 'something', color: 'green' }
-    Anchor({ createElement, href: path, style: override })
+    a.link({ createElement, href: path, style: override })
     eq(createElement.mock.calls.length, 1)
     let { style } = createElement.mock.calls[0][1]
     oeq(style, override)
   })
   it('should enforce same origin', function() {
-    Anchor({ createElement, href: 'http://foo.com' + path })
+    a.link({ createElement, href: 'http://foo.com' + path })
     eq(createElement.mock.calls.length, 1)
     let { onClick } = createElement.mock.calls[0][1]
     eq(preventDefault.mock.calls.length, 0)
@@ -125,7 +126,7 @@ describe('Anchor', function() {
     event.preventDefault()
     assert(event.defaultPrevented)
     event.preventDefault = preventDefault
-    Anchor({ createElement, href: path })
+    a.link({ createElement, href: path })
     let { onClick } = createElement.mock.calls[0][1]
     onClick(event)
     eq(preventDefault.mock.calls.length, 0)
