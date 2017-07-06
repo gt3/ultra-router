@@ -16,15 +16,15 @@ function recordVisit(dispatch, msg) {
 }
 
 function guardDispatch(ultra, dispatch, loc) {
-  let [len, targetHref, confirm] = ultra.inhibitRecord, { href } = loc
+  let [len, tappedHref, confirm] = ultra.tapped, { href } = loc
   let msg = Object.assign({}, loc, { ultra })
   let ok = () => {
-    ultra.restore()
+    ultra.untap()
     return dispatch(msg)
   }
   let cancel = pipe(recalibrate, go).bind(null, msg)
   if (confirm && len === env.history.length) {
-    if (href !== targetHref) return confirm(ok, cancel, msg)
+    if (href !== tappedHref) return confirm(ok, cancel, msg)
   } else return ok()
 }
 
@@ -34,7 +34,7 @@ function navigate(ultra, dispatch, navAction, loc) {
 }
 
 function run(_matchers, _mismatchers, _popstate) {
-  let _inhibitRec = [], dispatch = recordVisit.bind(null, dispatcher(_matchers, _mismatchers))
+  let _tapped = [], dispatch = recordVisit.bind(null, dispatcher(_matchers, _mismatchers))
   let ultra = {
     visited: null,
     get popstate() {
@@ -46,14 +46,14 @@ function run(_matchers, _mismatchers, _popstate) {
     get mismatchers() {
       return _mismatchers
     },
-    get inhibitRecord() {
-      return _inhibitRec
+    get tapped() {
+      return _tapped
     },
-    restore() {
-      return (_inhibitRec = [])
+    untap() {
+      return (_tapped = [])
     },
-    inhibit(cb) {
-      return (_inhibitRec = [env.history.length, env.href, cb])
+    tap(cb) {
+      return (_tapped = [env.history.length, env.href, cb])
     },
     stop: _popstate.add(loc => guardDispatch(ultra, dispatch, loc)),
     nav: (action, loc) => navigate(ultra, dispatch, action, loc),

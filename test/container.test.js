@@ -18,7 +18,7 @@ const makeId = VisitRewired.__GetDependency__('makeId')
 let len = () => u.env.history.length
 
 describe('container #guardDispatch', function() {
-  let confirm, inhibitRecord, restore, dispatch, path
+  let confirm, tapped, untap, dispatch, path
   let state, visited, ultra, loc
   beforeEach(function() {
     path = makeRandomPath()
@@ -27,11 +27,11 @@ describe('container #guardDispatch', function() {
     loc = { href: path, path, state }
     dispatch = mock()
     confirm = mock()
-    restore = mock()
-    inhibitRecord = [len(), u.env.href, confirm]
-    ultra = { inhibitRecord, restore, visited }
+    untap = mock()
+    tapped = [len(), u.env.href, confirm]
+    ultra = { tapped, untap, visited }
   })
-  it('should confirm and allow navigation in inhibited state', function() {
+  it('should confirm and allow navigation in tapped state', function() {
     guardDispatch(ultra, dispatch, loc)
     eq(dispatch.mock.calls.length, 0)
     eq(confirm.mock.calls.length, 1)
@@ -41,11 +41,11 @@ describe('container #guardDispatch', function() {
     assert(ok)
     assert(cancel)
     ok()
-    eq(restore.mock.calls.length, 1)
+    eq(untap.mock.calls.length, 1)
     eq(dispatch.mock.calls.length, 1)
     eq(dispatch.mock.calls[0][0], msg)
   })
-  it('should confirm and forfeit navigation in inhibited state', function(done) {
+  it('should confirm and forfeit navigation in tapped state', function(done) {
     guardDispatch(ultra, dispatch, loc)
     eq(dispatch.mock.calls.length, 0)
     eq(confirm.mock.calls.length, 1)
@@ -64,26 +64,26 @@ describe('container #guardDispatch', function() {
       restorePushState()
       done()
     })
-    eq(restore.mock.calls.length, 0)
+    eq(untap.mock.calls.length, 0)
     eq(dispatch.mock.calls.length, 0)
 
     eq(go.mock.calls.length, 1)
     eq(go.mock.calls[0][0], -1)
   })
-  it('should dispatch if inhibitRecord is not set', function() {
-    guardDispatch({ inhibitRecord: [], restore }, dispatch, loc)
+  it('should dispatch if tapped is not set', function() {
+    guardDispatch({ tapped: [], untap }, dispatch, loc)
     eq(dispatch.mock.calls.length, 1)
   })
-  it('should dispatch if inhibitRecord is stale', function() {
+  it('should dispatch if tapped is stale', function() {
     let prev = len()
     window.history.pushState(null, null, u.env.path + '?test')
     eq(prev + 1, len())
     guardDispatch(ultra, dispatch, loc)
     eq(dispatch.mock.calls.length, 1)
-    eq(restore.mock.calls.length, 1)
+    eq(untap.mock.calls.length, 1)
   })
   it('should neither dispatch nor confirm when returning back to the original url', function() {
-    guardDispatch(ultra, dispatch, { href: ultra.inhibitRecord[1] })
+    guardDispatch(ultra, dispatch, { href: ultra.tapped[1] })
     eq(dispatch.mock.calls.length, 0)
     eq(confirm.mock.calls.length, 0)
   })
@@ -187,17 +187,17 @@ describe('container', function() {
     assert(ultra.visited)
     eq(next.mock.calls.length, 2)
   })
-  it('should allow inhibit/restore control on navigation', function() {
+  it('should allow tap/untap control on navigation', function() {
     let confirm = mock()
     ultra = container(match(spec(path)(next)), null, null, false)
     assert(!ultra.visited)
     eq(next.mock.calls.length, 0)
-    ultra.inhibit(confirm)
+    ultra.tap(confirm)
     ultra.push({ href: path, path })
     eq(confirm.mock.calls.length, 1)
     eq(next.mock.calls.length, 0)
     assert(!ultra.visited)
-    ultra.restore()
+    ultra.untap()
     ultra.push({ href: path + '?test', path })
     eq(next.mock.calls.length, 1)
     assert(ultra.visited)
