@@ -131,10 +131,6 @@ This is true, in part because component-based design afforded us this level of  
 
 Quote from one of my favorite React talks by Cheng Lou: [The Spectrum of Abstraction](https://www.youtube.com/watch?v=mVVNJKv9esE) _#throwback_
 
-The [React example](#test-drive) might seem superficial as it does not really render a tree of components. However by keeping the rendering code concise, we're able to focus on the routing, goal of the exercise.
-
-Don't sweat it! We'll introduce more meaningful examples soon.
-
 
 ### USP
 - Embrace component paradigm, stay framework agnostic
@@ -161,6 +157,11 @@ Don't sweat it! We'll introduce more meaningful examples soon.
     - Path keys (non-minified) may contribute to bloated bundles
       - Concern for apps with _multiple_ deeply nested routes, e.g. Amazon
   - For the Developer: Overcome the notion of changing your routing code again this season, and actually following through. No pun intended.
+
+### Resources
+
+- Code Examples (React)
+  - Vehicle shop: [jsfiddle](http://jsfiddle.net/cheekyiscool/1n7v87aq/embedded/js,html,result/dark/), [source](https://github.com/gt3/ultra-react/tree/master/examples/01.carshop)
 
 ### License
 
