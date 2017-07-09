@@ -123,7 +123,7 @@ Finally a dry-run of our ~~hard~~ work should produce a similar result.
 - [JavaScript](https://jsfiddle.net/cheekyiscool/ktdmwx0o/embedded/js,html,css,result/dark/) (ctrl-click to open in JSFiddle)
 - [React](http://jsfiddle.net/cheekyiscool/4wpt096z/embedded/js,html,css,result/dark/)
 
-You may skip to more thorough examples(#resources) or continue reading.
+You may skip to more thorough [examples](#resources) or continue reading.
 
 > ✅ Routing code is reused in these examples. Generally a good measure to suggest that the abstraction hit a sweet spot!
 
