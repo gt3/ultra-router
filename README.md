@@ -123,14 +123,15 @@ Finally a dry-run of our ~~hard~~ work should produce a similar result.
 - [JavaScript](https://jsfiddle.net/cheekyiscool/ktdmwx0o/embedded/js,html,css,result/dark/) (ctrl-click to open in JSFiddle)
 - [React](http://jsfiddle.net/cheekyiscool/4wpt096z/embedded/js,html,css,result/dark/)
 
+Try out more thorough examples [below](#resources).
+
 > ✅ Routing code is reused in these examples. Generally a good measure to suggest that the abstraction hit a sweet spot!
 
-This is true, in part because component-based design afforded us this level of  flexibility: choosing how micro or macro you want your module to be.
+This is true, in part because component-based design afforded us this level of flexibility: choosing how micro or macro you want your module to be.
 
 > We're often not seeking for more power. We're seeking for more principled ways of using our existing power.
 
 Quote from one of my favorite React talks by Cheng Lou: [The Spectrum of Abstraction](https://www.youtube.com/watch?v=mVVNJKv9esE) _#throwback_
-
 
 ### USP
 - Embrace component paradigm, stay framework agnostic
