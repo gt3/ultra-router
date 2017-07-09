@@ -2,7 +2,7 @@
 
 Simple pushstate navigation for your component-based web app.
 
-### USP
+### Benefits
 - Embrace component paradigm, stay framework agnostic
   - Use conventions to map url string to component (sub)trees
   - Independent of rendering or view layer
