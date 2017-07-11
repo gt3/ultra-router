@@ -1,4 +1,4 @@
-import { pipe, isTimer, $devWarnOn } from './utils'
+import { pipe, isTimer, makeArray, $devWarnOn } from './utils'
 import { normalizePath } from './utils-path'
 import { prefixSpec } from './spec'
 
@@ -14,13 +14,15 @@ export function toggle(match, newKey, newMatch) {
   return on
 }
 
-export function toggleSelected(matchers, key, replaceWith) {
+export function toggleSelected(matchers, key, replacements) {
   if (key === undefined) return matchers
   $devWarnOn(
     () => matchers.filter(m => m.key === key).length !== 1,
     `Not a unique match for toggle key: ${key}`
   )
-  return matchers.map(m => (m.key === key ? toggle(m, key, replaceWith) : m))
+  replacements = makeArray(replacements)
+  let replaced = 0
+  return matchers.map(m => (m.key === key ? toggle(m, key, replacements[replaced++]) : m))
 }
 
 function matcher(specs, checks, msg) {

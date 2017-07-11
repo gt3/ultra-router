@@ -56,6 +56,18 @@ describe('match: toggle', function() {
     let untouched = toggleSelected(matchers)
     eq(untouched, matchers)
   })
+  it('toggleSelected multiple replacements', function() {
+    let m1 = { key: 'x', match: mock(true), resolve: mock(), reject: mock() }
+    let m2 = { key: 'x', match: mock(true), resolve: mock(), reject: mock() }
+    let m3 = { key: 'x', match: mock(true), resolve: mock(), reject: mock() }
+    let newm1 = { key: 'x', match: mock(true), resolve: mock(), reject: mock() }
+    let newm3 = { key: 'x', match: mock(true), resolve: mock(), reject: mock() }
+    let matchers = toggleSelected([m1, m2, m3], 'x')
+    matchers = toggleSelected(matchers, 'x', [newm1, null, newm3])
+    eq(matchers[1], m2)
+    testToggle('x', newm1).on(matchers[0])
+    testToggle('x', newm3).on(matchers[2])
+  })
 })
 
 describe('match', function() {
