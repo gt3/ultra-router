@@ -20,7 +20,7 @@ export function toggleSelected(matchers, key, replacements) {
   let replaced = 0
   let result = matchers.map(m => (m.key === key ? toggle(m, key, replacements[replaced++]) : m))
   $devWarnOn(
-    () => replaced === 0 || replaced.length !== replacements.length,
+    () => replaced === 0 || replaced !== replacements.length,
     `${replaced} replacements issued for toggle key: ${key}`
   )
   return result
