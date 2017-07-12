@@ -28,10 +28,7 @@ let push = (success, msg) => {
 
 let replace = (success, msg) => {
   let { href, path, state, docTitle } = msg
-  $devWarnOn(
-    () => encodePath(path) !== path,
-    `Incorrect encoding. Use encodeURI on path: ${path}`
-  )
+  $devWarnOn(() => encodePath(path) !== path, `Incorrect encoding. Use encodeURI on path: ${path}`)
   env.history.replaceState(state, docTitle, href)
   if (success) return success(msg)
 }
