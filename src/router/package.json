@@ -1,6 +1,6 @@
 {
   "name": "ultra-router",
-  "version": "0.6.7",
+  "version": "0.6.8",
   "description": "Core routing API of Ultra",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
