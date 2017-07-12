@@ -37,11 +37,7 @@ describe('history pushstate simulated', function() {
     eq(u.env.history.length - hlen, 0)
     eq(cb.mock.calls.length, 1)
     replace(cb, { href: path, path })
-    eq(cb.mock.calls.length, 1)
-    replace(cb, { href: path, path, state })
-    eq(u.env.history.length - hlen, 0)
     eq(cb.mock.calls.length, 2)
-    eq(u.env.history.state, state)
   })
 })
 
