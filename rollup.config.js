@@ -17,7 +17,7 @@ const lib = {
   ],
   targets: [
     { format: 'es', dest: './lib/ultra.es.js' },
-    { format: 'umd', dest: './lib/ultra.js', moduleId: 'ultra', moduleName: 'Ultra' }
+    { format: 'umd', dest: './lib/ultra.js', moduleId: 'ultra', moduleName: 'ultra' }
   ]
 }
 
@@ -33,7 +33,7 @@ const dist = Object.assign({}, lib, {
     uglify({}, minify)
   ],
   targets: [
-    { format: 'umd', dest: './dist/ultra.min.js', moduleId: 'ultra', moduleName: 'Ultra' }
+    { format: 'umd', dest: './dist/ultra.min.js', moduleId: 'ultra', moduleName: 'ultra' }
   ]
 })
 

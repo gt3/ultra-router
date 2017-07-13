@@ -51,7 +51,7 @@ function warnOn(warnCheck, msg) {
   return /*@__PURE__*/ warnCheck() && console.error(msg)
 }
 let $devWarnOn = function() {}
-if (process.env.NODE_ENV !== 'production') {
+if (typeof process !== 'object' || process.env.NODE_ENV !== 'production') {
   $devWarnOn = warnOn
 }
 
