@@ -58,17 +58,18 @@ function run(_matchers, _mismatchers, _popstate) {
     stop: _popstate.add(loc => guardDispatch(ultra, dispatch, loc)),
     nav: (action, loc) => navigate(ultra, dispatch, action, loc),
     push: loc => ultra.nav(push, loc),
-    replace: loc => ultra.nav(replace, loc)
+    replace: loc => ultra.nav(replace, loc),
+    dispatch: () => ultra.nav((cb, msg) => cb(msg), env.href)
   }
   return ultra
 }
 
-export function container(matchers, mismatchers, instance, runDispatch = true) {
+export function container(matchers, mismatchers, instance, scheduleDispatch = !instance) {
   let { stop, popstate, visited } = instance || {}
   if (!popstate) popstate = createPopstate()
   let ultra = run(makeArray(matchers), makeArray(mismatchers), popstate)
   if (stop) stop.call(instance)
   if (Array.isArray(visited)) ultra.visited = visited
-  else if (runDispatch) ultra.nav((cb, msg) => cb(msg), env.href)
+  if (scheduleDispatch) setTimeout(ultra.dispatch)
   return ultra
 }
