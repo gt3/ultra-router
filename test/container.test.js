@@ -153,12 +153,12 @@ describe('container', function() {
     assert(ultra.visited)
     assert(next.mock.calls.length, 2)
   })
-  it('should not dispatch current loc if runDispatch is false', function() {
+  it('should not dispatch current loc if scheduleDispatch is false', function() {
     ultra = container(match(spec(path)(next)), null, null, false)
     jest.runAllTimers()
     assert(!ultra.visited)
   })
-  it('should not dispatch current loc when cloning a container', function() {
+  it('should not dispatch current loc if cloning a container', function() {
     let prev = len()
     window.history.pushState(null, null, path)
     eq(len(), prev + 1)
@@ -184,17 +184,23 @@ describe('container', function() {
     eq(ultra.visited, visited)
     eq(next.mock.calls.length, 1)
   })
-  it.skip('should dispatch current loc when cloning a container that has not dispatched', function() {
+  it('should dispatch current loc when cloning a container that has not dispatched', function() {
     let prev = len()
     window.history.pushState(null, null, path)
     eq(len(), prev + 1)
     mockPS()
 
     ultra = container(match(spec(path)(next)), miss(next, 'xxx'), null, false)
+
+    jest.runAllTimers()
+
     assert(!ultra.visited)
     eq(next.mock.calls.length, 0)
 
     ultra = container(ultra.matchers, ultra.mismatchers, ultra)
+
+    jest.runAllTimers()
+
     assert(ultra.visited)
     eq(next.mock.calls.length, 2)
   })

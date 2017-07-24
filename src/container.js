@@ -64,12 +64,13 @@ function run(_matchers, _mismatchers, _popstate) {
   return ultra
 }
 
-export function container(matchers, mismatchers, instance, scheduleDispatch = !instance) {
-  let { stop, popstate, visited } = instance || {}
+export function container(matchers, mismatchers, instance, scheduleDispatch) {
+  let { stop, popstate, visited } = instance || {}, isRunning = Array.isArray(visited)
+  if (scheduleDispatch === void 0) scheduleDispatch = !instance || !isRunning
   if (!popstate) popstate = createPopstate()
   let ultra = run(makeArray(matchers), makeArray(mismatchers), popstate)
   if (stop) stop.call(instance)
-  if (Array.isArray(visited)) ultra.visited = visited
+  if (isRunning) ultra.visited = visited
   if (scheduleDispatch) setTimeout(ultra.dispatch)
   return ultra
 }
