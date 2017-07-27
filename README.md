@@ -34,9 +34,10 @@ Add pushstate navigation to your component-based web app. Integrate seamlessly w
 ### Resources
 
 - [Quick start](https://github.com/gt3/ultra-router/wiki/Quick-start) (build navigation for a news website tutorial)
-- Code Examples (React)
-  - Vehicle shop: [jsfiddle](http://jsfiddle.net/cheekyiscool/1n7v87aq/embedded/js,html,result/dark/), [source](https://github.com/gt3/ultra-react/tree/master/examples/01.carshop)
-  - Tap (intercept routing): [jsfiddle](http://jsfiddle.net/cheekyiscool/y9f8j44u/embedded/js,html,result/dark/), [source](https://github.com/gt3/ultra-react/tree/master/examples/02.tap)
+- [react-ultra](https://github.com/gt3/react-ultra) (React bindings)
+  - Code examples
+    - Vehicle shop: [jsfiddle](http://jsfiddle.net/cheekyiscool/1n7v87aq/embedded/js,html,result/dark/), [source](https://github.com/gt3/react-ultra/tree/master/examples/01.carshop)
+    - Tap (intercept routing): [jsfiddle](http://jsfiddle.net/cheekyiscool/y9f8j44u/embedded/js,html,result/dark/), [source](https://github.com/gt3/react-ultra/tree/master/examples/02.tap)
   
 ### To-dos
 - Document API
@@ -44,7 +45,6 @@ Add pushstate navigation to your component-based web app. Integrate seamlessly w
 - Add Preact and Vue.js examples
 - Implement Node.js container for [ultra-router](https://www.npmjs.com/package/ultra-router)
 
-Also collecting :stars: 
 
 ### License
 
