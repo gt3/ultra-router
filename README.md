@@ -1,6 +1,10 @@
 ## `npm i ultra`
 
-Simple pushstate navigation for your component-based web app.
+Add pushstate navigation to your component-based web app. Integrate seamlessly with React, Preact, and Vue.
+
+| download | dependencies |
+| :----: | :----: |
+| `4.6 kb` | none |
 
 ### Benefits
 - Embrace component paradigm, stay framework agnostic
