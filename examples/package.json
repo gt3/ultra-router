@@ -1,0 +1,18 @@
+{
+  "name": "ultra-examples",
+  "version": "1.0.0",
+  "description": "ultra router examples",
+  "scripts": {
+    "r": "runnn targetDir=./react",
+    "start": "npm install && npm run r"
+  },
+  "repository": "gt3/ultra-router",
+  "author": "Ankit Patel <gt3.someday@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "runnn": "0.3.3"
+  },
+  "engines": {
+    "npm": ">=4.2.0"
+  }
+}
