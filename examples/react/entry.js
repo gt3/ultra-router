@@ -23,6 +23,7 @@ let renderRoot = (app, msg) =>
     <Ultra matchers={rootMatch} dispatch={false}>
       <div>
         <Use matchers={examplesMatch} />
+        <h3>Ultra router with React</h3>
         <ul>
           <TocLinks />
         </ul>
