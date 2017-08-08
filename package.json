@@ -1,6 +1,6 @@
 {
   "name": "ultra",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Router for component-based web apps. Pair with React, Preact, Vue.js, and others.",
   "main": "./lib/ultra.js",
   "module": "./lib/ultra.es.js",
