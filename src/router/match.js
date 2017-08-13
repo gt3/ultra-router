@@ -5,9 +5,9 @@ import { prefixSpec } from './spec'
 const off = () => false
 const turnOff = o => Object.assign(o, { match: off, resolve: off, reject: off })
 
-export function toggle(match, newKey, newMatch) {
-  let { off, key } = match
-  let on = off ? newMatch || off : turnOff({ off: newMatch || match })
+export function toggle(matcher, newKey, replacement) {
+  let { off, key } = matcher
+  let on = off ? replacement || off : turnOff({ off: replacement || matcher })
   on.key = newKey || key
   let hasAll = (o, ...props) => props.every(Object.prototype.hasOwnProperty.bind(o))
   $devWarnOn(() => !hasAll(on, 'match', 'resolve', 'reject'), `Match not well formed: ${on.key}`)
