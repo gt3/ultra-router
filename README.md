@@ -41,7 +41,6 @@ Add pushstate navigation to your component-based web app. Integrate seamlessly w
   - Loading modules and routes dynamically
   
 ### To-dos
-- Document API
 - Create automated cross-browser test suite
 - Add Preact and Vue.js examples
 - Implement Node.js container for [ultra-router](https://www.npmjs.com/package/ultra-router)
